@@ -1,0 +1,20 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block page_title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    {% block css_files %}{% endblock css_files %}
+    {% block js_files %}{% endblock js_files %}
+</head>
+<body>
+    <figure class='logo__figure'>
+        <img src="{% static 'assets/icons/logo.svg' %}" alt="SIGEU Logo">
+    </figure>
+
+    {% block content %}{% endblock content %}
+</body>
+</html>

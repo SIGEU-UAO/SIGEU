@@ -1,0 +1,101 @@
+{% extends 'authentication/layouts/form.html' %}
+{% load static %}
+
+{% block page_title %} Registro de Usuario {% endblock page_title %}  
+
+{% block css_files %}
+    <link rel="stylesheet" href="{% static 'authentication/css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'authentication/css/registro.css' %}">
+{% endblock css_files %}
+
+{% block js_files %}
+    <script defer src="{% static 'authentication/js/registro.js' %}" ></script>
+{% endblock js_files %}
+
+{% block content %}
+    <form class="form" method="POST">
+        {% csrf_token %}
+        <h1 class="form__title">Bienvenido a SIGEU 👋</h1>
+
+        <div class="form__row">
+            <div class="form__group">
+                {{ form.documento.label_tag }}
+                {{ form.documento }}
+                {{ form.documento.errors }}
+            </div>
+            <div class="form__group">
+                {{ form.nombre.label_tag }}
+                {{ form.nombre }}
+                {{ form.nombre.errors }}
+            </div>
+        </div>
+        <div class="form__row">
+            <div class="form__group">
+                {{ form.apellido.label_tag }}
+                {{ form.apellido }}
+                {{ form.apellido.errors }}
+            </div>
+            <div class="form__group">
+                {{ form.email.label_tag }}
+                {{ form.email }}
+                {{ form.email.errors }}
+            </div>
+        </div>
+        <div class="form__row">
+            <div class="form__group">
+                {{ form.telefono.label_tag }}
+                {{ form.telefono }}
+                {{ form.telefono.errors }}
+            </div>
+            <div class="form__group">
+                {{ form.rol.label_tag }}
+                {{ form.rol }}
+                {{ form.rol.errors }}
+            </div>
+        </div>
+
+        <div class="form__group">
+            {{ form.password1.label_tag }}
+            {{ form.password1 }}
+            {{ form.password1.errors }}
+        </div>
+
+        <div class="form__group">
+            {{ form.password2.label_tag }}
+            {{ form.password2 }}
+            {{ form.password2.errors }}
+        </div>
+
+        <!-- Campos por rol -->
+        <div id="campos-estudiante" class="form__row form__optional">
+            <div class="form__group">
+                {{ form.codigo_estudiante.label_tag }}
+                {{ form.codigo_estudiante }}
+                {{ form.codigo_estudiante.errors }}
+            </div>
+
+            <div class="form__group">
+                {{ form.programa.label_tag }}
+                {{ form.programa }}
+                {{ form.programa.errors }}
+            </div>
+        </div>
+
+        <div id="campos-docente" class="form__group form__optional hide">
+            {{ form.unidadAcademica.label_tag }}
+            {{ form.unidadAcademica }}
+            {{ form.unidadAcademica.errors }}
+        </div>
+
+        <div id="campos-secretaria" class="form__group form__optional hide">
+            {{ form.facultad.label_tag }}
+            {{ form.facultad }}
+            {{ form.facultad.errors }}
+        </div>
+
+        <div class="form__actions">
+            <button type="submit" class="form__button">Registrarse</button>
+            <p class="form__secondary">¿Ya tienes una cuenta? <a href="#">Iniciar Sesión</a></p>
+        </div>
+    </form>
+{% endblock content %}

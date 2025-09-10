@@ -1,3 +1,6 @@
 from django.shortcuts import render
+from .forms import *
 
-# Create your views here.
+def formulario_registro(request):
+    form = RegistroForm()
+    return render(request, "authentication/registro.html", { "form": form })
