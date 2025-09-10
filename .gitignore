@@ -1,0 +1,43 @@
+# ================================
+# Django + Python + Virtualenv
+# ================================
+
+# Archivos de entorno
+**/.env
+
+# Entornos virtuales
+**/.venv/
+**/venv/
+**/env/
+**/ENV/
+**/.python-version
+
+# Archivos de cache de Python
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
+
+# Migraciones compiladas
+**/migrations/*.pyc
+**/migrations/*.pyo
+**/migrations/__pycache__/
+
+# Base de datos SQLite (si la usas en dev)
+**/db.sqlite3
+**/db.sqlite3-journal
+
+# Archivos de logs
+**/*.log
+
+# Coverage / testing
+**/.coverage
+**/.coverage.*
+**/.cache
+**/.pytest_cache/
+**/coverage.xml
+**/htmlcov/
+
+# Archivos de IDEs
+**/.idea/
+**/.vscode/
+**/.ropeproject
