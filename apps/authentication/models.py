@@ -19,6 +19,7 @@ class UsuarioManager(BaseUserManager):
     
 class Usuario(AbstractBaseUser, PermissionsMixin):
     idUsuario = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID') # PK
+    numeroIdentificacion = models.CharField(max_length=10, unique=True)
     nombres = models.CharField(max_length=100)
     apellidos = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
@@ -35,3 +36,59 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f"{self.nombres} {self.apellidos} ({self.email})"
+    
+class Facultad(models.Model):
+    idUsuario = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID') # PK
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nombre
+    
+    class Meta:
+        db_table = "authentication_facultad"
+        verbose_name = "facultad"
+        verbose_name_plural = "facultades"
+    
+class Programa(models.Model):
+    idPrograma = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID') # PK
+    facultad = models.ForeignKey(Facultad, on_delete=models.CASCADE, related_name="programas")
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.nombre} (Facultad: {self.facultad.nombre})"
+    
+class UnidadAcademica(models.Model):
+    idUnidadAcademica = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID') # PK
+    facultad = models.ForeignKey(Facultad, on_delete=models.CASCADE, related_name="unidades_academicas")
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.nombre} (Facultad: {self.facultad.nombre})"
+    
+    class Meta:
+        db_table = "authentication_unidad_academica"
+        verbose_name = "unidad_academica"
+        verbose_name_plural = "unidades_academicas"
+    
+#Usuarios
+class Estudiante(models.Model):
+    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name="estudiante", primary_key=True)
+    codigo_estudiante = models.CharField(max_length=7, unique=True)
+    programa = models.ForeignKey(Programa, on_delete=models.CASCADE, related_name="estudiantes")
+
+    def __str__(self):
+        return f"{self.usuario.nombre} {self.usuario.apellido} ({self.codigo_estudiante})"
+    
+class Docente(models.Model):
+    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name="docente", primary_key=True)
+    unidadAcademica = models.ForeignKey(UnidadAcademica, on_delete=models.CASCADE, related_name="docentes")
+
+    def __str__(self):
+        return f"{self.usuario.nombre} {self.usuario.apellido} ({self.unidadAcademica.nombre})"
+    
+class Secretaria(models.Model):
+    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name="secretaria", primary_key=True)
+    facultad = models.ForeignKey(Facultad, on_delete=models.CASCADE, related_name="secretarias")
+
+    def __str__(self):
+        return f"{self.usuario.nombre} {self.usuario.apellido} ({self.facultad.nombre})"
