@@ -1,30 +1,27 @@
 from django.http import JsonResponse
-from .services.registro_service import RegistroService
-from .services.usuario_service import UsuarioService
-
-def usuarios_listar(request):
-    # 1) Pedimos al service la lista de usuarios (la view NO toca el ORM).
-    usuarios = UsuarioService.list()
-
-    # 2) Preparar el arreglo de salida (convertimos objetos a dicts simples).
-    resultado = []
-    for usuario in usuarios:  # nombre completo en el for (usuario)
-        resultado.append({
-            "id": usuario.idUsuario,     # PK del Usuario según tu modelo
-            "email": usuario.email,
-            "nombres": usuario.nombres,
-            "apellidos": usuario.apellidos,
-            "telefono": usuario.telefono,
-        })
-
-    # 3) Devolver JSON de la lista (safe=False porque devolvemos un array, no un dict).
-    return JsonResponse(resultado, safe=False)
-
+from django.shortcuts import render
+from .forms import RegistroForm
+from .services.RegistroService import RegistroService
 
 def formulario_registro(request):
+    # - GET: I render the HTML form so we can open it directly in the browser.
+    # - POST: I return JSON and delegate the creation logic to the service layer.
+    # If at some point we want this endpoint to be JSON-only (as in the doc), we can
+    # just remove the GET block below and keep POST + the 405 at the end.
+
+    if request.method == "GET":
+        # : I instantiate the form only to feed the template with fields/choices.
+        # The server-side validation still lives in the form if we ever call form.is_valid().
+        form = RegistroForm()
+        return render(request, "authentication/registro.html", {"form": form})
+
     if request.method == "POST":
+        # : I map incoming form field names to the keys the service expects.
+        # I intentionally keep the mapping explicit to make it easy to maintain if the form changes.
         rol = request.POST.get("rol")
-        registros = {
+
+        registro = {
+            # : The manager behind Usuario.objects.create_user will hash the password.
             "email": request.POST.get("email"),
             "password": request.POST.get("password1"),
             "nombres": request.POST.get("nombre"),
@@ -33,15 +30,23 @@ def formulario_registro(request):
             "numeroIdentificacion": request.POST.get("documento"),
             "rol": rol,
         }
-        if rol == "estudiante":
-            registros["codigo_estudiante"] = request.POST.get("codigo_estudiante")
-            registros["programa_id"] = request.POST.get("programa")
-        elif rol == "docente":
-            registros["unidad_academica_id"] = request.POST.get("unidadAcademica")
-        elif rol == "secretaria":
-            registros["facultad_id"] = request.POST.get("facultad")
 
-        usuario_id = RegistroService.registrar(registros)
+        # : Role-specific fields — I only attach what the service needs for each role.
+        if rol == "estudiante":
+            registro["codigo_estudiante"] = request.POST.get("codigo_estudiante")
+            registro["programa_id"] = request.POST.get("programa")
+        elif rol == "docente":
+            registro["unidad_academica_id"] = request.POST.get("unidadAcademica")
+        elif rol == "secretaria":
+            registro["facultad_id"] = request.POST.get("facultad")
+
+        #: I delegate to the service. The service encapsulates all business decisions
+        # (create Usuario + role entity). If the service raises, we can wrap this in try/except
+        # and return a 400; I'm keeping it minimal for now because that's what we agreed on.
+        usuario_id = RegistroService.registrar(registro)
+
+        #: 201 Created because we actually created a resource (the user).
         return JsonResponse({"id": usuario_id, "message": "registro creado"}, status=201)
 
-    return JsonResponse({"error": "usa POST"}, status=405)
+    # : For any other HTTP method, I return an explicit 405 to be clear about allowed verbs.
+    return JsonResponse({"error": "método no permitido"}, status=405)
