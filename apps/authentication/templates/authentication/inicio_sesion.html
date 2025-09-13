@@ -1,0 +1,46 @@
+{% extends 'authentication/layouts/form.html' %}
+{% load static %}
+
+{% block page_title %} Iniciar Sesión {% endblock page_title %}
+
+{% block css_files %}
+  <link rel="stylesheet" href="{% static 'authentication/css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'authentication/css/inicio_sesion.css' %}">
+{% endblock css_files %}
+
+{% block js_files %}{% endblock js_files %}
+
+{% block content %}
+  <form class="form form--login" method="POST" novalidate>
+    {% csrf_token %}
+
+    <h1 class="form__title">Inicia Sesión en SIGEU 👋</h1>
+
+    {{ form.non_field_errors }}
+
+    <div class="form__group">
+      {{ form.email.label_tag }}
+      {{ form.email }}
+      {{ form.email.errors }}
+    </div>
+    
+    <div class="form__group">
+      {{ form.password.label_tag }}
+      {{ form.password }}
+      {{ form.password.errors }}
+    </div>
+
+    <div class="form__actions">
+      <button type="submit" class="form__button">Iniciar sesión</button>
+
+      <p class="form__secondary">
+        <a href="#" class="form__link">¿Olvidaste tu contraseña?</a>
+      </p>
+
+      <p class="form__tertiary">
+        ¿No tienes cuenta?
+        <a href="{%  url "registro"%}" class="form__link">Registrarse</a>
+      </p>
+    </div>
+  </form>
+{% endblock content %}

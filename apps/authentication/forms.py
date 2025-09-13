@@ -26,7 +26,7 @@ class RegistroForm(forms.Form):
         queryset=Programa.objects.all(),
         label="Selecciona un Programa",
         empty_label="-- Elige un Programa --",
-        required=True
+        required=False
     )
 
     #* Docente
@@ -34,7 +34,7 @@ class RegistroForm(forms.Form):
         queryset=UnidadAcademica.objects.all(),
         label="Selecciona una Unidad Académica",
         empty_label="-- Elige una Unidad Académica --",
-        required=True
+        required=False
     )
 
     #* Secretaria
@@ -42,7 +42,7 @@ class RegistroForm(forms.Form):
         queryset=Facultad.objects.all(),
         label="Selecciona una Facultad",
         empty_label="-- Elige una Facultad --",
-        required=True
+        required=False
     )
 
     # Validación de campos obligatorios según rol
@@ -61,3 +61,7 @@ class RegistroForm(forms.Form):
         elif rol == "secretaria":
             if not cleaned_data.get("facultad"):
                 self.add_error("facultad", "Este campo es obligatorio para secretarias académicas")
+
+class InicioSesionForm(forms.Form):
+    email = forms.EmailField(label="Correo electrónico", required=True)
+    password = forms.CharField(label="Contraseña", widget=forms.PasswordInput, required=True)

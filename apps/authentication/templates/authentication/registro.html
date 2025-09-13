@@ -9,7 +9,8 @@
 {% endblock css_files %}
 
 {% block js_files %}
-    <script defer src="{% static 'authentication/js/registro.js' %}" ></script>
+    <script defer type="module" src="{% static 'authentication/js/registro.js' %}" ></script>
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
 {% endblock js_files %}
 
 {% block content %}
@@ -95,7 +96,7 @@
 
         <div class="form__actions">
             <button type="submit" class="form__button">Registrarse</button>
-            <p class="form__secondary">¿Ya tienes una cuenta? <a href="#">Iniciar Sesión</a></p>
+            <p class="form__secondary">¿Ya tienes una cuenta? <a href="{%url "inicio_sesion"%}">Iniciar Sesión</a></p>
         </div>
     </form>
 {% endblock content %}

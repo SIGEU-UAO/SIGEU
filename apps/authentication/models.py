@@ -77,18 +77,18 @@ class Estudiante(models.Model):
     programa = models.ForeignKey(Programa, on_delete=models.CASCADE, related_name="estudiantes")
 
     def __str__(self):
-        return f"{self.usuario.nombre} {self.usuario.apellido} ({self.codigo_estudiante})"
+        return f"{self.usuario.nombres} {self.usuario.apellidos} ({self.codigo_estudiante})"
     
 class Docente(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name="docente", primary_key=True)
     unidadAcademica = models.ForeignKey(UnidadAcademica, on_delete=models.CASCADE, related_name="docentes")
 
     def __str__(self):
-        return f"{self.usuario.nombre} {self.usuario.apellido} ({self.unidadAcademica.nombre})"
+        return f"{self.usuario.nombres} {self.usuario.apellidos} ({self.unidadAcademica.nombre})"
     
 class Secretaria(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name="secretaria", primary_key=True)
     facultad = models.ForeignKey(Facultad, on_delete=models.CASCADE, related_name="secretarias")
 
     def __str__(self):
-        return f"{self.usuario.nombre} {self.usuario.apellido} ({self.facultad.nombre})"
+        return f"{self.usuario.nombres} {self.usuario.apellidos} ({self.facultad.nombre})"
