@@ -1,5 +1,6 @@
-# apps/authentication/services/registro_service.py
 from django.db import IntegrityError
+from django.contrib.auth.models import Group
+
 
 from ..models import (
     Usuario,
@@ -38,20 +39,25 @@ class RegistroService:
         try:
             if rol == "estudiante":
                 programa = Programa.objects.get(pk=data["programa_id"])
+                estudiantes = Group.objects.get(name="Estudiantes")      
                 Estudiante.objects.create(
                     usuario=usuario,
                     codigo_estudiante=data["codigo_estudiante"],
                     programa=programa,
                 )
+                usuario.groups.add(estudiantes)
 
             elif rol == "docente":
+                docentes = Group.objects.get(name="Docentes") 
                 unidad = UnidadAcademica.objects.get(pk=data["unidad_academica_id"])
                 Docente.objects.create(usuario=usuario, unidadAcademica=unidad)
+                usuario.groups.add(docentes) 
 
             elif rol == "secretaria":
+                secretarias = Group.objects.get(name="Secretarias") 
                 facultad = Facultad.objects.get(pk=data["facultad_id"])
                 Secretaria.objects.create(usuario=usuario, facultad=facultad)
-
+                usuario.groups.add(secretarias)
 
         except (Programa.DoesNotExist, UnidadAcademica.DoesNotExist, Facultad.DoesNotExist) as e:
             usuario.delete()
