@@ -8,7 +8,11 @@
   <link rel="stylesheet" href="{% static 'authentication/css/inicio_sesion.css' %}">
 {% endblock css_files %}
 
-{% block js_files %}{% endblock js_files %}
+{% block js_files %}
+  <script defer type="module" src="{% static 'authentication/js/inicio_sesion.js' %}"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+{% endblock js_files %}
 
 {% block content %}
   <form class="form form--login" method="POST" novalidate>

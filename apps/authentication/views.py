@@ -1,9 +1,12 @@
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.urls import reverse
+from django.views import View
 from .forms import RegistroForm, InicioSesionForm
 from .services.RegistroService import RegistroService
 from .services.InicioSesionService import InicioSesionService
-from django.db import IntegrityError
+from django.http import HttpResponseRedirect
+
 
 def _mensaje_integridad(e: Exception) -> str:
     s = str(e).lower()
@@ -15,8 +18,8 @@ def _mensaje_integridad(e: Exception) -> str:
         return "Ese código de estudiante ya existe."
     return "Datos duplicados: ya existe un registro con esos valores."
 
-def formulario_registro(request):
 
+def formulario_registro(request):
     if request.method == "GET":
         form = RegistroForm()
         return render(request, "authentication/registro.html", {"form": form})
@@ -52,24 +55,67 @@ def formulario_registro(request):
 
 
 def inicio_sesion(request):
-    # GET -> muestra el formulario HTML correcto
     if request.method == "GET":
         form = InicioSesionForm()
         return render(request, "authentication/inicio_sesion.html", {"form": form})
- 
-    # POST -> ejemplo simple usando el service
+
     if request.method == "POST":
         form = InicioSesionForm(request.POST)
         if not form.is_valid():
-            # re-render con errores del form
-            return render(request, "authentication/inicio_sesion.html", {"form": form}, status=400)
+            errors = {field: list(errs) for field, errs in form.errors.items()}
+            return JsonResponse({"error": "invalid_form", "errors": errors}, status=400)
 
         email = form.cleaned_data["email"]
         password = form.cleaned_data["password"]
 
-        ok, user_id = InicioSesionService.autenticar(email, password)
-        if ok:
-            return JsonResponse({"message": "login ok", "id": user_id})
-        return JsonResponse({"error": "credenciales inválidas"}, status=401)
+        result = InicioSesionService.iniciar(request, email, password)
 
-    return JsonResponse({"error": "método no permitido"}, status=405)
+        if not result.get("ok"):
+            # [ADICIÓN] devolver JSON con el error para que el front (notyf) lo muestre
+            code = result.get("error")
+            if code == "missing_fields":
+                return JsonResponse({"error": "Faltan el correo y/o la contraseña."}, status=400)
+            if code == "invalid_credentials":
+                return JsonResponse({"error": "Correo o contraseña incorrectos."}, status=401)
+            if code == "inactive_account":
+                return JsonResponse({"error": "Tu cuenta está inactiva. Contacta al administrador."}, status=403)
+            return JsonResponse({"error": "Error desconocido al iniciar sesión."}, status=400)
+
+       
+        request.session["usuario_id"] = result["user_id"]                  
+        request.session["rol"] = (request.user.groups.first().name if request.user.groups.exists() else "Sin grupo")  # [ADICIÓN]
+        request.session["nombre"] = f"{getattr(request.user, 'nombres', '')} {getattr(request.user, 'apellidos', '')}".strip()  # [ADICIÓN]
+
+        # Devolver JSON de éxito para que el front haga el redirect y muestre notyf
+        return JsonResponse({"message": "Inicio de sesión exitoso", "id": result["user_id"]}, status=200)
+
+    return JsonResponse({"error": "Método no permitido."}, status=405)
+
+
+class InicioSesionView(View):
+    template_name = "authentication/inicio_sesion.html"
+
+    def get(self, request):
+        return render(request, self.template_name, {"form": InicioSesionForm()})
+
+    def post(self, request):
+        form = InicioSesionForm(request.POST)
+        email = form.cleaned_data["email"]
+        password = form.cleaned_data["password"]
+
+        result = InicioSesionService.iniciar(request, email, password)
+        if not result.get("ok"):
+            code = result.get("error")
+            if code == "missing_fields":
+                return JsonResponse({"error": "Faltan el correo y/o la contraseña."}, status=400)
+            if code == "invalid_credentials":
+                return JsonResponse({"error": "Correo o contraseña incorrectos."}, status=401)
+            if code == "inactive_account":
+                return JsonResponse({"error": "Tu cuenta está inactiva. Contacta al administrador."}, status=403)
+            return JsonResponse({"error": "Error desconocido al iniciar sesión."}, status=400)
+
+        request.session["usuario_id"] = result["user_id"]
+        request.session["rol"] = (request.user.groups.first().name if request.user.groups.exists() else "Sin grupo")
+        request.session["nombre"] = f"{getattr(request.user, 'nombres', '')} {getattr(request.user, 'apellidos', '')}".strip()
+
+        return JsonResponse({"message": "Inicio de sesión exitoso", "id": result["user_id"]}, status=200)
