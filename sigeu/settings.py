@@ -141,5 +141,4 @@ LOGIN_URL = "login"
 # Modelo de usuario personalizado
 AUTH_USER_MODEL = "authentication.Usuario"
 
-SESSION_COOKIE_AGE = 60 * 60 * 24 * 7  # una semanA
-
+SESSION_COOKIE_AGE = 60 * 60 * 24   # 24 horas

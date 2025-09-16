@@ -1,5 +1,5 @@
 .form{
-    max-width: 677px;
+    max-width: 820px;
     background-color: #fff;
     padding: 48px;
     border-radius: 24px;
@@ -44,9 +44,10 @@
     font-size: 18px;
 }
 
-.form__group #id_documento{
+.form__group .form__input[type='number'] {
     font-family: Arial, Helvetica, sans-serif;
 }
+
 
 .form__optional.hide{
     display: none;

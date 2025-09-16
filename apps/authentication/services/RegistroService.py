@@ -1,16 +1,6 @@
 from django.db import IntegrityError
 from django.contrib.auth.models import Group
-
-
-from ..models import (
-    Usuario,
-    Estudiante,
-    Docente,
-    Secretaria,
-    Programa,
-    UnidadAcademica,
-    Facultad,
-)
+from ..models import *
 
 class RegistroService:
     @staticmethod
@@ -76,17 +66,3 @@ class RegistroService:
 
         return usuario.idUsuario
     
-    @staticmethod
-    def listar_usuarios():
-        
-        usuarios = []
-        for usuario in Usuario.objects.all().order_by("idUsuario"):
-            usuarios.append({
-                "id": usuario.idUsuario,
-                "email": usuario.email,
-                "nombres": usuario.nombres,
-                "apellidos": usuario.apellidos,
-                "telefono": usuario.telefono,
-                "numeroIdentificacion": usuario.numeroIdentificacion,
-            })
-        return usuarios

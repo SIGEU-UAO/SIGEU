@@ -10,22 +10,36 @@ def create_default_groups(apps, schema_editor):
     secretarias, _ = Group.objects.get_or_create(name="Secretarias")
     administradores, _ = Group.objects.get_or_create(name="Administradores")
 
-    codenames_secretaria = [
-        "view_programa",
-        "view_unidadacademica",
-        "view_facultad",
-        "view_estudiante",
-        "view_docente",
-    ]
-    secretaria_perms = list(
+    permisos = {
+        "estudiantes": ["view_estudiante", "change_estudiante"],
+        "docentes": ["view_docente", "view_programa", "view_unidadacademica"],
+        "secretarias": [
+            "view_programa",
+            "view_unidadacademica",
+            "view_facultad",
+            "view_estudiante",
+            "view_docente",
+        ],
+        # Administradores no necesitan permisos aquí, superuser los tiene todos
+    }
+    estudiantes.permissions.set(
         Permission.objects.filter(
-            codename__in=codenames_secretaria,
+            codename__in=permisos["estudiantes"],
             content_type__app_label="authentication",
         )
     )
-    secretarias.permissions.set(secretaria_perms)
-    estudiantes.permissions.clear()
-    docentes.permissions.clear()
+    docentes.permissions.set(
+        Permission.objects.filter(
+            codename__in=permisos["docentes"],
+            content_type__app_label="authentication",
+        )
+    )
+    secretarias.permissions.set(
+        Permission.objects.filter(
+            codename__in=permisos["secretarias"],
+            content_type__app_label="authentication",
+        )
+    )
     administradores.permissions.clear()
 
 def delete_default_groups(apps, schema_editor):

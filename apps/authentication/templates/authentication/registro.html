@@ -11,6 +11,7 @@
 {% block js_files %}
     <script defer type="module" src="{% static 'authentication/js/registro.js' %}" ></script>
     <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 {% endblock js_files %}
 
 {% block content %}
@@ -19,79 +20,35 @@
         <h1 class="form__title">Bienvenido a SIGEU 👋</h1>
 
         <div class="form__row">
-            <div class="form__group">
-                {{ form.documento.label_tag }}
-                {{ form.documento }}
-                {{ form.documento.errors }}
-            </div>
-            <div class="form__group">
-                {{ form.nombre.label_tag }}
-                {{ form.nombre }}
-                {{ form.nombre.errors }}
-            </div>
-        </div>
-        <div class="form__row">
-            <div class="form__group">
-                {{ form.apellido.label_tag }}
-                {{ form.apellido }}
-                {{ form.apellido.errors }}
-            </div>
-            <div class="form__group">
-                {{ form.email.label_tag }}
-                {{ form.email }}
-                {{ form.email.errors }}
-            </div>
-        </div>
-        <div class="form__row">
-            <div class="form__group">
-                {{ form.telefono.label_tag }}
-                {{ form.telefono }}
-                {{ form.telefono.errors }}
-            </div>
-            <div class="form__group">
-                {{ form.rol.label_tag }}
-                {{ form.rol }}
-                {{ form.rol.errors }}
-            </div>
+            {% include "authentication/components/input.html" with field=form.documento %}
+            {% include "authentication/components/input.html" with field=form.nombre %}
         </div>
 
-        <div class="form__group">
-            {{ form.password1.label_tag }}
-            {{ form.password1 }}
-            {{ form.password1.errors }}
+        <div class="form__row">
+            {% include "authentication/components/input.html" with field=form.apellido %}
+            {% include "authentication/components/input.html" with field=form.email %}
         </div>
 
-        <div class="form__group">
-            {{ form.password2.label_tag }}
-            {{ form.password2 }}
-            {{ form.password2.errors }}
+        <div class="form__row">
+            {% include "authentication/components/input.html" with field=form.telefono %}
+            {% include "authentication/components/input.html" with field=form.rol %}
         </div>
+
+        {% include "authentication/components/input.html" with field=form.password1 %}
+        {% include "authentication/components/input.html" with field=form.password2 %}
 
         <!-- Campos por rol -->
         <div id="campos-estudiante" class="form__row form__optional">
-            <div class="form__group">
-                {{ form.codigo_estudiante.label_tag }}
-                {{ form.codigo_estudiante }}
-                {{ form.codigo_estudiante.errors }}
-            </div>
-
-            <div class="form__group">
-                {{ form.programa.label_tag }}
-                {{ form.programa }}
-                {{ form.programa.errors }}
-            </div>
+            {% include "authentication/components/input.html" with field=form.codigo_estudiante %}
+            {% include "authentication/components/input.html" with field=form.programa %}
         </div>
 
         <div id="campos-docente" class="form__group form__optional hide">
-            {{ form.unidadAcademica.label_tag }}
-            {{ form.unidadAcademica }}
-            {{ form.unidadAcademica.errors }}
+            {% include "authentication/components/input.html" with field=form.unidadAcademica %}
         </div>
 
         <div id="campos-secretaria" class="form__group form__optional hide">
-            {{ form.facultad.label_tag }}
-            {{ form.facultad }}
-            {{ form.facultad.errors }}
+            {% include "authentication/components/input.html" with field=form.facultad %}
         </div>
 
         <div class="form__actions">

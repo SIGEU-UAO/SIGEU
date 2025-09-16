@@ -15,24 +15,13 @@
 {% endblock js_files %}
 
 {% block content %}
-  <form class="form form--login" method="POST" novalidate>
+  <form class="form form--login" method="POST">
     {% csrf_token %}
 
     <h1 class="form__title">Inicia Sesión en SIGEU 👋</h1>
-
-    {{ form.non_field_errors }}
-
-    <div class="form__group">
-      {{ form.email.label_tag }}
-      {{ form.email }}
-      {{ form.email.errors }}
-    </div>
     
-    <div class="form__group">
-      {{ form.password.label_tag }}
-      {{ form.password }}
-      {{ form.password.errors }}
-    </div>
+    {% include "authentication/components/input.html" with field=form.email %}
+    {% include "authentication/components/input.html" with field=form.password %}
 
     <div class="form__actions">
       <button type="submit" class="form__button">Iniciar sesión</button>
@@ -46,5 +35,7 @@
         <a href="{%  url "registro"%}" class="form__link">Registrarse</a>
       </p>
     </div>
+
   </form>
+
 {% endblock content %}
