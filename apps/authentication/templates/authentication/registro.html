@@ -1,0 +1,59 @@
+{% extends 'authentication/layouts/form.html' %}
+{% load static %}
+
+{% block page_title %} Registro de Usuario {% endblock page_title %}  
+
+{% block css_files %}
+    <link rel="stylesheet" href="{% static 'authentication/css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'authentication/css/registro.css' %}">
+{% endblock css_files %}
+
+{% block js_files %}
+    <script defer type="module" src="{% static 'authentication/js/registro.js' %}" ></script>
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{% endblock js_files %}
+
+{% block content %}
+    <form class="form" method="POST">
+        {% csrf_token %}
+        <h1 class="form__title">Bienvenido a SIGEU 👋</h1>
+
+        <div class="form__row">
+            {% include "authentication/components/input.html" with field=form.documento %}
+            {% include "authentication/components/input.html" with field=form.nombre %}
+        </div>
+
+        <div class="form__row">
+            {% include "authentication/components/input.html" with field=form.apellido %}
+            {% include "authentication/components/input.html" with field=form.email %}
+        </div>
+
+        <div class="form__row">
+            {% include "authentication/components/input.html" with field=form.telefono %}
+            {% include "authentication/components/input.html" with field=form.rol %}
+        </div>
+
+        {% include "authentication/components/input.html" with field=form.password1 %}
+        {% include "authentication/components/input.html" with field=form.password2 %}
+
+        <!-- Campos por rol -->
+        <div id="campos-estudiante" class="form__row form__optional">
+            {% include "authentication/components/input.html" with field=form.codigo_estudiante %}
+            {% include "authentication/components/input.html" with field=form.programa %}
+        </div>
+
+        <div id="campos-docente" class="form__group form__optional hide">
+            {% include "authentication/components/input.html" with field=form.unidadAcademica %}
+        </div>
+
+        <div id="campos-secretaria" class="form__group form__optional hide">
+            {% include "authentication/components/input.html" with field=form.facultad %}
+        </div>
+
+        <div class="form__actions">
+            <button type="submit" class="form__button">Registrarse</button>
+            <p class="form__secondary">¿Ya tienes una cuenta? <a href="{%url "inicio_sesion"%}">Iniciar Sesión</a></p>
+        </div>
+    </form>
+{% endblock content %}
