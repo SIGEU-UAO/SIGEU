@@ -6,7 +6,7 @@ urlpatterns = [
     # --- FBV ---
     path("registro/", views.formulario_registro, name="registro"),     
     path("inicio-sesion/", views.inicio_sesion, name="inicio_sesion"),    
-    path("dashboard/", views.inicio_sesion, name="dashboard"),            
+    path("dashboard/", views.dashboard, name="dashboard"),            
 
     # --- CBV ---
     path("registro/api/", registro.registroAPI.as_view(), name="registro_api"),
