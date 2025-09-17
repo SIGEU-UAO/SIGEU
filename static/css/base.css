@@ -2,8 +2,13 @@
 
 :root{
     --primary: #FF7AA2;
+    --pale-primary: #FF9EBB;
+
+    --red: #FF4141;
+
     --black: #191D21;
     --light-gray: #666666;
+    --pale-gray: #DCDCDC;
 }
 
 *{

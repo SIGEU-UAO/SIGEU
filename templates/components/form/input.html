@@ -1,0 +1,12 @@
+<div class="form__group">
+  {{ field.label_tag }}
+  {{ field }}
+
+  {% if icon %}
+      {% for ic in icon %}
+        <button type="button" class="icon__btn"><i class="{{ ic }} form__icon"></i></button>
+      {% endfor %}
+  {% endif %}
+
+  {{ field.errors }}
+</div>

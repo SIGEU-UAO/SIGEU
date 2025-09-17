@@ -24,8 +24,14 @@ class RegistroService:
             if "numeroidentificacion" in s or "numero_identificacion" in s:
                 raise ValueError("El documento de identidad ya está registrado.") from e
             raise ValueError("Datos duplicados en el usuario.") from e
+        
+        # --- Guardar la contraseña inicial en el historial ---
+        Contrasenia.objects.create(
+            idUsuario=usuario,
+            clave=usuario.password,  # hash generado por set_password
+        )
 
-        # 2) Crear el registro según el rol; si falla, limpiar al usuario
+        # --- Crear el registro según el rol; si falla, limpiar al usuario ---
         try:
             if rol == "estudiante":
                 programa = Programa.objects.get(pk=data["programa_id"])

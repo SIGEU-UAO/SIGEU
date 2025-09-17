@@ -1,9 +1,18 @@
 import { dashboardUrl, emailRegex, passwordRegex } from "/static/js/base.js";
+import { handlePasswordVisibility } from "./modules/utils.js";
 import Alert from "/static/js/modules/Alert.js";
 
 let form = document.querySelector("form.form");
 let emailInput = document.getElementById("id_email");
 let passwordInput = document.getElementById("id_password");
+
+//Icons
+const passwordEyeBtns = document.querySelector(".form__group:has(.password-field) .icon__btn:first-of-type")
+
+document.addEventListener("DOMContentLoaded", () => {
+  passwordEyeBtns.addEventListener("click", handlePasswordVisibility);
+  form.addEventListener("submit", handleSubmit);
+})
 
 function validarCampos() {
   if (emailInput.value.trim() === "" || !emailRegex.test(emailInput.value.trim())) {
@@ -22,7 +31,7 @@ async function handleSubmit(e) {
 
   if (!validarCampos()) return;
 
-  let csrf = (form.querySelector("input[name=csrfmiddlewaretoken]") || {}).value || "";
+  let csrf = form.querySelector("input[name=csrfmiddlewaretoken]").value;
 
   const bodyData = JSON.stringify({
     email: emailInput.value.trim(),
@@ -43,8 +52,8 @@ async function handleSubmit(e) {
     let json = await res.json();
 
     if (res.ok) {
-      Alert.success("Has ingresado exitosamente");
-      setTimeout(() => { window.location.href = dashboardUrl; }, 2000);
+      Alert.success("Inicio de sesión completado!");
+      setTimeout(() => { window.location.href = dashboardUrl; }, 1500);
     } else {
       Alert.error(json.error || "Error en el inicio de sesión");
     }
@@ -53,5 +62,3 @@ async function handleSubmit(e) {
     console.error(err);
   }
 }
-
-form.addEventListener("submit", handleSubmit);

@@ -14,18 +14,25 @@
     <meta name="apple-mobile-web-app-title" content="SIGEU" />
 
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     {% block css_files %}{% endblock css_files %}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.css" integrity="sha512-kJlvECunwXftkPwyvHbclArO8wszgBGisiLeuDFwNM8ws+wKIw0sv1os3ClWZOcrEB2eRXULYUsm8OVRGJKwGA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     {% block js_files %}{% endblock js_files %}
-    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-    <figure class='logo__figure'>
-        <img src="{% static 'assets/icons/logo.svg' %}" alt="SIGEU Logo">
-    </figure>
+    
+    {% include "components/dashboard/navbar.html" %}
+    {% include "components/dashboard/sidebar.html" %}
 
-    {% block content %}
-    {% endblock content %}
+    <div class="wrapper">
+        <header class="header">
+            <h1>{{ header_title }}</h1>
+            <p>{{ header_paragraph }}</p>
+        </header>
+
+        {% block content %}
+        {% endblock content %}
+    </div>
 </body>
 </html>

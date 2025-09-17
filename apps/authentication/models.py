@@ -18,7 +18,7 @@ class UsuarioManager(BaseUserManager):
 
 class Usuario(AbstractBaseUser, PermissionsMixin):
     idUsuario = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-    numeroIdentificacion = models.CharField(max_length=10, unique=True)   # ✅ min_length eliminado
+    numeroIdentificacion = models.CharField(max_length=10, unique=True)
     nombres = models.CharField(max_length=100)
     apellidos = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
@@ -32,8 +32,30 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
     objects = UsuarioManager()
 
+    @property
+    def rol(self):
+        if hasattr(self, "estudiante"):
+            return "Estudiante"
+        elif hasattr(self, "docente"):
+            return "Docente"
+        elif hasattr(self, "secretaria"):
+            return "Secretaria"
+        elif self.is_superuser:
+            return "Administrador"
+        return "Usuario"
+
     def __str__(self):
         return f"{self.nombres} {self.apellidos} ({self.email})"
+    
+class Contrasenia(models.Model):
+    idContrasenia = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    idUsuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="contrasenias")
+    fechaCambio = models.DateTimeField(auto_now_add=True)
+    clave = models.CharField(max_length=128)
+    es_activa = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"Contraseña de {self.idUsuario.email} ({'Activa' if self.es_activa else 'Inactiva'})"
 
 class Facultad(models.Model):
     idUsuario = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
@@ -70,7 +92,7 @@ class UnidadAcademica(models.Model):
 
 class Estudiante(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name="estudiante", primary_key=True)
-    codigo_estudiante = models.CharField(max_length=7, unique=True)  # ✅ min_length eliminado
+    codigo_estudiante = models.CharField(max_length=7, unique=True)
     programa = models.ForeignKey(Programa, on_delete=models.CASCADE, related_name="estudiantes")
 
     def __str__(self):

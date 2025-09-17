@@ -36,6 +36,8 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'apps.authentication',
+    'apps.events',
+    'apps.external_organizations',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -59,7 +61,7 @@ ROOT_URLCONF = 'sigeu.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -132,11 +134,11 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Redirección después de login/logout
-LOGIN_REDIRECT_URL = "dashboard" # A dónde ir tras login
-LOGOUT_REDIRECT_URL = "login" # A dónde ir tras logout
+LOGIN_REDIRECT_URL = "/dashboard/" # A dónde ir tras login
+LOGOUT_REDIRECT_URL = "/inicio-sesion/" # A dónde ir tras logout
 
 # Vista que Django usará si se intenta acceder a @login_required
-LOGIN_URL = "login"
+LOGIN_URL = "/inicio-sesion/"
 
 # Modelo de usuario personalizado
 AUTH_USER_MODEL = "authentication.Usuario"
