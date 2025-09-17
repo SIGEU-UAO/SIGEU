@@ -1,4 +1,5 @@
 import { loginUrl, numeroIdentificacionRegex, emailRegex, passwordRegex, telefonoRegex } from "/static/js/base.js";
+import { handlePasswordVisibility } from "./modules/utils.js";
 import Alert from "/static/js/modules/Alert.js";
 
 const form = document.querySelector("form.form");
@@ -32,19 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
   rolSelect.addEventListener("change", handleFormVisibility);
   form.addEventListener("submit", handleSubmit);
 })
-
-function handlePasswordVisibility(e) {
-    const passwordInput = e.target.closest(".form__group").querySelector("input");
-    
-    //Change visibility
-    const isPassword = passwordInput.type === "password";
-    passwordInput.type = isPassword ? "text" : "password";
-
-    const icon = e.target;
-        icon.src = isPassword 
-            ? "/static/authentication/assets/icons/eye-slash.svg"
-            : "/static/authentication/assets/icons/eye.svg";
-}
 
 function handleFormVisibility(e) {
   const rol = e.target.value;

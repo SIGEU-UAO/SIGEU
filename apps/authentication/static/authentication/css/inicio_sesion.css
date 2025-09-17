@@ -1,4 +1,4 @@
-@import url("./components/form.css");
+@import url("./components/authentication/form.css");
 
 body{
    background-image: url("../assets/img/inicio_sesion_background.webp"); 

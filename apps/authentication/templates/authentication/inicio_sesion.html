@@ -4,14 +4,12 @@
 {% block page_title %} Iniciar Sesión {% endblock page_title %}
 
 {% block css_files %}
-  <link rel="stylesheet" href="{% static 'authentication/css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'authentication/css/base-auth.css' %}">
   <link rel="stylesheet" href="{% static 'authentication/css/inicio_sesion.css' %}">
 {% endblock css_files %}
 
 {% block js_files %}
-  <script defer type="module" src="{% static 'authentication/js/inicio_sesion.js' %}"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+  <script defer type="module" src="{% static 'authentication/js/inicio_sesion.js' %}"></script>  
 {% endblock js_files %}
 
 {% block content %}
@@ -21,7 +19,7 @@
     <h1 class="form__title">Inicia Sesión en SIGEU 👋</h1>
     
     {% include "components/form/input.html" with field=form.email %}
-    {% include "components/form/input.html" with field=form.password %}
+    {% include "components/form/input.html" with field=form.password icon=password_icons %}
 
     <div class="form__actions">
       <button type="submit" class="form__button">Iniciar sesión</button>

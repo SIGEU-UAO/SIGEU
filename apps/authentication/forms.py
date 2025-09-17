@@ -164,6 +164,7 @@ class InicioSesionForm(forms.Form):
                      "incluyendo una mayúscula, una minúscula y un número.")
         )],
         widget=forms.PasswordInput(attrs={
+            "class": "password-field",
             "pattern": r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$",
             "title": "La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula, una minúscula y un número"
         }),

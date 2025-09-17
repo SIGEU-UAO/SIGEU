@@ -32,6 +32,18 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
     objects = UsuarioManager()
 
+    @property
+    def rol(self):
+        if hasattr(self, "estudiante"):
+            return "Estudiante"
+        elif hasattr(self, "docente"):
+            return "Docente"
+        elif hasattr(self, "secretaria"):
+            return "Secretaria"
+        elif self.is_superuser:
+            return "Administrador"
+        return "Usuario"
+
     def __str__(self):
         return f"{self.nombres} {self.apellidos} ({self.email})"
 

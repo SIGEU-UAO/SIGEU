@@ -1,12 +1,10 @@
-{% load static %}
-
 <div class="form__group">
   {{ field.label_tag }}
   {{ field }}
 
   {% if icon %}
       {% for ic in icon %}
-        <button type="button" class="icon__btn"><img src="{% static ic %}" alt="icon" class="form__icon"></button>
+        <button type="button" class="icon__btn"><i class="{{ ic }} form__icon"></i></button>
       {% endfor %}
   {% endif %}
 

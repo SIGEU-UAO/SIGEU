@@ -70,8 +70,19 @@
     outline: none;
 }
 
+.icon__btn i{
+    font-size: 20px;
+    color: var(--light-gray);
+    opacity: .8;
+}
+
 .form__group:has(#id_password1) .icon__btn:last-of-type{
     top: -5px;
+}
+
+.form__group:has(#id_password1) .icon__btn:last-of-type i{
+    color: var(--primary);
+    opacity: 1;
 }
 
 /* End Form Icons */

@@ -13,13 +13,9 @@ class inicio_sesionAPI(View):
         email = data.get("email")
         password = data.get("password")
 
-        print(email)
-        print(password)
-
         user = authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user) 
-            request.session["usuario_id"] = user.idUsuario
             return JsonResponse({"message": "Inicio de sesión exitoso"}, status=200)
 
         return JsonResponse({"error": "No se encontró ningun usuario."}, status=401)

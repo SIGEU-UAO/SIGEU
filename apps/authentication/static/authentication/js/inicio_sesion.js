@@ -1,11 +1,16 @@
 import { dashboardUrl, emailRegex, passwordRegex } from "/static/js/base.js";
+import { handlePasswordVisibility } from "./modules/utils.js";
 import Alert from "/static/js/modules/Alert.js";
 
 let form = document.querySelector("form.form");
 let emailInput = document.getElementById("id_email");
 let passwordInput = document.getElementById("id_password");
 
+//Icons
+const passwordEyeBtns = document.querySelector(".form__group:has(.password-field) .icon__btn:first-of-type")
+
 document.addEventListener("DOMContentLoaded", () => {
+  passwordEyeBtns.addEventListener("click", handlePasswordVisibility);
   form.addEventListener("submit", handleSubmit);
 })
 
