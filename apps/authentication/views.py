@@ -22,7 +22,7 @@ def inicio_sesion(request):
         return render(request, "authentication/inicio_sesion.html", {"form": form, "password_icons": ["ri-eye-fill"]})
     return JsonResponse({"error": "Método no permitido"}, status=405)
 
-@login_required
+@login_required()
 def dashboard(request):
     if request.method == "GET":
         return render(request, "authentication/dashboard.html", {
