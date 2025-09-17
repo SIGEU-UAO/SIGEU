@@ -1,5 +1,14 @@
+{% load static %}
+
 <div class="form__group">
   {{ field.label_tag }}
   {{ field }}
+
+  {% if icon %}
+      {% for ic in icon %}
+        <button type="button" class="icon__btn"><img src="{% static ic %}" alt="icon" class="form__icon"></button>
+      {% endfor %}
+  {% endif %}
+
   {{ field.errors }}
 </div>

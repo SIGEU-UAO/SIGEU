@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .api import registro, login
 
 urlpatterns = [
     # --- FBV ---
@@ -8,6 +9,6 @@ urlpatterns = [
     path("dashboard/", views.inicio_sesion, name="dashboard"),            
 
     # --- CBV ---
-    path("registro/api/", views.registroAPI.as_view(), name="registro_api"),
-    path("inicio-sesion/api/", views.inicio_sesionAPI.as_view(), name="inicio_sesion_api"),
+    path("registro/api/", registro.registroAPI.as_view(), name="registro_api"),
+    path("inicio-sesion/api/", login.inicio_sesionAPI.as_view(), name="inicio_sesion_api"),
 ]

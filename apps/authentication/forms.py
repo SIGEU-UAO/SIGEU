@@ -33,30 +33,54 @@ class RegistroForm(forms.Form):
         required=True,
         max_length=10,
         min_length=8,
-        validators=[numero_identificacion_validator]
+        validators=[numero_identificacion_validator],
+        widget=forms.TextInput(attrs={
+            "class": "numeric-field",
+            "pattern": r"[0-9]{8,10}",
+            "title": "El documento debe contener entre 8 y 10 números"
+        })
     )
     email = forms.EmailField(
         label="Correo electrónico",
         required=True,
-        validators=[email_validator]
+        validators=[email_validator],
+        widget=forms.EmailInput(attrs={
+            "pattern": r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,63}",
+            "title": "Ingresa un correo electrónico válido"
+        })
     )
     nombre = forms.CharField(label="Nombre", required=True, max_length=100)
     apellido = forms.CharField(label="Apellido", required=True, max_length=100)
     telefono = forms.CharField(
         label="Teléfono",
         required=True,
+        min_length=10,
         max_length=10,
-        validators=[telefono_validator]
+        validators=[telefono_validator],
+        widget=forms.TextInput(attrs={
+            "type": "tel",
+            "class": "numeric-field",
+            "pattern": r"[0-9]{1,10}",
+            "title": "El teléfono debe contener 10 números"
+        })
     )
     password1 = forms.CharField(
         label="Contraseña",
-        widget=forms.PasswordInput,
-        validators=[password_validator]
+        validators=[password_validator],
+        widget=forms.PasswordInput(attrs={
+            "class": "password-field",
+            "pattern": r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$",
+            "title": "La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula, una minúscula y un número"
+        }),
     )
     password2 = forms.CharField(
         label="Confirmar Contraseña",
-        widget=forms.PasswordInput,
-        validators=[password_validator]
+        validators=[password_validator],
+        widget=forms.PasswordInput(attrs={
+            "class": "password-field",
+            "pattern": r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$",
+            "title": "La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula, una minúscula y un número"
+        }),
     )
 
     # Selección de rol
@@ -70,7 +94,18 @@ class RegistroForm(forms.Form):
     # Campos específicos por rol (opcionales, se validan en clean())
 
     #* Estudiante
-    codigo_estudiante = forms.CharField(required=False, label="Código de estudiante", min_length=7, max_length=7)
+    codigo_estudiante = forms.CharField(
+        label="Código de estudiante",
+        required=False,
+        min_length=7,
+        max_length=7,
+        validators=[codigo_validator],
+        widget=forms.TextInput(attrs={
+            "class": "numeric-field",
+            "pattern": r"[0-9]{7}",
+            "title": "El código de estudiante debe tener exactamente 7 dígitos"
+        })
+    )
     programa = forms.ModelChoiceField(
         queryset=Programa.objects.all(),
         label="Selecciona un Programa",
@@ -122,11 +157,14 @@ class InicioSesionForm(forms.Form):
     )
     password = forms.CharField(
         label="Contraseña",
-        widget=forms.PasswordInput,
         required=True,
         validators=[RegexValidator(
             regex=password_validator.regex,
             message=("La contraseña debe tener al menos 8 caracteres, "
                      "incluyendo una mayúscula, una minúscula y un número.")
-        )]
+        )],
+        widget=forms.PasswordInput(attrs={
+            "pattern": r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$",
+            "title": "La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula, una minúscula y un número"
+        }),
     )

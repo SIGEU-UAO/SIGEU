@@ -34,8 +34,8 @@
             {% include "components/form/input.html" with field=form.rol %}
         </div>
 
-        {% include "components/form/input.html" with field=form.password1 %}
-        {% include "components/form/input.html" with field=form.password2 %}
+        {% include "components/form/input.html" with field=form.password1 icon=password_icons %}
+        {% include "components/form/input.html" with field=form.password2 icon=password_icons|slice:":1" %}
 
         <!-- Campos por rol -->
         <div id="campos-estudiante" class="form__row form__optional">
@@ -53,7 +53,7 @@
 
         <div class="form__actions">
             <button type="submit" class="form__button">Registrarse</button>
-            <p class="form__secondary">¿Ya tienes una cuenta? <a href="{%url "inicio_sesion"%}">Iniciar Sesión</a></p>
+            <p class="form__secondary">¿Ya tienes una cuenta? <a href="{%url 'inicio_sesion'%}">Iniciar Sesión</a></p>
         </div>
     </form>
 {% endblock content %}

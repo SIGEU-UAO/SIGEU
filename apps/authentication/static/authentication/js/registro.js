@@ -1,27 +1,50 @@
 import { loginUrl, numeroIdentificacionRegex, emailRegex, passwordRegex, telefonoRegex } from "/static/js/base.js";
 import Alert from "/static/js/modules/Alert.js";
 
-let form = document.querySelector("form.form");
-let rolSelect = document.getElementById("id_rol");
-let camposEstudiante = document.getElementById("campos-estudiante");
-let camposDocente = document.getElementById("campos-docente");
-let camposSecretaria = document.getElementById("campos-secretaria");
+const form = document.querySelector("form.form");
+const rolSelect = document.getElementById("id_rol");
+const camposEstudiante = document.getElementById("campos-estudiante");
+const camposDocente = document.getElementById("campos-docente");
+const camposSecretaria = document.getElementById("campos-secretaria");
 
-let documentoInput = document.getElementById("id_documento");
-let nombreInput = document.getElementById("id_nombre");
-let apellidoInput = document.getElementById("id_apellido");
-let emailInput = document.getElementById("id_email");
-let telefonoInput = document.getElementById("id_telefono");
-let password1Input = document.getElementById("id_password1");
-let password2Input = document.getElementById("id_password2");
+const documentoInput = document.getElementById("id_documento");
+const nombreInput = document.getElementById("id_nombre");
+const apellidoInput = document.getElementById("id_apellido");
+const emailInput = document.getElementById("id_email");
+const telefonoInput = document.getElementById("id_telefono");
+const password1Input = document.getElementById("id_password1");
+const password2Input = document.getElementById("id_password2");
 
-let codigoEstudianteInput = document.getElementById("id_codigo_estudiante");
-let programaSelect = document.getElementById("id_programa");
-let unidadAcademicaSelect = document.getElementById("id_unidadAcademica");
-let facultadSelect = document.getElementById("id_facultad");
+//Campos oppcionales segun el rol
+const codigoEstudianteInput = document.getElementById("id_codigo_estudiante");
+const programaSelect = document.getElementById("id_programa");
+const unidadAcademicaSelect = document.getElementById("id_unidadAcademica");
+const facultadSelect = document.getElementById("id_facultad");
 
-rolSelect.addEventListener("change", handleFormVisibility);
-form.addEventListener("submit", handleSubmit);
+//Icons
+const passwordInfoBtn = document.querySelector(".form__group:has(#id_password1) .icon__btn:last-of-type");
+const passwordEyeBtns = document.querySelectorAll(".form__group:has(.password-field) .icon__btn:first-of-type")
+
+//Events Listeners
+document.addEventListener("DOMContentLoaded", () => {
+  passwordInfoBtn.addEventListener("click", Alert.showPasswordInfo)
+  passwordEyeBtns.forEach(btn => btn.addEventListener("click", handlePasswordVisibility));
+  rolSelect.addEventListener("change", handleFormVisibility);
+  form.addEventListener("submit", handleSubmit);
+})
+
+function handlePasswordVisibility(e) {
+    const passwordInput = e.target.closest(".form__group").querySelector("input");
+    
+    //Change visibility
+    const isPassword = passwordInput.type === "password";
+    passwordInput.type = isPassword ? "text" : "password";
+
+    const icon = e.target;
+        icon.src = isPassword 
+            ? "/static/authentication/assets/icons/eye-slash.svg"
+            : "/static/authentication/assets/icons/eye.svg";
+}
 
 function handleFormVisibility(e) {
   const rol = e.target.value;
@@ -92,7 +115,7 @@ async function handleSubmit(e) {
 
     if (res.ok) {
       Alert.success(`${rolSelect.value.charAt(0).toUpperCase() + rolSelect.value.slice(1).toLowerCase()} registrado exitosamente`);
-      setTimeout(() => { window.location.href = loginUrl; }, 2000);
+      setTimeout(() => { window.location.href = loginUrl; }, 1500);
     } else {
       Alert.error(json.error || "Error en el registro");
     }
