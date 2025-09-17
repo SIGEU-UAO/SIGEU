@@ -20,35 +20,35 @@
         <h1 class="form__title">Bienvenido a SIGEU 👋</h1>
 
         <div class="form__row">
-            {% include "authentication/components/input.html" with field=form.documento %}
-            {% include "authentication/components/input.html" with field=form.nombre %}
+            {% include "components/form/input.html" with field=form.documento %}
+            {% include "components/form/input.html" with field=form.nombre %}
         </div>
 
         <div class="form__row">
-            {% include "authentication/components/input.html" with field=form.apellido %}
-            {% include "authentication/components/input.html" with field=form.email %}
+            {% include "components/form/input.html" with field=form.apellido %}
+            {% include "components/form/input.html" with field=form.email %}
         </div>
 
         <div class="form__row">
-            {% include "authentication/components/input.html" with field=form.telefono %}
-            {% include "authentication/components/input.html" with field=form.rol %}
+            {% include "components/form/input.html" with field=form.telefono %}
+            {% include "components/form/input.html" with field=form.rol %}
         </div>
 
-        {% include "authentication/components/input.html" with field=form.password1 %}
-        {% include "authentication/components/input.html" with field=form.password2 %}
+        {% include "components/form/input.html" with field=form.password1 %}
+        {% include "components/form/input.html" with field=form.password2 %}
 
         <!-- Campos por rol -->
         <div id="campos-estudiante" class="form__row form__optional">
-            {% include "authentication/components/input.html" with field=form.codigo_estudiante %}
-            {% include "authentication/components/input.html" with field=form.programa %}
+            {% include "components/form/input.html" with field=form.codigo_estudiante %}
+            {% include "components/form/input.html" with field=form.programa %}
         </div>
 
         <div id="campos-docente" class="form__group form__optional hide">
-            {% include "authentication/components/input.html" with field=form.unidadAcademica %}
+            {% include "components/form/input.html" with field=form.unidadAcademica %}
         </div>
 
         <div id="campos-secretaria" class="form__group form__optional hide">
-            {% include "authentication/components/input.html" with field=form.facultad %}
+            {% include "components/form/input.html" with field=form.facultad %}
         </div>
 
         <div class="form__actions">
