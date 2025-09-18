@@ -1,10 +1,10 @@
 from django.http import JsonResponse
-from django.views import View
-from ..services.RegistroService import RegistroService
+from django.contrib.auth import authenticate, login
+from .services.RegistroService import RegistroService
 import json
 
-class registroAPI(View):
-    def post(self, request):
+class AuthAPI():
+    def registro(request):
         try:
             data = json.loads(request.body)
         except json.JSONDecodeError:
@@ -35,3 +35,19 @@ class registroAPI(View):
             return JsonResponse({"id": usuario_id, "message": "registro creado"}, status=201)
         except ValueError as e:
             return JsonResponse({"error": str(e)}, status=400)
+        
+    def login(request):
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Formato JSON inválido."}, status=400)
+
+        email = data.get("email")
+        password = data.get("password")
+
+        user = authenticate(request, email=email, password=password)
+        if user is not None:
+            login(request, user) 
+            return JsonResponse({"message": "Inicio de sesión exitoso"}, status=200)
+
+        return JsonResponse({"error": "No se encontró ningun usuario."}, status=401)

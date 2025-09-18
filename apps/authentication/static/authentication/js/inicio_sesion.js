@@ -39,7 +39,7 @@ async function handleSubmit(e) {
   });
 
   try {
-    let res = await fetch("/auth/inicio-sesion/api/", {
+    let res = await fetch("/auth/api/inicio-sesion/", {
       method: "POST",
       headers: {
         "X-CSRFToken": csrf,

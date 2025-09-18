@@ -45,7 +45,7 @@ class RegistroForm(forms.Form):
         required=True,
         validators=[email_validator],
         widget=forms.EmailInput(attrs={
-            "pattern": r"^[A-Za-z0-9._%+-]+@uao\.edu\.co$",
+            "pattern": "^[A-Za-z0-9._%+\-]+@uao\.edu\.co$",
             "title": "Ingresa un correo electrónico válido"
         })
     )
