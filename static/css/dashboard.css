@@ -1,0 +1,36 @@
+@import url("./components/dashboard/navbar.css");
+@import url("./components/dashboard/sidebar.css");
+
+body{
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    grid-template-rows: 72px 1fr;
+    grid-row-gap: 38px;
+    grid-template-areas: "sidebar navbar"
+                         "sidebar content";
+}
+
+.wrapper{
+    grid-area: content;
+    padding-left: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.header{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+h1{
+    font-size: 36px;
+}
+
+.header p{
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--light-gray);
+}

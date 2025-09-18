@@ -1,0 +1,79 @@
+{% load static %}
+
+<aside class="sidebar">
+    <div class="sidebar__logo">
+        <img src="{% static 'assets/icons/logo.svg' %}" alt="SIGEU Logo" class="sidebar__icon">
+        <h3 class="sidebar__name">SIGEU</h3>
+    </div>
+
+    <ul class="sidebar__list">
+        <li class="sidebar__item {% if active_page == 'dashboard' %}sidebar__item--active{% endif %}">
+            <div class="item__group">
+                <div class="item__info">
+                    <i class="ri-dashboard-fill"></i>
+                    <h4>Inicio</h4>
+                </div>
+            </div>
+        </li>
+        <li class="sidebar__item">
+            <details>
+                <summary class="item__summary">
+                    <div class="item__info">
+                        <i class="ri-calendar-event-fill"></i>
+                        <h4>Eventos</h4>
+                    </div>
+                    <i class="ri-arrow-right-s-line" class="chevron__icon"></i>
+                </summary>
+
+                <ul class="item__sublist">
+                    <li class="sidebar__item {% if active_page == 'registrar-evento' %}sidebar__item--active{% endif %}">
+                        <div class="item__group">
+                            <div class="item__info">
+                                <i class="ri-add-box-fill"></i>
+                                <h4>Registrar Evento</h4>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="sidebar__item {% if active_page == 'mis-eventos' %}sidebar__item--active{% endif %}">
+                        <div class="item__group">
+                            <div class="item__info">
+                                <i class="ri-table-fill"></i>
+                                <h4>Mis Eventos</h4>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </details>
+        </li>
+        <li class="sidebar__item">
+            <details class="item__group">
+                <summary class="item__summary">
+                    <div class="item__info">
+                        <i class="ri-building-fill"></i>
+                        <h4>Org. Externas</h4>
+                    </div>
+                    <i class="ri-arrow-right-s-line" class="chevron__icon"></i>
+                </summary>
+
+                <ul class="item__sublist">
+                    <li class="sidebar__item {% if active_page == 'listar-org' %}sidebar__item--active{% endif %}">
+                        <div class="item__group">
+                            <div class="item__info">
+                                <i class="ri-table-fill"></i>
+                                <h4>Listar Org.</h4>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </details>
+        </li>
+        <li class="sidebar__item {% if active_page == 'perfil' %}sidebar__item--active{% endif %}">
+            <div class="item__group">
+                <div class="item__info">
+                    <i class="ri-user-fill"></i>
+                    <h4>Perfil</h4>
+                </div>
+            </div>
+        </li>
+    </ul>
+</aside>

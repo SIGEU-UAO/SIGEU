@@ -1,0 +1,16 @@
+body{
+   background-position: center;
+   background-size: cover;
+   background-repeat: no-repeat;
+   min-height: 100vh;
+   display: flex;
+   justify-content: flex-end;
+   align-items: center;
+   padding-right: 96px;
+}
+
+.logo__figure{
+    position: fixed;
+    top: 48px;
+    left: 48px;
+}

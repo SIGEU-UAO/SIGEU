@@ -35,6 +35,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'apps.authentication',
+    'apps.events',
+    'apps.external_organizations',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -58,7 +61,7 @@ ROOT_URLCONF = 'sigeu.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -123,8 +126,21 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Redirección después de login/logout
+LOGIN_REDIRECT_URL = "/dashboard/" # A dónde ir tras login
+LOGOUT_REDIRECT_URL = "/inicio-sesion/" # A dónde ir tras logout
+
+# Vista que Django usará si se intenta acceder a @login_required
+LOGIN_URL = "/inicio-sesion/"
+
+# Modelo de usuario personalizado
+AUTH_USER_MODEL = "authentication.Usuario"
+
+SESSION_COOKIE_AGE = 60 * 60 * 24   # 24 horas
