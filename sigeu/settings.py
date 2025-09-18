@@ -135,10 +135,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Redirección después de login/logout
 LOGIN_REDIRECT_URL = "/dashboard/" # A dónde ir tras login
-LOGOUT_REDIRECT_URL = "/inicio-sesion/" # A dónde ir tras logout
+LOGOUT_REDIRECT_URL = "/auth/inicio-sesion/" # A dónde ir tras logout
 
 # Vista que Django usará si se intenta acceder a @login_required
-LOGIN_URL = "/inicio-sesion/"
+LOGIN_URL = "/auth/inicio-sesion/"
 
 # Modelo de usuario personalizado
 AUTH_USER_MODEL = "authentication.Usuario"
