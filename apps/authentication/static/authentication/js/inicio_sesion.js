@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function validarCampos() {
   if (emailInput.value.trim() === "" || !emailRegex.test(emailInput.value.trim())) {
-    Alert.error("Correo inválido");
+    Alert.error("Correo inválido, debe terminar en @uao.edu.co");
     return false;
   }
   if (passwordInput.value.trim() === "" || !passwordRegex.test(passwordInput.value.trim())) {
@@ -39,7 +39,7 @@ async function handleSubmit(e) {
   });
 
   try {
-    let res = await fetch("/inicio-sesion/api/", {
+    let res = await fetch("/auth/inicio-sesion/api/", {
       method: "POST",
       headers: {
         "X-CSRFToken": csrf,

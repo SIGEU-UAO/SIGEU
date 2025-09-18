@@ -8,7 +8,7 @@ numero_identificacion_validator = RegexValidator(
 )
 
 email_validator = RegexValidator(
-    regex=r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,63}$',
+    regex=r'^[A-Za-z0-9._%+-]+@uao\.edu\.co$',
     message="Ingresa un correo electrónico válido."
 )
 
@@ -45,7 +45,7 @@ class RegistroForm(forms.Form):
         required=True,
         validators=[email_validator],
         widget=forms.EmailInput(attrs={
-            "pattern": r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,63}",
+            "pattern": r"^[A-Za-z0-9._%+-]+@uao\.edu\.co$",
             "title": "Ingresa un correo electrónico válido"
         })
     )

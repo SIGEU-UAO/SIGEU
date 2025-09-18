@@ -27,6 +27,7 @@ def dashboard(request):
     if request.method == "GET":
         return render(request, "authentication/dashboard.html", {
             "header_title": f"Hola, {request.user.nombres} {request.user.apellidos} 👋", 
-            "header_paragraph": "Bienvenido de vuelta a SIGEU"
+            "header_paragraph": "Bienvenido de vuelta a SIGEU",
+            "active_page": "dashboard"
         })
     return JsonResponse({"error": "Método no permitido"}, status=405)

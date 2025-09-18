@@ -35,6 +35,16 @@
 
 .sidebar__item--active .item__group{
     background-color: var(--pale-primary);
+    padding: 10px 5px;
+    border-radius: 12px;
+}
+
+.sidebar__item--active .item__group .item__info h4{
+    color: #fff;
+}
+
+.sidebar__item--active .item__group .item__info i{
+    color: #fff;
 }
 
 .item__summary{

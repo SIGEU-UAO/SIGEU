@@ -50,7 +50,7 @@ function validarCampos() {
   if (documentoInput.value.trim() === "" || !numeroIdentificacionRegex.test(documentoInput.value.trim())) { Alert.error("Documento de identidad invalido"); return false; }
   if (nombreInput.value.trim() === "") { Alert.error("Ingresa el nombre"); return false; }
   if (apellidoInput.value.trim() === "") { Alert.error("Ingresa el apellido"); return false; }
-  if (emailInput.value.trim() === "" || !emailRegex.test(emailInput.value.trim())) { Alert.error("Correo invalido"); return false; }
+  if (emailInput.value.trim() === "" || !emailRegex.test(emailInput.value.trim())) { Alert.error("Correo invalido, debe terminar en @uao.edu.co"); return false; }
   if (telefonoInput.value.trim() === "" || !telefonoRegex.test(telefonoInput.value.trim())) { Alert.error("Telefono invalido"); return false; }
   if (password1Input.value.trim() === "" || !passwordRegex.test(password1Input.value.trim())) { Alert.error("Contraseña invalida"); return false; }
   if (password2Input.value.trim() === "" || !passwordRegex.test(password2Input.value.trim())) { Alert.error("Contraseña invalida"); return false; }
@@ -89,7 +89,7 @@ async function handleSubmit(e) {
   });
 
   try {
-    let res = await fetch("/registro/api/", {
+    let res = await fetch("/auth/registro/api/", {
       method: "POST",
       headers: {
         "X-CSRFToken": csrf,
