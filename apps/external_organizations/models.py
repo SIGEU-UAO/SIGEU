@@ -11,3 +11,8 @@ class OrganizacionExterna(models.Model):
 
     def __str__(self):
         return f"{self.nombre} - Representante: {self.representanteLegal}"
+    
+    class Meta:
+        db_table = "organizaciones_externas"
+        verbose_name = "organizacion_externa"
+        verbose_name_plural = "organizaciones_externas"

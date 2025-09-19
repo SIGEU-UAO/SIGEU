@@ -47,6 +47,9 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return f"{self.nombres} {self.apellidos} ({self.email})"
     
+    class Meta:
+        db_table = "usuarios"
+    
 class Contrasenia(models.Model):
     idContrasenia = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     idUsuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="contrasenias")
@@ -56,6 +59,9 @@ class Contrasenia(models.Model):
 
     def __str__(self):
         return f"Contraseña de {self.idUsuario.email} ({'Activa' if self.es_activa else 'Inactiva'})"
+    
+    class Meta:
+        db_table = "contrasenias"
 
 class Facultad(models.Model):
     idUsuario = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
@@ -65,7 +71,7 @@ class Facultad(models.Model):
         return self.nombre
 
     class Meta:
-        db_table = "authentication_facultad"
+        db_table = "facultades"
         verbose_name = "facultad"
         verbose_name_plural = "facultades"
 
@@ -76,6 +82,9 @@ class Programa(models.Model):
 
     def __str__(self):
         return f"{self.nombre} (Facultad: {self.facultad.nombre})"
+    
+    class Meta:
+        db_table = "programas"
 
 class UnidadAcademica(models.Model):
     idUnidadAcademica = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
@@ -86,7 +95,7 @@ class UnidadAcademica(models.Model):
         return f"{self.nombre} (Facultad: {self.facultad.nombre})"
 
     class Meta:
-        db_table = "authentication_unidad_academica"
+        db_table = "unidades_academicas"
         verbose_name = "unidad_academica"
         verbose_name_plural = "unidades_academicas"
 
@@ -97,6 +106,9 @@ class Estudiante(models.Model):
 
     def __str__(self):
         return f"{self.usuario.nombres} {self.usuario.apellidos} ({self.codigo_estudiante})"
+    
+    class Meta:
+        db_table = "estudiantes"
 
 class Docente(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name="docente", primary_key=True)
@@ -104,6 +116,9 @@ class Docente(models.Model):
 
     def __str__(self):
         return f"{self.usuario.nombres} {self.usuario.apellidos} ({self.unidadAcademica.nombre})"
+    
+    class Meta:
+        db_table = "docentes"
 
 class Secretaria(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name="secretaria", primary_key=True)
@@ -111,3 +126,6 @@ class Secretaria(models.Model):
 
     def __str__(self):
         return f"{self.usuario.nombres} {self.usuario.apellidos} ({self.facultad.nombre})"
+    
+    class Meta:
+        db_table = "secretarias"
