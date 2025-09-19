@@ -1,15 +1,15 @@
-{% extends 'authentication/layouts/form.html' %}
+{% extends 'users/layouts/form.html' %}
 {% load static %}
 
 {% block page_title %} Iniciar Sesión {% endblock page_title %}
 
 {% block css_files %}
-  <link rel="stylesheet" href="{% static 'authentication/css/base-auth.css' %}">
-  <link rel="stylesheet" href="{% static 'authentication/css/inicio_sesion.css' %}">
+  <link rel="stylesheet" href="{% static 'users/css/base-users.css' %}">
+  <link rel="stylesheet" href="{% static 'users/css/inicio_sesion.css' %}">
 {% endblock css_files %}
 
 {% block js_files %}
-  <script defer type="module" src="{% static 'authentication/js/inicio_sesion.js' %}"></script>  
+  <script defer type="module" src="{% static 'users/js/inicio_sesion.js' %}"></script>  
 {% endblock js_files %}
 
 {% block content %}

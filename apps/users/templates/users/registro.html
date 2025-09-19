@@ -1,15 +1,15 @@
-{% extends 'authentication/layouts/form.html' %}
+{% extends 'users/layouts/form.html' %}
 {% load static %}
 
 {% block page_title %} Registro de Usuario {% endblock page_title %}  
 
 {% block css_files %}
-    <link rel="stylesheet" href="{% static 'authentication/css/base-auth.css' %}">
-    <link rel="stylesheet" href="{% static 'authentication/css/registro.css' %}">
+    <link rel="stylesheet" href="{% static 'users/css/base-users.css' %}">
+    <link rel="stylesheet" href="{% static 'users/css/registro.css' %}">
 {% endblock css_files %}
 
 {% block js_files %}
-    <script defer type="module" src="{% static 'authentication/js/registro.js' %}" ></script>
+    <script defer type="module" src="{% static 'users/js/registro.js' %}" ></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 {% endblock js_files %}
 

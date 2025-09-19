@@ -1,8 +1,8 @@
 from django.db import IntegrityError
 from django.contrib.auth.models import Group
-from ..models import *
+from .models import *
 
-class RegistroService:
+class UserService:
     @staticmethod
     def registrar(data):
      
@@ -36,11 +36,7 @@ class RegistroService:
             if rol == "estudiante":
                 programa = Programa.objects.get(pk=data["programa_id"])
                 estudiantes = Group.objects.get(name="Estudiantes")      
-                Estudiante.objects.create(
-                    usuario=usuario,
-                    codigo_estudiante=data["codigo_estudiante"],
-                    programa=programa,
-                )
+                Estudiante.objects.create(usuario=usuario, codigo_estudiante=data["codigo_estudiante"], programa=programa)
                 usuario.groups.add(estudiantes)
 
             elif rol == "docente":
@@ -71,4 +67,3 @@ class RegistroService:
             raise
 
         return usuario.idUsuario
-    

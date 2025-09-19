@@ -89,7 +89,7 @@ async function handleSubmit(e) {
   });
 
   try {
-    let res = await fetch("/auth/api/registro/", {
+    let res = await fetch("/users/api/registro/", {
       method: "POST",
       headers: {
         "X-CSRFToken": csrf,

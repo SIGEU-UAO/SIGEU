@@ -1,4 +1,4 @@
-export const loginUrl = "/auth/inicio-sesion/";
+export const loginUrl = "/users/inicio-sesion/";
 export const dashboardUrl = "/dashboard/";
 
 export const numeroIdentificacionRegex = /^[0-9]{8,10}$/

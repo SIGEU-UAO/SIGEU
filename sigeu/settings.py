@@ -35,7 +35,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'apps.authentication',
+    'apps.users.apps.UsersConfig',
     'apps.events',
     'apps.external_organizations',
     'django.contrib.admin',
@@ -135,12 +135,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Redirección después de login/logout
 LOGIN_REDIRECT_URL = "/dashboard/" # A dónde ir tras login
-LOGOUT_REDIRECT_URL = "/auth/inicio-sesion/" # A dónde ir tras logout
+LOGOUT_REDIRECT_URL = "/users/inicio-sesion/" # A dónde ir tras logout
 
 # Vista que Django usará si se intenta acceder a @login_required
-LOGIN_URL = "/auth/inicio-sesion/"
+LOGIN_URL = "/users/inicio-sesion/"
 
 # Modelo de usuario personalizado
-AUTH_USER_MODEL = "authentication.Usuario"
+AUTH_USER_MODEL = "users.Usuario"
 
 SESSION_COOKIE_AGE = 60 * 60 * 24   # 24 horas
