@@ -1,32 +1,43 @@
 import { loginUrl, numeroIdentificacionRegex, emailRegex, passwordRegex, telefonoRegex } from "/static/js/base.js";
 import { handlePasswordVisibility } from "./modules/utils.js";
+import { validarFormData, formDataToJSON } from "/static/js/modules/forms/utils.js";
 import Alert from "/static/js/modules/Alert.js";
 
+//* Variables
+const validationRules = {
+    documento: [
+      { check: value => numeroIdentificacionRegex.test(value), msg: "Documento inválido" }
+    ],
+    email: [
+      { check: value => emailRegex.test(value), msg: "Correo inválido, debe terminar en @uao.edu.co" }
+    ],
+    telefono: [
+      { check: value => telefonoRegex.test(value), msg: "Teléfono inválido" }
+    ],
+    password1: [
+      { check: value => passwordRegex.test(value), msg: "Contraseña inválida" }
+    ],
+    password2: [
+      { check: value => passwordRegex.test(value), msg: "Contraseña inválida" },
+      { check: (value, formData) => value === formData.get("password1"), msg: "Las contraseñas no coinciden" }
+    ],
+    codigo_estudiante: [
+      { check: (value, formData) => formData.get("rol") !== "estudiante" || value !== "", msg: "Ingresa el código de estudiante" }
+    ]
+};
+
+//* Selectors
 const form = document.querySelector("form.form");
 const rolSelect = document.getElementById("id_rol");
 const camposEstudiante = document.getElementById("campos-estudiante");
 const camposDocente = document.getElementById("campos-docente");
 const camposSecretaria = document.getElementById("campos-secretaria");
 
-const documentoInput = document.getElementById("id_documento");
-const nombreInput = document.getElementById("id_nombre");
-const apellidoInput = document.getElementById("id_apellido");
-const emailInput = document.getElementById("id_email");
-const telefonoInput = document.getElementById("id_telefono");
-const password1Input = document.getElementById("id_password1");
-const password2Input = document.getElementById("id_password2");
-
-//Campos oppcionales segun el rol
-const codigoEstudianteInput = document.getElementById("id_codigo_estudiante");
-const programaSelect = document.getElementById("id_programa");
-const unidadAcademicaSelect = document.getElementById("id_unidadAcademica");
-const facultadSelect = document.getElementById("id_facultad");
-
 //Icons
 const passwordInfoBtn = document.querySelector(".form__group:has(#id_password1) .icon__btn:last-of-type");
 const passwordEyeBtns = document.querySelectorAll(".form__group:has(.password-field) .icon__btn:first-of-type")
 
-//Events Listeners
+//*Events Listeners
 document.addEventListener("DOMContentLoaded", () => {
   passwordInfoBtn.addEventListener("click", Alert.showPasswordInfo)
   passwordEyeBtns.forEach(btn => btn.addEventListener("click", handlePasswordVisibility));
@@ -34,59 +45,40 @@ document.addEventListener("DOMContentLoaded", () => {
   form.addEventListener("submit", handleSubmit);
 })
 
+//* Functions
 function handleFormVisibility(e) {
   const rol = e.target.value;
-  camposEstudiante.classList.add("hide");
-  camposDocente.classList.add("hide");
-  camposSecretaria.classList.add("hide");
 
-  if (rol === "estudiante") camposEstudiante.classList.remove("hide");
-  if (rol === "docente") camposDocente.classList.remove("hide");
-  if (rol === "secretaria") camposSecretaria.classList.remove("hide");
-}
+  const bloques = {
+    estudiante: camposEstudiante,
+    docente: camposDocente,
+    secretaria: camposSecretaria
+  };
 
-function validarCampos() {
-  let rol = rolSelect.value;
-  if (documentoInput.value.trim() === "" || !numeroIdentificacionRegex.test(documentoInput.value.trim())) { Alert.error("Documento de identidad invalido"); return false; }
-  if (nombreInput.value.trim() === "") { Alert.error("Ingresa el nombre"); return false; }
-  if (apellidoInput.value.trim() === "") { Alert.error("Ingresa el apellido"); return false; }
-  if (emailInput.value.trim() === "" || !emailRegex.test(emailInput.value.trim())) { Alert.error("Correo invalido, debe terminar en @uao.edu.co"); return false; }
-  if (telefonoInput.value.trim() === "" || !telefonoRegex.test(telefonoInput.value.trim())) { Alert.error("Telefono invalido"); return false; }
-  if (password1Input.value.trim() === "" || !passwordRegex.test(password1Input.value.trim())) { Alert.error("Contraseña invalida"); return false; }
-  if (password2Input.value.trim() === "" || !passwordRegex.test(password2Input.value.trim())) { Alert.error("Contraseña invalida"); return false; }
-  if (password1Input.value !== password2Input.value) { Alert.error("Las contraseñas no coinciden"); return false; }
+  Object.values(bloques).forEach(block => {
+    block.classList.add("hide");
+    block.querySelectorAll("input, select, textarea").forEach(el => {
+      el.disabled = true;
+    });
+  });
 
-  if (rol === "estudiante") {
-    if (codigoEstudianteInput.value.trim() === "") { Alert.error("Ingresa el código de estudiante"); return false; }
-    if (!programaSelect.value) { Alert.error("Selecciona un programa"); return false; }
-  } else if (rol === "docente") {
-    if (!unidadAcademicaSelect.value) { Alert.error("Selecciona una unidad académica"); return false; }
-  } else if (rol === "secretaria") {
-    if (!facultadSelect.value) { Alert.error("Selecciona una facultad"); return false; }
+  if (bloques[rol]) {
+    bloques[rol].classList.remove("hide");
+    bloques[rol].querySelectorAll("input, select, textarea").forEach(el => {
+      el.disabled = false;
+    });
   }
-  return true;
 }
 
 async function handleSubmit(e) {
   e.preventDefault();
-  if (!validarCampos()) return;
 
-  let csrf = (form.querySelector("input[name=csrfmiddlewaretoken]") || {}).value || "";
+  //Validate form
+  let formData = new FormData(form);
+  if (!validarFormData(formData, validationRules)) return;
 
-  const bodyData = JSON.stringify({
-    documento: documentoInput.value.trim(),
-    nombre: nombreInput.value.trim(),
-    apellido: apellidoInput.value.trim(),
-    email: emailInput.value.trim(),
-    telefono: telefonoInput.value.trim(),
-    password1: password1Input.value.trim(),
-    password2: password2Input.value.trim(),
-    rol: rolSelect.value,
-    codigo_estudiante: codigoEstudianteInput?.value.trim(),
-    programa: programaSelect?.value,
-    unidadAcademica: unidadAcademicaSelect?.value,
-    facultad: facultadSelect?.value
-  });
+  const csrf = (form.querySelector("input[name=csrfmiddlewaretoken]") || {}).value || "";
+  const bodyData = formDataToJSON(formData)
 
   try {
     let res = await fetch("/users/api/registro/", {

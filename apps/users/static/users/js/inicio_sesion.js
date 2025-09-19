@@ -1,7 +1,19 @@
 import { dashboardUrl, emailRegex, passwordRegex } from "/static/js/base.js";
 import { handlePasswordVisibility } from "./modules/utils.js";
+import { validarFormData, formDataToJSON } from "/static/js/modules/forms/utils.js";
 import Alert from "/static/js/modules/Alert.js";
 
+//* Variables
+const validationRules = {
+    email: [
+      { check: value => emailRegex.test(value), msg: "Correo inválido, debe terminar en @uao.edu.co" }
+    ],
+    password: [
+      { check: value => passwordRegex.test(value), msg: "Contraseña inválida" }
+    ]
+};
+
+//* Selectors
 let form = document.querySelector("form.form");
 let emailInput = document.getElementById("id_email");
 let passwordInput = document.getElementById("id_password");
@@ -14,29 +26,15 @@ document.addEventListener("DOMContentLoaded", () => {
   form.addEventListener("submit", handleSubmit);
 })
 
-function validarCampos() {
-  if (emailInput.value.trim() === "" || !emailRegex.test(emailInput.value.trim())) {
-    Alert.error("Correo inválido, debe terminar en @uao.edu.co");
-    return false;
-  }
-  if (passwordInput.value.trim() === "" || !passwordRegex.test(passwordInput.value.trim())) {
-    Alert.error("Contraseña inválida");
-    return false;
-  }
-  return true;
-}
-
 async function handleSubmit(e) {
   e.preventDefault();
 
-  if (!validarCampos()) return;
+  //Validate form
+  let formData = new FormData(form);
+  if (!validarFormData(formData, validationRules)) return;
 
-  let csrf = form.querySelector("input[name=csrfmiddlewaretoken]").value;
-
-  const bodyData = JSON.stringify({
-    email: emailInput.value.trim(),
-    password: passwordInput.value.trim()
-  });
+  const csrf = (form.querySelector("input[name=csrfmiddlewaretoken]") || {}).value || "";
+  const bodyData = formDataToJSON(formData)
 
   try {
     let res = await fetch("/users/api/inicio-sesion/", {

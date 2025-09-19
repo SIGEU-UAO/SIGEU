@@ -2,30 +2,12 @@ from django import forms
 from django.core.validators import RegexValidator
 from .models import *
 
-numero_identificacion_validator = RegexValidator(
-    regex=r'^[0-9]{8,10}$',
-    message="El documento debe contener entre 8 y 10 números."
-)
-
-email_validator = RegexValidator(
-    regex=r'^[A-Za-z0-9._%+-]+@uao\.edu\.co$',
-    message="Ingresa un correo electrónico válido."
-)
-
-telefono_validator = RegexValidator(
-    regex=r'^[0-9]{1,10}$',
-    message="El teléfono solo puede contener hasta 10 números."
-)
-
-password_validator = RegexValidator(
-    regex=r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$',
-    message="La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula, una minúscula y un número."
-)
-
-codigo_validator = RegexValidator(
-    regex=r'^[0-9]{7}$',
-    message="El código de estudiante debe tener exactamente 7 dígitos."
-)
+# * Validators
+numero_identificacion_validator = RegexValidator(regex=r'^[0-9]{8,10}$', message="El documento debe contener entre 8 y 10 números.")
+email_validator = RegexValidator(regex=r'^[A-Za-z0-9._%+-]+@uao\.edu\.co$', message="Ingresa un correo electrónico válido.")
+telefono_validator = RegexValidator(regex=r'^[0-9]{1,10}$', message="El teléfono solo puede contener hasta 10 números.")
+password_validator = RegexValidator(regex=r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$', message="La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula, una minúscula y un número.")
+codigo_validator = RegexValidator(regex=r'^[0-9]{7}$', message="El código de estudiante debe tener exactamente 7 dígitos.")
 
 class RegistroForm(forms.Form):
     documento = forms.CharField(
@@ -118,7 +100,8 @@ class RegistroForm(forms.Form):
         queryset=UnidadAcademica.objects.all(),
         label="Selecciona una Unidad Académica",
         empty_label="-- Elige una Unidad Académica --",
-        required=False
+        required=False,
+        disabled=True # By default
     )
 
     #* Secretaria
@@ -126,25 +109,15 @@ class RegistroForm(forms.Form):
         queryset=Facultad.objects.all(),
         label="Selecciona una Facultad",
         empty_label="-- Elige una Facultad --",
-        required=False
+        required=False,
+        disabled=True # By default
     )
 
-    # Validación de campos obligatorios según rol
-    def clean(self):
-        cleaned_data = super().clean()
-        rol = cleaned_data.get("rol")
-
-        if rol == "estudiante":
-            if not cleaned_data.get("codigo_estudiante"):
-                self.add_error("codigo_estudiante", "Este campo es obligatorio para estudiantes")
-            if not cleaned_data.get("programa"):
-                self.add_error("programa", "Este campo es obligatorio para estudiantes")
-        elif rol == "docente":
-            if not cleaned_data.get("unidadAcademica"):
-                self.add_error("departamento", "Este campo es obligatorio para docentes")
-        elif rol == "secretaria":
-            if not cleaned_data.get("facultad"):
-                self.add_error("facultad", "Este campo es obligatorio para secretarias académicas")
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Force autocomplete=off on all fields
+        for field in self.fields.values():
+            field.widget.attrs["autocomplete"] = "off"
 
 class InicioSesionForm(forms.Form):
     email = forms.EmailField(
@@ -169,3 +142,9 @@ class InicioSesionForm(forms.Form):
             "title": "La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula, una minúscula y un número"
         }),
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Force autocomplete=off on all fields
+        for field in self.fields.values():
+            field.widget.attrs["autocomplete"] = "off"
