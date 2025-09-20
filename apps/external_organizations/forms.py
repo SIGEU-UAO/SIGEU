@@ -4,14 +4,14 @@ from .models import *
 
 # * Validators
 nit_validator = RegexValidator(regex=r'^[0-9]{8,10}-[0-9]$', message="El NIT debe contener entre 8 y 10 dígitos seguidos de un guion y un dígito de verificación")
-telefono_validator = RegexValidator(regex=r'^[0-9]{1,10}$', message="El teléfono solo puede contener hasta 10 números.")
+telefono_validator = RegexValidator(regex=r'^[0-9]{10}$', message="El teléfono solo puede contener hasta 10 números.")
 
 class RegistroForm(forms.Form):
     nit = forms.CharField(
         label="NIT",
         required=True,
-        max_length=10,
-        min_length=8,
+        max_length=12,
+        min_length=10,
         validators=[nit_validator],
         widget=forms.TextInput(attrs={
             "class": "numeric-field",
@@ -30,7 +30,7 @@ class RegistroForm(forms.Form):
         widget=forms.TextInput(attrs={
             "type": "tel",
             "class": "numeric-field",
-            "pattern": r"[0-9]{1,10}",
+            "pattern": r"[0-9]{10}",
             "title": "El teléfono debe contener 10 números"
         })
     )

@@ -8,6 +8,11 @@
     <link rel="stylesheet" href="{% static 'external_organizations/css/registro.css' %}">
 {% endblock css_files %}
 
+{% block js_files %}
+    <script defer type="module" src="{% static 'external_organizations/js/registro.js' %}" ></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{% endblock js_files %}
+
 {% block content %}
     <form class="form" method="POST">
         {% csrf_token %}
