@@ -1,0 +1,178 @@
+{% extends 'layouts/dashboard.html' %}
+{% load static %}
+
+{% block page_title %} SIGEU | Perfil {% endblock page_title %}
+
+{% block css_files %}
+    <link rel="stylesheet" href="{% static 'users/css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'users/css/editar_perfil.css' %}">
+{% endblock css_files %}
+
+{% block content %}
+    <form class="form" method="POST">
+        {% csrf_token %}
+        <div class="form__bg"></div>
+  
+        <div class="form__wrapper">
+            <button type="button" class="form__edit"><i class="ri-pencil-fill"></i></button>
+
+            <h1 class="form__title">Información de Perfil</h1>
+            
+            <div class="form__groups">
+                <div class="form__row">
+                    {% include "components/form/input.html" with field=form.numeroIdentificacion %}
+                    {% include "components/form/input.html" with field=form.nombres %}
+                </div>
+
+                <div class="form__row">
+                    {% include "components/form/input.html" with field=form.apellidos %}
+                    {% include "components/form/input.html" with field=form.email %}
+                </div>
+
+                <div class="form__row">
+                    {% include "components/form/input.html" with field=form.telefono %}
+                    {% include "components/form/input.html" with field=form.contraseña %}
+                </div>
+
+                {% if form.codigo_estudiante %}
+                    <div class="form__group form__optional">
+                        {% include "components/form/input.html" with field=form.codigo_estudiante %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form__actions hide">
+                <button type="submit" class="form__button form__button--norounded">Guardar Cambios</button>
+                <button id="cancelBtn" type="button" class="form__button form__button--norounded form__button--secondary">Cancelar</button>
+            </div>
+        </div>
+    </form>
+{% endblock content %}
+
+{% block scripts %}
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+document.addEventListener("DOMContentLoaded", function() {
+    const editButton = document.querySelector(".form__edit");
+    const formActions = document.querySelector(".form__actions");
+    const form = document.querySelector(".form");
+    const formFields = document.querySelectorAll(".form input, .form textarea, .form select");
+    const cancelButton = document.getElementById("cancelBtn");
+
+    if (!editButton || !formActions || !form) return;
+
+    // Guardar valores originales (para "Cancelar")
+    const originalValues = {};
+    formFields.forEach(field => {
+        originalValues[field.name] = field.value;
+    });
+
+    editButton.addEventListener("click", function(e) {
+        e.preventDefault();
+        formActions.classList.remove("hide");
+        formFields.forEach(field => field.removeAttribute("readonly"));
+        editButton.style.display = "none";
+    });
+
+    if (cancelButton) {
+        cancelButton.addEventListener("click", function(e) {
+            e.preventDefault();
+            formActions.classList.add("hide");
+            formFields.forEach(field => {
+                if (originalValues.hasOwnProperty(field.name)) {
+                    field.value = originalValues[field.name];
+                }
+                field.setAttribute("readonly", "true");
+            });
+            editButton.style.display = "inline-block";
+        });
+    }
+
+    // Interceptar submit con fetch
+    form.addEventListener("submit", function(e) {
+        e.preventDefault();
+        const formData = new FormData(form);
+
+        fetch(window.location.href, {
+            method: 'POST',
+            body: formData,
+            headers: {'X-Requested-With': 'XMLHttpRequest'}
+        })
+        .then(async resp => {
+            console.debug('perfil POST status', resp.status);
+            const ct = resp.headers.get('content-type') || '';
+            let data = null;
+            let text = null;
+            if (ct.includes('application/json')) {
+                try {
+                    data = await resp.json();
+                } catch (err) {
+                    console.error('Failed to parse JSON response', err);
+                    text = await resp.text();
+                }
+            } else {
+                // Not JSON: capture the raw response for debugging
+                text = await resp.text();
+            }
+
+            if (data && data.success) {
+                // ✅ Éxito
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Perfil actualizado correctamente',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+
+                // Actualizar valores originales
+                ["nombres", "apellidos", "telefono", "codigo_estudiante"].forEach(field => {
+                    if (data[field] !== undefined) {
+                        const f = form.querySelector(`[name="${field}"]`);
+                        if (f) {
+                            f.value = data[field];
+                            originalValues[field] = data[field];
+                        }
+                    }
+                });
+
+                formFields.forEach(field => field.setAttribute("disabled", "true"));
+                formActions.classList.add("hide");
+                editButton.style.display = "inline-block";
+            } else if (data && data.errors) {
+                // ❌ Errores de validación
+                let html = "";
+                for (const [field, errs] of Object.entries(data.errors)) {
+                    html += `<p><strong>${field}:</strong> ${errs.join(", ")}</p>`;
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Errores de validación',
+                    html: html
+                });
+            } else {
+                // Error inesperado or non-JSON response
+                const message = text || 'No se pudieron guardar los cambios. Intenta nuevamente.';
+                // show raw server response (escaped) when available
+                const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    html: `<pre style="white-space:pre-wrap;">${escapeHtml(message)}</pre>`
+                });
+            }
+        }).catch(err => {
+            console.error('Save failed', err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Ocurrió un error inesperado. Intenta nuevamente.'
+            });
+        });
+    });
+});
+</script>
+{% endblock scripts %}

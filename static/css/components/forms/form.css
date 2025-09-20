@@ -1,0 +1,92 @@
+.form__row{
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    align-items: center;
+}
+
+.form__group{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form__row .form__group{
+    width: 50%;
+}
+
+.form__group label{
+    color: var(--light-gray);
+}
+
+.form__group input, .form__group select{
+    height: 48px;
+    padding: 0 16px;
+    color: var(--black);
+    border-radius: 12px;
+    border: 1px solid rgba(102, 102, 102, 0.35);
+    font-size: 18px;
+}
+
+.form__group .numeric-field {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.form__optional.hide{
+    display: none;
+}
+
+.form__wrapper{
+    padding: 30px;
+    position: relative;
+}
+
+.form__wrapper, .form__groups{
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form__actions{
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.form__actions.hide{
+    display: none;
+}
+
+.form__button{
+    padding: 0 48px;
+    height: 64px;
+    background-color: var(--primary);
+    border-radius: 40px;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 600;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.form__button--norounded{
+    height: 54px;
+    border-radius: 12px;
+    font-size: 18px;
+}
+
+.form__button--secondary{
+    background-color: transparent;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+}
+
+.form__secondary{
+    color: var(--light-gray);
+}
+
+.form__secondary a{
+    color: var(--black);
+}
