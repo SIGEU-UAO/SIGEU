@@ -34,3 +34,7 @@ h1{
     font-weight: 400;
     color: var(--light-gray);
 }
+
+.header:has(h1:empty, p:empty) {
+    display: none;
+}

@@ -1,0 +1,9 @@
+@import url("/static/css/components/forms/form.css");
+
+.form{
+    max-width: 800px;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
