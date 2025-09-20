@@ -1,0 +1,63 @@
+.swal2-container {
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.swal2-popup {
+    border-radius: 8px;
+    padding: 20px 24px;
+    font-family: "Poppins", sans-serif;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    width: 25%s !important;
+}
+
+.swal2-title {
+    color: #ff7aa2; 
+    font-size: 24px;
+    font-weight: 600;
+    text-align: left;
+    margin-bottom: 8px;
+}
+
+.swal2-html-container {
+    color: #333;
+    font-size: 14px;
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.swal2-actions {
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 8px;
+    width: 100%;
+}
+
+.swal2-cancel {
+    background: transparent !important;
+    color: #ff7aa2 !important;
+    border: 1px solid #ff7aa2 !important;
+    border-radius: 6px !important;
+    padding: 6px 14px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s;
+}
+
+.swal2-cancel:hover {
+    background: #fce4ec !important;
+}
+
+.swal2-confirm {
+    background: #ff7aa2 !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 6px 14px !important;
+    font-weight: 500 !important;
+    transition: background 0.2s, transform 0.15s;
+}
+.swal2-confirm:hover {
+    background: #ff7aa2 !important;
+    transform: scale(1.05);
+}
