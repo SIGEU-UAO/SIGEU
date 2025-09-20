@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from .service import UserService
 import json
 
@@ -55,4 +55,10 @@ class UsersAPI():
                 return JsonResponse({"message": "Inicio de sesión exitoso"}, status=200)
 
             return JsonResponse({"error": "No se encontró ningun usuario."}, status=401)
+        return JsonResponse({"error": "Método no permitido"}, status=405)
+    
+    def logout(request):
+        if request.method == "POST":
+            logout(request)
+            return JsonResponse({"message": "Cierre de sesión exitoso"}, status=200)
         return JsonResponse({"error": "Método no permitido"}, status=405)
