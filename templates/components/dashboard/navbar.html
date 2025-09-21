@@ -8,22 +8,7 @@
             </div>
         </div>
         <i class="ri-logout-circle-r-line nav__logout"
-            id="boton-cerrar-sesion"
-            data-logout-url="{% url 'logout' %}"
-            data-login-url="{% url 'inicio_sesion' %}">
+            id="boton-cerrar-sesion">
         </i>
     </div>
 </nav>
-
-<!-- Modal oculto del cierre de sesión -->
-<div class="modal hidden">
-    <div class="modal-content">
-    <button class="modal-close">&times;</button>
-    <h2>Cerrar Sesión</h2>
-    <p>¿Está seguro que desea cerrar sesión?</p>
-        <div class="modal-actions">
-            <button class="btn cancel">Cancelar</button>
-            <button class="btn accept">Aceptar</button>
-        </div>
-    </div>
-</div>

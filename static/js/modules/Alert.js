@@ -27,3 +27,21 @@ export default class Alert {
         });
     }
 }
+
+export async function confirmationAlert({
+    title,
+    text,
+    confirmButtonText = "Aceptar",
+    cancelButtonText = "Cancelar"
+}) {
+    return await Swal.fire({
+        title,
+        text,
+        showCancelButton: true,
+        confirmButtonText,
+        cancelButtonText,
+        confirmButtonColor: "#ff7aa2",
+        cancelButtonColor: "#666666",
+        reverseButtons: true
+    });
+}

@@ -18,8 +18,11 @@
     {% block css_files %}{% endblock css_files %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.css" integrity="sha512-kJlvECunwXftkPwyvHbclArO8wszgBGisiLeuDFwNM8ws+wKIw0sv1os3ClWZOcrEB2eRXULYUsm8OVRGJKwGA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     {% block js_files %}{% endblock js_files %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf/notyf.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/notyf/notyf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="{% static 'users/css/modal.css' %}">
+    <script defer type="module" src="{% static 'users/js/cierre_sesion.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/components/dashboard/modalConfirmation.css' %}">
 </head>
 <body>
     
@@ -35,7 +38,5 @@
         {% block content %}
         {% endblock content %}
     </div>
-    <script defer type="module" src="{% static 'users/js/cierre_sesion.js' %}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>

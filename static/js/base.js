@@ -1,4 +1,5 @@
 export const loginUrl = "/users/inicio-sesion/";
+export const logoutUrl = "/users/api/logout/";
 export const dashboardUrl = "/dashboard/";
 
 export const numeroIdentificacionRegex = /^[0-9]{8,10}$/
