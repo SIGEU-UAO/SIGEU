@@ -39,11 +39,11 @@
     opacity: .8;
 }
 
-.form__group:has(#id_password1) .icon__btn:last-of-type{
+.form_group:has(#id_password1) .icon_btn:last-of-type{
     top: -5px;
 }
 
-.form__group:has(#id_password1) .icon__btn:last-of-type i{
+.form_group:has(#id_password1) .icon_btn:last-of-type i{
     color: var(--primary);
     opacity: 1;
 }
