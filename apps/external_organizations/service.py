@@ -6,6 +6,7 @@ class OrganizacionExternaService:
     def registrar(data):
         try:
             org = OrganizacionExterna.objects.create(
+                nit=data["nit"],
                 nombre=data["nombre"],
                 representanteLegal=data["representante_legal"],
                 telefono=data["telefono"],

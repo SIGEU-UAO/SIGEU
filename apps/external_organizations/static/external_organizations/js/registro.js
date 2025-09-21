@@ -1,28 +1,17 @@
-import { telefonoRegex } from "/static/js/base.js";
+import { telefonoRegex, nitRegex } from "/static/js/base.js";
+import { validarFormData, formDataToJSON } from "/static/js/modules/forms/utils.js";
+
 import Alert from "/static/js/modules/Alert.js";
 
 //* Variables
 const validationRules = {
     nit: [
-        { check: value => value.length > 0, msg: "El NIT es obligatorio" }
-    ],
-    nombre: [
-        { check: value => value.length > 0, msg: "El nombre es obligatorio" }
-    ],
-    representante_legal: [
-        { check: value => value.length > 0, msg: "El representante legal es obligatorio" }
+        { check: value => value.length > 0, msg: "El NIT es obligatorio" },
+        { check: value => nitRegex.test(value), msg: "El NIT no cumple el formato válido (ej. 12345678-9)" }
+        
     ],
     telefono: [
         { check: value => telefonoRegex.test(value), msg: "Teléfono inválido" }
-    ],
-    ubicacion: [
-        { check: value => value.length > 0, msg: "La ubicación es obligatoria" }
-    ],
-    sector_economico: [
-        { check: value => value.length > 0, msg: "El sector económico es obligatorio" }
-    ],
-    actividad_principal: [
-        { check: value => value.length > 0, msg: "La actividad principal es obligatoria" }
     ]
 };
 
@@ -59,8 +48,14 @@ async function handleSubmit(e) {
         let json = await res.json();
 
         if (res.ok) {
+            console.log("antes de mostrar alerta");
             Alert.success("Organización registrada exitosamente");
-            setTimeout(() => { window.location.reload(); }, 1500);
+            console.log("después de mostrar alerta");
+            form.reset();
+            //Alert.success("Organización registrada exitosamente");
+            //setTimeout(() => { window.location.reload(); }, 3000);
+            //form.reset();
+            //setTimeout(() => { window.location.reload(); }, 1500);
         } else {
             Alert.error(json.error || "Error en el registro");
         }

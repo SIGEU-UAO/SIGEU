@@ -1,12 +1,10 @@
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from .forms import RegistroForm
 from .service import OrganizacionExternaService
 import json
 
 class OrganizacionesExternasAPI:
 
-    @csrf_exempt
     def registro(request):
         if request.method == "POST":
             try:
