@@ -83,7 +83,7 @@ def editar_perfil(request):
                     "telefono": request.user.telefono,
                     "codigo_estudiante": getattr(request.user, "codigo_estudiante", "")
                 })
-            return redirect("perfil")
+            
 
         # If form is invalid and it's an AJAX request, return JSON errors (avoid returning full HTML)
         if is_ajax:

@@ -148,11 +148,7 @@ class InicioSesionForm(forms.Form):
         # Force autocomplete=off on all fields
         for field in self.fields.values():
             field.widget.attrs["autocomplete"] = "off"
-
-class EditarPerfil(forms.Form):
-
-
-    
+class EditarPerfil(forms.Form):  
     numeroIdentificacion = forms.CharField(
         label="Documento de Identidad",
         required=True,
@@ -161,7 +157,7 @@ class EditarPerfil(forms.Form):
     nombres = forms.CharField(
         label="Nombres",
         required=True,
-        widget=forms.TextInput(attrs={"readonly": "true"})
+        widget=forms.TextInput(attrs={"disabled": "true"})
     )
     apellidos = forms.CharField(
         label="Apellidos",
@@ -171,7 +167,7 @@ class EditarPerfil(forms.Form):
     email = forms.EmailField(
         label="Email",
         required=True,
-        widget=forms.EmailInput(attrs={"readonly": "true"})
+        widget=forms.EmailInput(attrs={"disabled": "true"})
     )
     telefono = forms.CharField(
         label="Teléfono",
@@ -219,6 +215,6 @@ class EditarPerfil(forms.Form):
         for field in self.fields.values():
             field.widget.attrs["autocomplete"] = "off"
 
-        # Si el usuario no es estudiante, quitar campo
+        # if the user is not a strudent, remove field
         if not user or user.rol != "Estudiante":
             self.fields.pop("codigo_estudiante", None)
