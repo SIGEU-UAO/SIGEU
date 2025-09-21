@@ -26,22 +26,17 @@ export default class Alert {
             confirmButtonColor: "#FF7AA2"
         });
     }
-}
 
-export async function confirmationAlert({
-    title,
-    text,
-    confirmButtonText = "Aceptar",
-    cancelButtonText = "Cancelar"
-}) {
-    return await Swal.fire({
-        title,
-        text,
-        showCancelButton: true,
-        confirmButtonText,
-        cancelButtonText,
-        confirmButtonColor: "#ff7aa2",
-        cancelButtonColor: "#666666",
-        reverseButtons: true
+    static async confirmationAlert({title, text, confirmButtonText = "Aceptar", cancelButtonText = "Cancelar"}) {
+        return await Swal.fire({title, 
+            text, 
+            showCancelButton: true, 
+            confirmButtonText,
+            cancelButtonText,
+            confirmButtonColor: "#ff7aa2",
+            cancelButtonColor: "#666666",
+            reverseButtons: true
     });
 }
+}
+

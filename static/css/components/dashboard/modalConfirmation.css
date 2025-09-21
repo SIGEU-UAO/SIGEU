@@ -14,7 +14,7 @@
 
 .swal2-title {
     color: #ff7aa2; 
-    font-size: 24px;
+    font-size: 32px;
     font-weight: 600;
     text-align: left;
     margin-bottom: 8px;
@@ -22,7 +22,7 @@
 
 .swal2-html-container {
     color: #333;
-    font-size: 14px;
+    font-size: 18px;
     text-align: left;
     margin-bottom: 20px;
 }

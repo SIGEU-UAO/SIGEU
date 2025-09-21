@@ -1,17 +1,14 @@
 import { logoutUrl, loginUrl } from "/static/js/base.js";
-import { confirmationAlert } from "/static/js/modules/Alert.js";
 import { getCookie } from "/static/js/modules/forms/utils.js";
 import Alert from "/static/js/modules/Alert.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     const logoutBtn = document.getElementById("boton-cerrar-sesion");
-    if (!logoutBtn) return;
-
     logoutBtn.addEventListener("click", logoutConfirmation);
 });
 
 async function logoutConfirmation() {
-    const result = await confirmationAlert({
+    const result = await Alert.confirmationAlert({
         title: "Cerrar sesión",
         text: "¿Está seguro que desea cerrar sesión?",
         confirmButtonText: "Aceptar",
@@ -28,14 +25,7 @@ async function logoutConfirmation() {
         });
 
         if (response.ok) {
-            await Swal.fire({
-                title: "Sesión cerrada",
-                text: "Has salido del sistema correctamente",
-                icon: "success",
-                timer: 1500,
-                showConfirmButton: false
-            });
-            Alert.success("¡Cierre de sesión exitoso!");
+            Alert.success("Cierre de sesión exitoso!");
             setTimeout(() => {
                 window.location.href = loginUrl;
             }, 1500);
