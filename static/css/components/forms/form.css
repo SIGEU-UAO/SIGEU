@@ -36,12 +36,27 @@
 .form__optional.hide{
     display: none;
 }
+
+.form__wrapper{
+    padding: 30px;
+    position: relative;
+}
+
+.form__wrapper, .form__groups{
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
 .form__actions{
     display: flex;
     align-items: center;
     gap: 16px;
 }
 
+.form__actions.hide{
+    display: none;
+}
 .form__button{
     padding: 0 48px;
     height: 64px;
@@ -58,7 +73,7 @@
 .form__button--norounded{
     height: 54px;
     border-radius: 12px;
-    font-size: 22px;
+    font-size: 18px;
 }
 
 .form__button--secondary{

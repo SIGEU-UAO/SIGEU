@@ -1,0 +1,37 @@
+@import url('/static/css/components/forms/form.css');
+
+.form{
+    max-width: 800px;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    box-shadow: 0 10px 60px rgba(252, 252, 255, 0.5);
+    border-radius: 30px;
+    overflow: hidden;
+}
+
+.form__bg{
+    height: 120px;
+    background-image: url("../assets/img/profile-background.webp");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.form__edit{
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 20px;
+    background-color: var(--primary);
+    border: none;
+    outline: none;
+    cursor: pointer;
+    position: absolute;
+    right: 30px;
+}
