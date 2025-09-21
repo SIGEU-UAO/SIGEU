@@ -6,7 +6,6 @@ import Alert from "/static/js/modules/Alert.js";
 //* Variables
 const validationRules = {
     nit: [
-        { check: value => value.length > 0, msg: "El NIT es obligatorio" },
         { check: value => nitRegex.test(value), msg: "El NIT no cumple el formato válido (ej. 12345678-9)" }
         
     ],
@@ -48,14 +47,8 @@ async function handleSubmit(e) {
         let json = await res.json();
 
         if (res.ok) {
-            console.log("antes de mostrar alerta");
             Alert.success("Organización registrada exitosamente");
-            console.log("después de mostrar alerta");
             form.reset();
-            //Alert.success("Organización registrada exitosamente");
-            //setTimeout(() => { window.location.reload(); }, 3000);
-            //form.reset();
-            //setTimeout(() => { window.location.reload(); }, 1500);
         } else {
             Alert.error(json.error || "Error en el registro");
         }
