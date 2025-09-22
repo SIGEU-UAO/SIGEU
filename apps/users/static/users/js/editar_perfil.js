@@ -1,3 +1,4 @@
+import Alert from "/static/js/modules/Alert.js";
 console.log("editar_perfil.js loaded");
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -154,7 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             if (!res.ok) {
-                // Intentar leer JSON de error
+                // Leer JSON de error
                 let errorJson = await res.json().catch(() => null);
                 if (errorJson && errorJson.errors) {
                     // Mostrar errores por campo
@@ -165,14 +166,14 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
                     }
                 } else {
-                    showMessage("Error al actualizar el perfil.", "error");
+                    Alert.error("Error al actualizar el perfil.");
                 }
                 return;
             }
 
             const data = await res.json();
             console.log("Success response:", data);
-            showMessage("Perfil actualizado correctamente!", "success");
+            Alert.success("Perfil actualizado correctamente!");
 
             // Actualizar valores iniciales y deshabilitar campos
             editableFields.forEach(field => {
@@ -188,7 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
         } catch (err) {
-            showMessage("Error de red. Intenta de nuevo.", "error");
+             Alert.error("Error de red. Intenta de nuevo.", err);
             console.error(err);
         }
     });

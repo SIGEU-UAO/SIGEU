@@ -6,6 +6,8 @@
 {% block css_files %}
     <link rel="stylesheet" href="{% static 'users/css/dashboard.css' %}">
     <link rel="stylesheet" href="{% static 'users/css/editar_perfil.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+
 {% endblock css_files %}
 
 {% block content %}
@@ -52,5 +54,7 @@
 
 
 {% block scripts %}
-  <script src="{% static 'users/js/editar_perfil.js' %}"></script>
+  <script defer type="module"  src="{% static 'users/js/editar_perfil.js' %}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+ 
 {% endblock scripts %}
