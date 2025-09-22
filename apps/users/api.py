@@ -56,35 +56,4 @@ class UsersAPI():
 
             return JsonResponse({"error": "No se encontró ningun usuario."}, status=401)
         return JsonResponse({"error": "Método no permitido"}, status=405)
-    @staticmethod
-    def editar(request):
-        if request.method == "POST":
-            if not request.user.is_authenticated:
-                return JsonResponse({"error": "No autenticado"}, status=401)
-
-            try:
-                data = json.loads(request.body)
-            except json.JSONDecodeError:
-                return JsonResponse({"error": "Formato JSON inválido."}, status=400)
-
-            editar = {
-                "email": data.get("email"),
-                "nombres": data.get("nombres"),
-                "apellidos": data.get("apellidos"),
-                "telefono": data.get("telefono"),
-                "numeroIdentificacion": data.get("numeroIdentificacion"),
-            }
-
-            if data.get("password"):
-                editar["password"] = data.get("password")
-
-            if request.user.rol == "estudiante":
-                editar["codigo_estudiante"] = data.get("codigo_estudiante")
-
-            try:
-                UserService.editar(request.user.id, editar)
-                return JsonResponse({"message": "Perfil actualizado"}, status=200)
-            except ValueError as e:
-                return JsonResponse({"error": str(e)}, status=400)
-
-        return JsonResponse({"error": "Método no permitido"}, status=405)
+        

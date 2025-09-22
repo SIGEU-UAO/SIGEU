@@ -1,119 +1,195 @@
-// Imports
-import { emailRegex, passwordRegex } from "/static/js/base.js";
-import { validarFormData, formDataToJSON } from "/static/js/modules/forms/utils.js";
-import Alert from "/static/js/modules/Alert.js";
-
-//* Reglas de validación
-const validationRules = {
-  email: [
-    { check: value => emailRegex.test(value), msg: "Correo inválido, debe terminar en @uao.edu.co" }
-  ],
-  contraseña: [
-    { check: value => !value || passwordRegex.test(value), msg: "Contraseña inválida" }
-  ],
-};
+console.log("editar_perfil.js loaded");
 
 document.addEventListener("DOMContentLoaded", () => {
-  //* Selectores
-  const form = document.querySelector("form.form");
-  const editButton = document.querySelector(".form__edit");
-  const formActions = document.querySelector(".form__actions");
-  const cancelButton = document.getElementById("cancelBtn");
-  const formFields = document.querySelectorAll(".form input, .form textarea, .form select");
+    console.log("DOM loaded, initializing...");
+    
+    const form = document.querySelector("form.form");
+    const editBtn = document.querySelector(".form__edit");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const formActions = document.querySelector(".form__actions");
+    
+    console.log("Elements found:", {form, editBtn, cancelBtn, formActions});
 
-  //* Estado inicial
-  const originalValues = {};
-  formFields.forEach(field => {
-    originalValues[field.name] = field.value;
-  });
+    // Campos editables
+    const editableFields = [
+        document.getElementById("id_nombres"),
+        document.getElementById("id_apellidos"),
+        document.getElementById("id_telefono"),
+        document.getElementById("id_codigo_estudiante")
+    ].filter(field => field !== null);
+    
+    console.log("Editable fields found:", editableFields);
 
-  //* Funciones
-  function handleEdit(e) {
-    e.preventDefault();
-    if (formActions) formActions.classList.remove("hide");
-    formFields.forEach(field => {
-      field.removeAttribute("readonly");
-      field.removeAttribute("disabled");
+    // Guardar valores iniciales
+    let initialValues = {};
+    editableFields.forEach(field => {
+        initialValues[field.id] = field.value;
+        field.disabled = true;
     });
-    if (editButton) editButton.style.display = "none";
-  }
 
-  function handleCancel(e) {
-    e.preventDefault();
-    if (formActions) formActions.classList.add("hide");
-    formFields.forEach(field => {
-      if (originalValues.hasOwnProperty(field.name)) {
-        field.value = originalValues[field.name];
-      }
-      field.setAttribute("readonly", "true");
-      if (field.dataset.wasDisabled === "true") {
-        field.setAttribute("disabled", "true");
-      }
-    });
-    if (editButton) editButton.style.display = "inline-block";
-  }
+    // Contenedor para mensajes generales
+    let messageContainer = document.createElement("div");
+    messageContainer.classList.add("form__message");
+    form.prepend(messageContainer);
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    if (!form) return;
-
-    // Validar
-    const formData = new FormData(form);
-    if (!validarFormData(formData, validationRules)) return;
-
-    const csrf = (form.querySelector("input[name=csrfmiddlewaretoken]") || {}).value || "";
-    const bodyData = formDataToJSON(formData);
-
-    try {
-      const res = await fetch("/users/api/editar/", {
-        method: "POST",
-        headers: {
-          "X-CSRFToken": csrf,
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-          "X-Requested-With": "XMLHttpRequest"
-        },
-        body: bodyData   // bodyData is already a JSON string from formDataToJSON
-      });
-
-      const json = await res.json();
-
-      if (res.ok && json.message) {
-        Alert.success(json.message || "Perfil actualizado correctamente");
-
-        // Actualizar valores originales
-        ["nombres", "apellidos", "telefono", "codigo_estudiante"].forEach(field => {
-          if (json[field] !== undefined) {
-            const f = form.querySelector(`[name="${field}"]`);
-            if (f) {
-              f.value = json[field];
-              originalValues[field] = json[field];
-            }
-          }
-        });
-
-        formFields.forEach(field => field.setAttribute("readonly", "true"));
-        if (formActions) formActions.classList.add("hide");
-        if (editButton) editButton.style.display = "inline-block";
-      } else if (json.errors) {
-        let html = "";
-        for (const [field, errs] of Object.entries(json.errors)) {
-          html += `<p><strong>${field}:</strong> ${errs.join(", ")}</p>`;
-        }
-        Alert.error(html);
-      } else {
-        Alert.error(json.error || "No se pudieron guardar los cambios. Intenta nuevamente.");
-      }
-    } catch (err) {
-      Alert.error("Error de red. Intenta de nuevo.", err);
-      console.error(err);
+    function showMessage(text, type = "error") {
+        messageContainer.textContent = text;
+        messageContainer.style.color = type === "error" ? "red" : "green";
+        messageContainer.style.marginBottom = "10px";
     }
-  }
 
-  //* Listeners
-  if (editButton) editButton.addEventListener("click", handleEdit);
-  if (cancelButton) cancelButton.addEventListener("click", handleCancel);
-  if (form) form.addEventListener("submit", handleSubmit);
+    function clearMessage() {
+        messageContainer.textContent = "";
+    }
 
-  
+    // Crear contenedor de error por campo
+    editableFields.forEach(field => {
+        let err = document.createElement("div");
+        err.classList.add("field-error");
+        err.style.color = "red";
+        err.style.fontSize = "0.9em";
+        err.style.marginTop = "2px";
+        field.parentNode.appendChild(err);
+    });
+
+    function clearFieldErrors() {
+        editableFields.forEach(field => {
+            field.parentNode.querySelector(".field-error").textContent = "";
+        });
+    }
+
+    // Habilitar edición
+    editBtn.addEventListener("click", () => {
+        console.log("Edit button clicked!");
+        
+        editableFields.forEach(field => {
+            field.disabled = false;
+            field.removeAttribute('disabled');
+            field.readOnly = false;
+            field.removeAttribute('readonly');
+        });
+        
+        console.log("Fields enabled");
+        
+        if (editableFields.length > 0) {
+            editableFields[0].focus();
+        }
+        
+        // Limpiar mensajes
+        clearMessage();
+        clearFieldErrors();
+        
+        // Mostrar botones de acción
+        if (formActions) {
+            formActions.classList.remove("hide");
+            console.log("Buttons shown");
+        } else {
+            console.error("formActions not found!");
+        }
+    });
+
+    // Cancelar cambios
+    cancelBtn.addEventListener("click", () => {
+        console.log("Cancel button clicked!");
+        
+        editableFields.forEach(field => {
+            field.value = initialValues[field.id];
+            field.disabled = true;
+            field.setAttribute('disabled', 'true');
+        });
+        
+        clearMessage();
+        clearFieldErrors();
+        
+        // Ocultar botones de acción
+        if (formActions) {
+            formActions.classList.add("hide");
+            console.log("Buttons hidden");
+        }
+    });
+
+    // Guardar cambios
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        clearMessage();
+        clearFieldErrors();
+
+        let valid = true;
+        editableFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.parentNode.querySelector(".field-error").textContent = `El campo "${field.name}" no puede estar vacío.`;
+                valid = false;
+            }
+        });
+        if (!valid) return;
+
+        console.log("Preparing to submit form...");
+        
+        // Crear FormData con todos los campos (incluidos los deshabilitados)
+        const formData = new FormData();
+        
+        // Agregar CSRF token
+        const csrf = form.querySelector("input[name=csrfmiddlewaretoken]");
+        if (csrf) {
+            formData.append('csrfmiddlewaretoken', csrf.value);
+        }
+        
+        // Agregar todos los campos del formulario
+        const allInputs = form.querySelectorAll('input, select, textarea');
+        allInputs.forEach(input => {
+            if (input.name && input.name !== 'csrfmiddlewaretoken') {
+                formData.append(input.name, input.value || '');
+            }
+        });
+        
+        console.log("FormData prepared");
+
+        try {
+            const res = await fetch("/perfil/", {
+                method: "POST",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                body: formData
+            });
+
+            if (!res.ok) {
+                // Intentar leer JSON de error
+                let errorJson = await res.json().catch(() => null);
+                if (errorJson && errorJson.errors) {
+                    // Mostrar errores por campo
+                    for (let key in errorJson.errors) {
+                        let field = document.getElementById(`id_${key}`);
+                        if (field) {
+                            field.parentNode.querySelector(".field-error").textContent = errorJson.errors[key].join(", ");
+                        }
+                    }
+                } else {
+                    showMessage("Error al actualizar el perfil.", "error");
+                }
+                return;
+            }
+
+            const data = await res.json();
+            console.log("Success response:", data);
+            showMessage("Perfil actualizado correctamente!", "success");
+
+            // Actualizar valores iniciales y deshabilitar campos
+            editableFields.forEach(field => {
+                initialValues[field.id] = field.value;
+                field.disabled = true;
+                field.setAttribute('disabled', 'true');
+            });
+            
+            // Ocultar botones de acción
+            const formActions = document.querySelector(".form__actions");
+            if (formActions) {
+                formActions.classList.add("hide");
+            }
+
+        } catch (err) {
+            showMessage("Error de red. Intenta de nuevo.", "error");
+            console.error(err);
+        }
+    });
 });

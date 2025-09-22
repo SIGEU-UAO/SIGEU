@@ -19,6 +19,5 @@ urlpatterns = [
     # --- API ---
     path("users/api/registro/", UsersAPI.registro, name="registro_api"),
     path("users/api/inicio-sesion/", UsersAPI.login, name="inicio_sesion_api"),
-    path("users/api/editar/", UsersAPI.editar, name="editar_api"),
     
 ]

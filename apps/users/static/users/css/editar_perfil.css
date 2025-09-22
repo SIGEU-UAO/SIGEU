@@ -35,3 +35,17 @@
     position: absolute;
     right: 30px;
 }
+
+/* Estilos para campos editables */
+.form__group input:not([disabled]):not([readonly]) {
+    background-color: #fff;
+    border-color: var(--primary);
+    cursor: text;
+}
+
+.form__group input[disabled], 
+.form__group input[readonly] {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    cursor: not-allowed;
+}

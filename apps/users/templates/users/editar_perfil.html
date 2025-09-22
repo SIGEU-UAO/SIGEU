@@ -42,7 +42,7 @@
                 {% endif %}
             </div>
             
-            <div class="form__actions  ">
+            <div class="form__actions hide">
                 <button type="submit" class="form__button form__button--norounded">Guardar Cambios</button>
                 <button id="cancelBtn" type="button" class="form__button form__button--norounded form__button--secondary">Cancelar</button>
             </div>
@@ -50,6 +50,7 @@
     </form>
 {% endblock content %}
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    <script type="module" src="{C:\Users\alexp\Desktop\repositorios\SIGEU\apps\users\static\users\js\editar_perfil.js}"></script>
+
+{% block scripts %}
+  <script src="{% static 'users/js/editar_perfil.js' %}"></script>
+{% endblock scripts %}

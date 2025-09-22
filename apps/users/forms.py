@@ -162,7 +162,7 @@ class EditarPerfil(forms.Form):
     apellidos = forms.CharField(
         label="Apellidos",
         required=True,
-        widget=forms.TextInput(attrs={"readonly": "true"})
+        widget=forms.TextInput(attrs={"disabled": "true"})
     )
     email = forms.EmailField(
         label="Email",
@@ -180,7 +180,7 @@ class EditarPerfil(forms.Form):
             "class": "numeric-field",
             "pattern": r"[0-9]{1,10}",
             "title": "El teléfono debe contener 10 números",
-            "readonly": "true"
+            "disabled": "true"
         })
     )
     #* Estudiante
@@ -193,7 +193,8 @@ class EditarPerfil(forms.Form):
         widget=forms.TextInput(attrs={
             "class": "numeric-field",
             "pattern": r"[0-9]{7}",
-            "title": "El código de estudiante debe tener exactamente 7 dígitos"
+            "title": "El código de estudiante debe tener exactamente 7 dígitos",
+            "disabled": "true"
         })
     )
 
