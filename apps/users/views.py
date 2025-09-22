@@ -1,10 +1,14 @@
+from pyexpat.errors import messages
 from django.http import JsonResponse
 from django.shortcuts import render ,redirect
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+
 from .forms import RegistroForm, InicioSesionForm, EditarPerfil
 from django.contrib.auth.decorators import login_required
 from sigeu.decorators import no_superuser_required
+from .service import UserService, validate_new_password, save_password_history
+
 import json
 
 # Solo permite acceso a usuarios que NO sean superuser
@@ -95,9 +99,21 @@ def editar_perfil(request):
                 request.user.estudiante.codigo_estudiante = cd["codigo_estudiante"]
                 request.user.estudiante.save()
             
+            # Cambio de contraseña con validación de historial
             if cd.get("contraseña"):
-                request.user.set_password(cd["contraseña"])
-            request.user.save()
+                            try:
+                                from .service import validate_new_password, save_password_history
+                                validate_new_password(request.user, cd["contraseña"])
+                                request.user.set_password(cd["contraseña"])
+                                request.user.save()
+                                save_password_history(request.user)
+                            except ValueError as e:
+                                if is_ajax:
+                                    return JsonResponse({"success": False, "errors": {"contraseña": [str(e)]}}, status=400)
+                                form.add_error("contraseña", str(e))
+                                return render(request, "users/editar_perfil.html", {"form": form, "active_page": "perfil"})
+            else:
+                request.user.save()
             # If the request is an AJAX/fetch call, return JSON with updated fields
             if is_ajax:
                 # Obtener código de estudiante actualizado
@@ -123,3 +139,21 @@ def editar_perfil(request):
         return render(request, "users/editar_perfil.html", {"form": form, "active_page": "perfil"})
 
     return JsonResponse({"error": "Método no permitido"}, status=405)
+ 
+@login_required
+def change_password(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Formato JSON inválido."}, status=400)
+
+    new_password = data.get("new_password")
+    if not new_password:
+        return JsonResponse({"error": "La nueva contraseña es requerida"}, status=400)
+
+    try:
+        UserService.cambiar_password(request.user, new_password)
+        return JsonResponse({"success": "Contraseña actualizada con éxito"}, status=200)
+    except ValueError as e:
+        return JsonResponse({"error": str(e)}, status=400)

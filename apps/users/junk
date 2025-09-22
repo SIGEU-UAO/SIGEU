@@ -1,0 +1,704 @@
+from pyexpat.errors import messages
+from django.http import JsonResponse
+from django.shortcuts import render ,redirect
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
+from apps.users.models import PasswordHistory
+from .forms import RegistroForm, InicioSesionForm, EditarPerfil
+from django.contrib.auth.decorators import login_required
+from sigeu.decorators import no_superuser_required
+from .service import UserService, validate_new_password, save_password_history
+
+import json
+
+# Solo permite acceso a usuarios que NO sean superuser
+def not_superuser(user):
+    return not user.is_superuser
+
+def formulario_registro(request):
+    if request.method == "GET":
+        form = RegistroForm()
+        return render(request, "users/registro.html", {"form": form, "password_icons": ["ri-eye-fill", "ri-information-2-fill" ]})
+    return JsonResponse({"error": "Método no permitido"}, status=405)
+
+
+def inicio_sesion(request):
+    # If already authenticated, redirect to the dashboard
+    if request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("dashboard"))
+
+    if request.method == "GET":
+        form = InicioSesionForm()
+        return render(request, "users/inicio_sesion.html", {"form": form, "password_icons": ["ri-eye-fill"]})
+    return JsonResponse({"error": "Método no permitido"}, status=405)
+
+@no_superuser_required
+@login_required()
+def dashboard(request):
+    if request.method == "GET":
+        return render(request, "users/dashboard.html", {
+            "header_title": f"Hola, {request.user.nombres} {request.user.apellidos} 👋", 
+            "header_paragraph": "Bienvenido de vuelta a SIGEU",
+            "active_page": "dashboard"
+        })
+    return JsonResponse({"error": "Método no permitido"}, status=405)
+
+@no_superuser_required
+@login_required()
+def editar_perfil(request):
+    if request.method == "GET":
+        # Obtener código de estudiante si el usuario es estudiante
+        codigo_estudiante = ""
+        if hasattr(request.user, 'estudiante'):
+            codigo_estudiante = request.user.estudiante.codigo_estudiante
+        
+        initial_data = {
+            "numeroIdentificacion": request.user.numeroIdentificacion,
+            "nombres": request.user.nombres,
+            "apellidos": request.user.apellidos,
+            "email": request.user.email,
+            "telefono": request.user.telefono,
+            "contraseña": "",   
+            "codigo_estudiante": codigo_estudiante
+        }
+        form = EditarPerfil(initial=initial_data, user=request.user)
+        return render(request, "users/editar_perfil.html", {"form": form, "active_page": "perfil"})
+
+    elif request.method == "POST":
+        is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+        
+        # Manejar datos de formulario (AJAX o normal)
+        if request.POST:
+            post_data = request.POST.copy()
+        elif is_ajax and request.content_type == 'application/json':
+            try:
+                json_data = json.loads(request.body)
+                post_data = {}
+                for key, value in json_data.items():
+                    post_data[key] = value
+            except json.JSONDecodeError:
+                return JsonResponse({"success": False, "errors": {"json": ["Formato JSON inválido"]}}, status=400)
+        else:
+            post_data = {}
+            
+        # Asegurar que los campos deshabilitados/requeridos estén incluidos
+        for fld in ["numeroIdentificacion", "nombres", "apellidos", "email", "telefono"]:
+            if not post_data.get(fld):
+                post_data[fld] = getattr(request.user, fld, "")
+
+        form = EditarPerfil(post_data, user=request.user)
+
+        if form.is_valid():
+            cd = form.cleaned_data
+            request.user.nombres = cd["nombres"]
+            request.user.apellidos = cd["apellidos"]
+            request.user.telefono = cd["telefono"]
+            
+            # Actualizar código de estudiante si existe y el usuario es estudiante
+            if "codigo_estudiante" in cd and hasattr(request.user, 'estudiante'):
+                request.user.estudiante.codigo_estudiante = cd["codigo_estudiante"]
+                request.user.estudiante.save()
+            
+            # Cambio de contraseña con validación de historial
+            if cd.get("contraseña"):
+                            try:
+                                from .service import validate_new_password, save_password_history
+                                validate_new_password(request.user, cd["contraseña"])
+                                request.user.set_password(cd["contraseña"])
+                                request.user.save()
+                                save_password_history(request.user)
+                            except ValueError as e:
+                                if is_ajax:
+                                    return JsonResponse({"success": False, "errors": {"contraseña": [str(e)]}}, status=400)
+                                form.add_error("contraseña", str(e))
+                                return render(request, "users/editar_perfil.html", {"form": form, "active_page": "perfil"})
+            else:
+                request.user.save()
+            # If the request is an AJAX/fetch call, return JSON with updated fields
+            if is_ajax:
+                # Obtener código de estudiante actualizado
+                codigo_estudiante = ""
+                if hasattr(request.user, 'estudiante'):
+                    codigo_estudiante = request.user.estudiante.codigo_estudiante
+                
+                return JsonResponse({
+                    "success": True,
+                    "nombres": request.user.nombres,
+                    "apellidos": request.user.apellidos,
+                    "telefono": request.user.telefono,
+                    "codigo_estudiante": codigo_estudiante
+                })
+            return redirect("perfil")
+
+        # If form is invalid and it's an AJAX request, return JSON errors (avoid returning full HTML)
+        if is_ajax:
+            # Include received values for debugging
+            received = {fld: post_data.get(fld) for fld in ["numeroIdentificacion", "nombres", "apellidos", "email", "telefono", "contraseña"]}
+            return JsonResponse({"success": False, "errors": form.errors, "received": received}, status=400)
+
+        return render(request, "users/editar_perfil.html", {"form": form, "active_page": "perfil"})
+
+    return JsonResponse({"error": "Método no permitido"}, status=405)
+ 
+@login_required
+def change_password(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Formato JSON inválido."}, status=400)
+
+    new_password = data.get("new_password")
+    if not new_password:
+        return JsonResponse({"error": "La nueva contraseña es requerida"}, status=400)
+
+    try:
+        UserService.cambiar_password(request.user, new_password)
+        return JsonResponse({"success": "Contraseña actualizada con éxito"}, status=200)
+    except ValueError as e:
+        return JsonResponse({"error": str(e)}, status=400)
+    #views
+    mport Alert from "/static/js/modules/Alert.js";
+console.log("editar_perfil.js loaded");
+
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("DOM loaded, initializing...");
+    
+    const form = document.querySelector("form.form");
+    const editBtn = document.querySelector(".form__edit");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const formActions = document.querySelector(".form__actions");
+    
+    console.log("Elements found:", {form, editBtn, cancelBtn, formActions});
+
+    // Campos editables
+    const editableFields = [
+        document.getElementById("id_nombres"),
+        document.getElementById("id_apellidos"),
+        document.getElementById("id_telefono"),
+        document.getElementById("id_codigo_estudiante"),
+        document.getElementById("id_contrasena")
+    ].filter(field => field !== null);
+    
+    console.log("Editable fields found:", editableFields);
+
+    // Guardar valores iniciales
+    let initialValues = {};
+    editableFields.forEach(field => {
+        initialValues[field.id] = field.value;
+        field.disabled = true;
+    });
+
+    // Contenedor para mensajes generales
+    let messageContainer = document.createElement("div");
+    messageContainer.classList.add("form__message");
+    form.prepend(messageContainer);
+
+    function showMessage(text, type = "error") {
+        messageContainer.textContent = text;
+        messageContainer.style.color = type === "error" ? "red" : "green";
+        messageContainer.style.marginBottom = "10px";
+    }
+
+    function clearMessage() {
+        messageContainer.textContent = "";
+    }
+
+    // Crear contenedor de error por campo
+    editableFields.forEach(field => {
+        let err = document.createElement("div");
+        err.classList.add("field-error");
+        err.style.color = "red";
+        err.style.fontSize = "0.9em";
+        err.style.marginTop = "2px";
+        field.parentNode.appendChild(err);
+    });
+
+    function clearFieldErrors() {
+        editableFields.forEach(field => {
+            field.parentNode.querySelector(".field-error").textContent = "";
+        });
+    }
+
+    // Habilitar edición
+    editBtn.addEventListener("click", () => {
+        console.log("Edit button clicked!");
+        
+        editableFields.forEach(field => {
+            field.disabled = false;
+            field.removeAttribute('disabled');
+            field.readOnly = false;
+            field.removeAttribute('readonly');
+        });
+        
+        console.log("Fields enabled");
+        
+        if (editableFields.length > 0) {
+            editableFields[0].focus();
+        }
+        
+        // Limpiar mensajes
+        clearMessage();
+        clearFieldErrors();
+        
+        // Mostrar botones de acción
+        if (formActions) {
+            formActions.classList.remove("hide");
+            console.log("Buttons shown");
+        } else {
+            console.error("formActions not found!");
+        }
+    });
+
+    // Cancelar cambios
+    cancelBtn.addEventListener("click", () => {
+        console.log("Cancel button clicked!");
+        
+        editableFields.forEach(field => {
+            field.value = initialValues[field.id];
+            field.disabled = true;
+            field.setAttribute('disabled', 'true');
+        });
+        
+        clearMessage();
+        clearFieldErrors();
+        
+        // Ocultar botones de acción
+        if (formActions) {
+            formActions.classList.add("hide");
+            console.log("Buttons hidden");
+        }
+    });
+
+    // Guardar cambios
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        clearMessage();
+        clearFieldErrors();
+
+        let valid = true;
+        editableFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.parentNode.querySelector(".field-error").textContent = `El campo "${field.name}" no puede estar vacío.`;
+                valid = false;
+            }
+        });
+        if (!valid) return;
+
+        console.log("Preparing to submit form...");
+        
+        // Crear FormData con todos los campos (incluidos los deshabilitados)
+        const formData = new FormData();
+        
+        // Agregar CSRF token
+        const csrf = form.querySelector("input[name=csrfmiddlewaretoken]");
+        console.log("CSRF token encontrado:", csrf ? csrf.value : "NO HAY");
+        if (csrf) {
+            formData.append('csrfmiddlewaretoken', csrf.value);
+        }
+        
+        // Agregar todos los campos del formulario
+        const allInputs = form.querySelectorAll('input, select, textarea');
+        allInputs.forEach(input => {
+            if (input.name && input.name !== 'csrfmiddlewaretoken') {
+                formData.append(input.name, input.value || '');
+            }
+        });
+        
+        console.log("FormData prepared");
+
+        try {
+            const res = await fetch("/perfil/", {
+                method: "POST",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                    "x-CSRFTOKEN": csrf ? csrf.value : ""
+                },
+                body: formData
+            });
+
+            if (!res.ok) {
+                 console.error("⚠️ Error HTTP:", res.status, res.statusText);
+                // Leer JSON de error
+                let errorJson = await res.json().catch(() => null);
+                if (errorJson && errorJson.errors) {
+                    // Mostrar errores por campo
+                    for (let key in errorJson.errors) {
+                        let field = document.getElementById(`id_${key}`);
+                        if (field) {
+                            field.parentNode.querySelector(".field-error").textContent = errorJson.errors[key].join(", ");
+                        }
+                    }
+                    // Si hay error de contraseña, mostrar notificación
+                        if (errorJson.errors.contraseña) {
+                            Alert.error(errorJson.errors.contraseña.join(", "));
+                        }
+                    } else {
+                        Alert.error("Error al actualizar el perfil.");
+                    }
+                    return;
+            }
+
+            const data = await res.json();
+            console.log("Success response:", data);
+            Alert.success("Perfil actualizado correctamente!");
+
+            // Actualizar valores iniciales y deshabilitar campos
+            editableFields.forEach(field => {
+                initialValues[field.id] = field.value;
+                field.disabled = true;
+                field.setAttribute('disabled', 'true');
+            });
+            
+            // Ocultar botones de acción
+            const formActions = document.querySelector(".form__actions");
+            if (formActions) {
+                formActions.classList.add("hide");
+            }
+
+        } catch (err) {
+             Alert.error("Error de red. Intenta de nuevo.", err);
+            console.error(err);
+        }
+    });
+});
+#.js
+from django.db import IntegrityError
+from django.contrib.auth.models import Group
+from django.contrib.auth.hashers import check_password
+
+from .models import *
+
+
+
+
+
+class UserService:
+    @staticmethod
+    def registrar(data):
+        rol = data.get("rol")
+
+        try:
+            usuario = Usuario.objects.create_user(
+                email=data["email"],
+                password=data["password"],
+                nombres=data["nombres"],
+                apellidos=data["apellidos"],
+                telefono=data["telefono"],
+                numeroIdentificacion=data["numeroIdentificacion"],
+            )
+        except IntegrityError as e:
+            s = str(e).lower()
+            if "email" in s:
+                raise ValueError("El correo electrónico ya está registrado.") from e
+            if "numeroidentificacion" in s or "numero_identificacion" in s:
+                raise ValueError("El documento de identidad ya está registrado.") from e
+            raise ValueError("Datos duplicados en el usuario.") from e
+        
+        # --- Guardar la contraseña inicial en el historial ---
+        Contrasenia.objects.create(
+            idUsuario=usuario,
+            clave=usuario.password,  # hash generado por set_password
+        )
+
+        # --- Crear el registro según el rol; si falla, limpiar al usuario ---
+        try:
+            if rol == "estudiante":
+                programa = Programa.objects.get(pk=data["programa_id"])
+                estudiantes = Group.objects.get(name="Estudiantes")      
+                Estudiante.objects.create(usuario=usuario, codigo_estudiante=data["codigo_estudiante"], programa=programa)
+                usuario.groups.add(estudiantes)
+
+            elif rol == "docente":
+                docentes = Group.objects.get(name="Docentes") 
+                unidad = UnidadAcademica.objects.get(pk=data["unidad_academica_id"])
+                Docente.objects.create(usuario=usuario, unidadAcademica=unidad)
+                usuario.groups.add(docentes) 
+
+            elif rol == "secretaria":
+                secretarias = Group.objects.get(name="Secretarias") 
+                facultad = Facultad.objects.get(pk=data["facultad_id"])
+                Secretaria.objects.create(usuario=usuario, facultad=facultad)
+                usuario.groups.add(secretarias)
+
+        except (Programa.DoesNotExist, UnidadAcademica.DoesNotExist, Facultad.DoesNotExist) as e:
+            usuario.delete()
+            raise ValueError("ID relacionado inválido para el rol seleccionado.") from e
+
+        except IntegrityError as e:
+            usuario.delete()
+            s = str(e).lower()
+            if "codigo_estudiante" in s or "codigo" in s:
+                raise ValueError("El código de estudiante ya existe.") from e
+            raise ValueError("Datos duplicados para el registro del rol.") from e
+
+        except Exception as e:
+            usuario.delete()
+            raise
+
+        return usuario.idUsuario
+
+
+
+def validate_new_password(user, new_password):
+    # Valida que la nueva contraseña no sea igual a la actual ni a las últimas usadas por el usuario.
+    # Comparar con la actual
+    if check_password(new_password, user.password):
+        raise ValueError("La nueva contraseña no puede ser igual a la actual.")
+
+    # Comparar con historial
+    historial = PasswordHistory.objects.filter(user=user).order_by("-created_at")[:5]  # últimas 5
+    for h in historial:
+        if check_password(new_password, h.password):
+            raise ValueError("La nueva contraseña no puede ser igual a contraseñas anteriores.")
+
+    return True
+
+
+def save_password_history(user):
+    """
+    Guarda la contraseña actual del usuario en el historial.
+    """
+    PasswordHistory.objects.create(user=user, password=user.password)
+
+
+class UserService:
+    # ... (existing methods)
+
+    @staticmethod
+    def cambiar_password(user, new_password):
+        """
+        Cambia la contraseña del usuario validando historial.
+        """
+        validate_new_password(user, new_password)
+        user.set_password(new_password)
+        user.save()
+        save_password_history(user)
+        return True
+
+
+#service.py
+rom django.db import models
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+
+from sigeu import settings
+
+class UsuarioManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError("El usuario debe tener un email")
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        return self.create_user(email, password, **extra_fields)
+
+class Usuario(AbstractBaseUser, PermissionsMixin):
+    idUsuario = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    numeroIdentificacion = models.CharField(max_length=10, unique=True)
+    nombres = models.CharField(max_length=100)
+    apellidos = models.CharField(max_length=100)
+    email = models.EmailField(unique=True)
+    telefono = models.CharField(max_length=10, unique=True)
+
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["nombres", "apellidos", "telefono"]
+
+    objects = UsuarioManager()
+
+    @property
+    def rol(self):
+        if hasattr(self, "estudiante"):
+            return "Estudiante"
+        elif hasattr(self, "docente"):
+            return "Docente"
+        elif hasattr(self, "secretaria"):
+            return "Secretaria"
+        elif self.is_superuser:
+            return "Administrador"
+        return "Usuario"
+
+    def __str__(self):
+        return f"{self.nombres} {self.apellidos} ({self.email})"
+    
+    class Meta:
+        db_table = "usuarios"
+    
+class Contrasenia(models.Model):
+    idContrasenia = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    idUsuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="contrasenias")
+    fechaCambio = models.DateTimeField(auto_now_add=True)
+    clave = models.CharField(max_length=128)
+    es_activa = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"Contraseña de {self.idUsuario.email} ({'Activa' if self.es_activa else 'Inactiva'})"
+    
+    class Meta:
+        db_table = "contrasenias"
+
+class Facultad(models.Model):
+    idUsuario = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nombre
+
+    class Meta:
+        db_table = "facultades"
+        verbose_name = "facultad"
+        verbose_name_plural = "facultades"
+
+class Programa(models.Model):
+    idPrograma = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    facultad = models.ForeignKey(Facultad, on_delete=models.CASCADE, related_name="programas")
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.nombre} (Facultad: {self.facultad.nombre})"
+    
+    class Meta:
+        db_table = "programas"
+
+class UnidadAcademica(models.Model):
+    idUnidadAcademica = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    facultad = models.ForeignKey(Facultad, on_delete=models.CASCADE, related_name="unidades_academicas")
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.nombre} (Facultad: {self.facultad.nombre})"
+
+    class Meta:
+        db_table = "unidades_academicas"
+        verbose_name = "unidad_academica"
+        verbose_name_plural = "unidades_academicas"
+
+class Estudiante(models.Model):
+    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name="estudiante", primary_key=True)
+    codigo_estudiante = models.CharField(max_length=7, unique=True)
+    programa = models.ForeignKey(Programa, on_delete=models.CASCADE, related_name="estudiantes")
+
+    def __str__(self):
+        return f"{self.usuario.nombres} {self.usuario.apellidos} ({self.codigo_estudiante})"
+    
+    class Meta:
+        db_table = "estudiantes"
+
+class Docente(models.Model):
+    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name="docente", primary_key=True)
+    unidadAcademica = models.ForeignKey(UnidadAcademica, on_delete=models.CASCADE, related_name="docentes")
+
+    def __str__(self):
+        return f"{self.usuario.nombres} {self.usuario.apellidos} ({self.unidadAcademica.nombre})"
+    
+    class Meta:
+        db_table = "docentes"
+
+class Secretaria(models.Model):
+    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name="secretaria", primary_key=True)
+    facultad = models.ForeignKey(Facultad, on_delete=models.CASCADE, related_name="secretarias")
+
+    def __str__(self):
+        return f"{self.usuario.nombres} {self.usuario.apellidos} ({self.facultad.nombre})"
+    
+    class Meta:
+        db_table = "secretarias"
+class PasswordHistory(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    password = models.CharField(max_length=255)  # hash de la contraseña (pbkdf2)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Historial de contraseña"
+        verbose_name_plural = "Historial de contraseñas"
+
+    def __str__(self):
+        return f"Historial de {self.user} ({self.created_at})"
+#models.py
+from urllib import request
+from django.http import JsonResponse
+from django.contrib.auth import authenticate, login
+from .service import UserService
+import json
+
+class UsersAPI():
+    def registro(request):
+        if request.method == "POST":
+            try:
+                data = json.loads(request.body)
+            except json.JSONDecodeError:
+                return JsonResponse({"error": "Formato JSON inválido."}, status=400)
+
+            rol = data.get("rol")
+
+            registro = {
+                "email": data.get("email"),
+                "password": data.get("password1"),
+                "nombres": data.get("nombre"),
+                "apellidos": data.get("apellido"),
+                "telefono": data.get("telefono"),
+                "numeroIdentificacion": data.get("documento"),
+                "rol": rol,
+            }
+
+            if rol == "estudiante":
+                registro["codigo_estudiante"] = data.get("codigo_estudiante")
+                registro["programa_id"] = data.get("programa")
+            elif rol == "docente":
+                registro["unidad_academica_id"] = data.get("unidadAcademica")
+            elif rol == "secretaria":
+                registro["facultad_id"] = data.get("facultad")
+
+            try:
+                usuario_id = UserService.registrar(registro)
+                return JsonResponse({"id": usuario_id, "message": "registro creado"}, status=201)
+            except ValueError as e:
+                return JsonResponse({"error": str(e)}, status=400)
+        
+        return JsonResponse({"error": "Método no permitido"}, status=405)
+        
+    def login(request):
+        if request.method == "POST":
+            try:
+                data = json.loads(request.body)
+            except json.JSONDecodeError:
+                return JsonResponse({"error": "Formato JSON inválido."}, status=400)
+
+            email = data.get("email")
+            password = data.get("password")
+
+            user = authenticate(request, email=email, password=password)
+            if user is not None:
+                login(request, user) 
+                return JsonResponse({"message": "Inicio de sesión exitoso"}, status=200)
+
+            return JsonResponse({"error": "No se encontró ningun usuario."}, status=401)
+        return JsonResponse({"error": "Método no permitido"}, status=405)
+
+
+def change_password(request):
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Formato JSON inválido."}, status=400)
+
+    new_password = data.get("new_password")
+    if not new_password:
+        return JsonResponse({"error": "La nueva contraseña es requerida"}, status=400)
+
+    try:
+        UserService.cambiar_password(request.user, new_password)
+        return JsonResponse({"success": "Contraseña actualizada con éxito"}, status=200)
+    except ValueError as e:
+        return JsonResponse({"error": str(e)}, status=400)
+#apis.py

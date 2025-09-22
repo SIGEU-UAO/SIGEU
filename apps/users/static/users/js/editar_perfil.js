@@ -16,8 +16,14 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("id_nombres"),
         document.getElementById("id_apellidos"),
         document.getElementById("id_telefono"),
-        document.getElementById("id_codigo_estudiante")
+        document.getElementById("id_contrasena"),
+        document.getElementById("id_contraseña")
     ].filter(field => field !== null);
+
+    // Campo de contraseña (robusto a variaciones de id)
+    const passwordFieldEl = document.querySelector('input[name="contraseña"]')
+        || document.getElementById("id_contraseña")
+        || document.getElementById("id_contrasena");
     
     console.log("Editable fields found:", editableFields);
 
@@ -117,12 +123,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let valid = true;
         editableFields.forEach(field => {
+            const isPasswordField = passwordFieldEl && field === passwordFieldEl;
+            // Permitir que la contraseña esté vacía
+            if (isPasswordField) return;
             if (!field.value.trim()) {
-                field.parentNode.querySelector(".field-error").textContent = `El campo "${field.name}" no puede estar vacío.`;
+                const errNode = field.parentNode.querySelector(".field-error");
+                if (errNode) {
+                    errNode.textContent = `El campo "${field.name}" no puede estar vacío.`;
+                }
                 valid = false;
             }
         });
         if (!valid) return;
+
+        // Confirmación si se está cambiando la contraseña
+        if (passwordFieldEl && passwordFieldEl.value.trim().length > 0) {
+            const result = await Alert.confirmationAlert({
+                title: "Cambiar contraseña",
+                text: "¿Está seguro que desea cambiar la contraseña?",
+                confirmButtonText: "Aceptar",
+                cancelButtonText: "Cancelar",
+            });
+            const confirmed = (result && typeof result === 'object') ? !!result.isConfirmed : !!result;
+            if (!confirmed) {
+                // Volver a la vista por defecto (cancelado)
+                editableFields.forEach(field => {
+                    field.disabled = true;
+                    field.setAttribute('disabled', 'true');
+                });
+                if (formActions) {
+                    formActions.classList.add("hide");
+                }
+                return; // cancelar envío
+            }
+        }
 
         console.log("Preparing to submit form...");
         
@@ -149,7 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const res = await fetch("/perfil/", {
                 method: "POST",
                 headers: {
-                    "X-Requested-With": "XMLHttpRequest"
+                    "X-Requested-With": "XMLHttpRequest",
                 },
                 body: formData
             });
@@ -164,12 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         if (field) {
                             field.parentNode.querySelector(".field-error").textContent = errorJson.errors[key].join(", ");
                         }
-                    }
-                } else {
-                    Alert.error("Error al actualizar el perfil.");
-                }
-                return;
-            }
+                    }}}
 
             const data = await res.json();
             console.log("Success response:", data);

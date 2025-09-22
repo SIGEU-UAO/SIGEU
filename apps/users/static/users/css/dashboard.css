@@ -1,11 +1,41 @@
-@import url("/static/css/components/dashboard/card.css");
+@import url("./components/dashboard/navbar.css");
+@import url("./components/dashboard/sidebar.css");
+@import url("./components/dashboard/modalConfirmation.css");
 
 body{
-    background-color: var(--gray-background);
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    grid-template-rows: 72px 1fr;
+    grid-row-gap: 38px;
+    grid-template-areas: "sidebar navbar"
+                         "sidebar content";
 }
 
-.cards{
+.wrapper{
+    grid-area: content;
+    padding-left: 32px;
     display: flex;
-    flex-wrap: wrap;
-    gap: 32px;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.header{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+h1{
+    font-size: 36px;
+}
+
+.header p{
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--light-gray);
+}
+
+.header:has(h1:empty, p:empty) {
+    display: none;
 }
