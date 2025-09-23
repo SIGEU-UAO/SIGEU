@@ -8,6 +8,7 @@ from .forms import RegistroForm, InicioSesionForm, EditarPerfil
 from django.contrib.auth.decorators import login_required
 from sigeu.decorators import no_superuser_required
 from .service import UserService, validate_new_password, save_password_history
+from django.db import IntegrityError
 
 import json
 
@@ -112,8 +113,21 @@ def editar_perfil(request):
                                     return JsonResponse({"success": False, "errors": {"contraseña": [str(e)]}}, status=400)
                                 form.add_error("contraseña", str(e))
                                 return render(request, "users/editar_perfil.html", {"form": form, "active_page": "perfil"})
+                            except IntegrityError:
+                                message = "El teléfono ya está registrado."
+                                if is_ajax:
+                                    return JsonResponse({"success": False, "errors": {"telefono": [message]}}, status=400)
+                                form.add_error("telefono", message)
+                                return render(request, "users/editar_perfil.html", {"form": form, "active_page": "perfil"})
             else:
-                request.user.save()
+                try:
+                    request.user.save()
+                except IntegrityError:
+                    message = "El teléfono ya está registrado."
+                    if is_ajax:
+                        return JsonResponse({"success": False, "errors": {"telefono": [message]}}, status=400)
+                    form.add_error("telefono", message)
+                    return render(request, "users/editar_perfil.html", {"form": form, "active_page": "perfil"})
             # If the request is an AJAX/fetch call, return JSON with updated fields
             if is_ajax:
                 # Obtener código de estudiante actualizado

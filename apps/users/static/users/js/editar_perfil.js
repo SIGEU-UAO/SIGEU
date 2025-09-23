@@ -196,13 +196,33 @@ document.addEventListener("DOMContentLoaded", () => {
                     for (let key in errorJson.errors) {
                         let field = document.getElementById(`id_${key}`);
                         if (field) {
-                            field.parentNode.querySelector(".field-error").textContent = errorJson.errors[key].join(", ");
+                            const errNode = field.parentNode.querySelector(".field-error");
+                            if (errNode) {
+                                errNode.textContent = errorJson.errors[key].join(", ");
+                            }
                         }
-                    }}}
+                    }
+                    // No continuar con el flujo de éxito si hubo errores de validación
+                    return;
+                }
+                // Si viene un error general en formato { error: "mensaje" }, mostrarlo arriba del formulario
+                if (errorJson && errorJson.error) {
+                    showMessage(errorJson.error, "error");
+                    return;
+                }
+                // Si no hay JSON o estructura conocida, mostrar mensaje genérico pero no como error de red
+                showMessage("No se pudo procesar la solicitud. Revisa los datos e inténtalo de nuevo.", "error");
+                return;
+            }
 
             const data = await res.json();
             console.log("Success response:", data);
             Alert.success("Perfil actualizado correctamente!");
+
+            // Limpiar el campo de contraseña después de éxito, si existe
+            if (passwordFieldEl) {
+                passwordFieldEl.value = "";
+            }
 
             // Actualizar valores iniciales y deshabilitar campos
             editableFields.forEach(field => {

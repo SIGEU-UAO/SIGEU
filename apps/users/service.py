@@ -5,7 +5,7 @@ from django.conf import settings
 
 from .models import *
 
-PASSWORD_HISTORY_LIMIT = getattr(settings, 'PASSWORD_HISTORY_LIMIT', 5)
+PASSWORD_HISTORY_LIMIT = getattr(settings, 'PASSWORD_HISTORY_LIMIT', 3)
 
 class UserService:
     @staticmethod
@@ -83,7 +83,7 @@ def validate_new_password(user, new_password):
 
     # Comparar con la actual
     if check_password(new_password, user.password):
-        raise ValueError("La nueva contraseña no puede ser igual a la actual.")
+        raise ValueError("No puede ser igual a la actual.")
 
     # Comparar con historial (últimas N)
     historial = (Contrasenia.objects
@@ -91,7 +91,7 @@ def validate_new_password(user, new_password):
                  .order_by('-fechaCambio')[:PASSWORD_HISTORY_LIMIT])
     for h in historial:
         if check_password(new_password, h.clave):
-            raise ValueError("La nueva contraseña no puede ser igual a contraseñas anteriores.")
+            raise ValueError("Ya la usaste antes.")
 
     return True
 
