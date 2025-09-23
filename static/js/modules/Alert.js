@@ -1,13 +1,32 @@
 const notyf = new Notyf({
-    position: { x: 'right', y: 'top' }
+    position: { x: 'right', y: 'top' },
+    types: [
+      {
+        type: 'info',
+        background: '#3498db', 
+        icon: {
+          className: 'ri-information-fill', 
+          tagName: 'i',                    
+          color: 'white'                     
+        }
+      }
+    ]
 });
 
 export default class Alert {
     static success(message) {
         notyf.success(message);
     }   
+    
     static error(message) {
         notyf.error(message);
+    }
+    
+    static info(message) {
+        notyf.open({
+            type: 'info',
+            message: message
+        });
     }
 
     static showPasswordInfo(){

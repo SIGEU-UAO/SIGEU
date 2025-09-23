@@ -18,9 +18,7 @@ const validationRules = {
 const form = document.querySelector("form.form");
 
 //* Events Listeners
-document.addEventListener("DOMContentLoaded", () => {
-    form.addEventListener("submit", handleSubmit);
-});
+form.addEventListener("submit", handleSubmit);
 
 //* Functions
 async function handleSubmit(e) {
