@@ -1,5 +1,5 @@
 from django.db import IntegrityError
-from .models import *
+from .models import OrganizacionExterna
 
 class OrganizacionExternaService:
     @staticmethod
@@ -25,9 +25,21 @@ class OrganizacionExternaService:
     @staticmethod
     def listar():
         return list(OrganizacionExterna.objects.values())
-    
+
     @staticmethod
     def filtrar_por_nit(nit):
         if not nit:
             return []
         return list(OrganizacionExterna.objects.filter(nit__contains=nit).values())
+
+    @staticmethod
+    def filtrar_por_nit(nit):
+        return list(
+            OrganizacionExterna.objects
+            .filter(nit__icontains=nit)  
+            .values(
+                "idOrganizacion",   
+                "nit",
+                "nombre"
+            )
+        )

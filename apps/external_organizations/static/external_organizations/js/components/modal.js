@@ -3,25 +3,20 @@ import Loader from "/static/js/modules/Loader.js";
 import Modal from "/static/js/modules/Modal.js";
 import { cleanContainer } from "/static/js/modules/forms/utils.js";
 
-//* Variables
 let lastNitSearchValue = "";
 
-//* Selectores
 const searchOrgsLoader = document.querySelector("#search-orgs-form .loader")
 const searchOrgsResult = document.querySelector("#search-orgs-form .form__results")
 const searchOrgsSuggest = document.querySelector("#search-orgs-form .form__suggest")
 
-//* Functions
 function toggleSearchState(loader, result) {
     Loader.toggleLoader(loader);
     Modal.toggleResultsVisibility(result);
 }
 
-//* Function to search by id
 export async function handleOrgsFormSubmit(e) {
     e.preventDefault();
 
-    //Get search value
     const searchInputValue = e.target.nit.value;
     if (searchInputValue.trim() === "") {
         Alert.error(`El campo de busqueda es obligatorio`);
@@ -29,7 +24,6 @@ export async function handleOrgsFormSubmit(e) {
     }
     if (searchInputValue == lastNitSearchValue) return;
 
-    // Save current value as last search
     lastNitSearchValue = searchInputValue;
 
     searchOrgsResult.classList.add("hide");
@@ -45,10 +39,8 @@ export async function handleOrgsFormSubmit(e) {
             return;   
         }
 
-        //* Display cards with organizations
         const { organizaciones, message, messageType } = json;
 
-        // If there are no organizations, display message and return
         if (messageType === "info") {
             Alert.info(message);
             setTimeout(() => {
@@ -58,7 +50,6 @@ export async function handleOrgsFormSubmit(e) {
             return;
         }
 
-        //* Show organizations & alert
         displayOrganizationsCards(searchOrgsResult, organizaciones);
         Alert.success(message)
         toggleSearchState(searchOrgsLoader, searchOrgsResult);
@@ -68,23 +59,39 @@ export async function handleOrgsFormSubmit(e) {
     }
 }
 
-//TODO: AQUI VA EL CODIGO DE BETA
 export async function getExternalOrganization(id){
-    alert(`El id de la organizacion externa es: ${id}`)
+    try {
+        let res = await fetch(`/orgs/api/${id}/`);
+        let json = await res.json();
+
+        if (!res.ok) {
+            Alert.error(json.error || "No se pudo obtener la organización");
+            return;
+        }
+
+        const org = json.organizacion;
+        document.getElementById("organizacion-nit").textContent = org.nit;
+        document.getElementById("organizacion-nombre").textContent = org.nombre;
+        document.getElementById("organizacion-representante").textContent = org.representanteLegal;
+        document.getElementById("organizacion-telefono").textContent = org.telefono;
+        document.getElementById("organizacion-ubicacion").textContent = org.ubicacion;
+        document.getElementById("organizacion-sector").textContent = org.sectorEconomico;
+        document.getElementById("organizacion-actividad").textContent = org.actividadPrincipal;
+    } catch (err) {
+        console.error(err);
+        Alert.error("Error de red al cargar datos de la organización.");
+    }
 }
 
-//* Function to display the organizations in the modal
 function displayOrganizationsCards(resultContainer, organizations){
     cleanContainer(resultContainer)
 
     organizations.forEach(organization => {
         const { idOrganizacion, nit, nombre } = organization;
-        
-        //* Container div
+
         const organizationCard = document.createElement("DIV")
         organizationCard.classList.add("organization__card");
 
-        //* Left div
         const organizationInfo = document.createElement("DIV");
         organizationInfo.classList.add("organization__info");
 
@@ -107,13 +114,11 @@ function displayOrganizationsCards(resultContainer, organizations){
         organizationInfo.appendChild(organizationIcon)
         organizationInfo.appendChild(organizationDescription)
 
-        //* Right div
         const viewMoreBtn = document.createElement("A");
         viewMoreBtn.classList.add("organization__btn")
         viewMoreBtn.innerHTML = "<label for='step2'>Visualizar datos</label>"
         viewMoreBtn.onclick = () => getExternalOrganization(idOrganizacion);
 
-        //* Append elements
         organizationCard.appendChild(organizationInfo)
         organizationCard.appendChild(viewMoreBtn)
 

@@ -6,19 +6,21 @@
 
         <header class="modal__header">
             <h3>Asociar Organización Externa</h3>
-            <button class="modal__close modal__close--icon"><label for="openModal"><i class="ri-close-fill"></i></label></button>
+            <button class="modal__close modal__close--icon">
+                <label for="openModal"><i class="ri-close-fill"></i></label>
+            </button>
         </header>
 
         <main class="modal__main">
             <div class="progress"><div class="progress__bar"></div></div>
 
             <div class="modal__step modal__step--1">
-                <p class="modal__paragraph">Busca las organizaciones que participaran en el evento...</p>
+                <p class="modal__paragraph">Busca las organizaciones que participarán en el evento...</p>
                 <form class="modal__form" id="search-orgs-form">
                     <div class="form__group form__group--search">
                         <div class="group__content">
                             <label for="nit" class="form__label">NIT</label>
-                            <input type="search" name="nit" id="nit" class="form__input numeric-field" required pattern="^\d+(-\d+)?$" title="Formato invalido para NIT">
+                            <input type="search" name="nit" id="nit" class="form__input numeric-field" required pattern="^\d+(-\d+)?$" title="Formato inválido para NIT">
                         </div>
                         <button type="submit">Buscar</button>
                     </div>
@@ -39,13 +41,13 @@
                 <div class="modal__details">
                     <h4>Datos Organización Externa</h4>
                     <ul class="modal__list">
-                        <li class="modal__li" id="organizacion-nit"><span>NIT: </span> TEXTO</li>
-                        <li class="modal__li" id="organizacion-nombre"><span>Nombre: </span> TEXTO</li>
-                        <li class="modal__li" id="organizacion-representante"><span>Representante Legal: </span> TEXTO</li>
-                        <li class="modal__li" id="organizacion-telefono"><span>Teléfono: </span> TEXTO</li>
-                        <li class="modal__li" id="organizacion-ubicacion"><span>Ubicación: </span> TEXTO</li>
-                        <li class="modal__li" id="organizacion-sector"><span>Sector económico: </span> TEXTO</li>
-                        <li class="modal__li" id="organizacion-actividad"><span>Actividad principal: </span> TEXTO</li>
+                        <li class="modal__li"><strong>NIT:</strong> <span id="organizacion-nit"></span></li> 
+                        <li class="modal__li"><strong>Nombre:</strong> <span id="organizacion-nombre"></span></li> 
+                        <li class="modal__li"><strong>Representante Legal:</strong> <span id="organizacion-representante"></span></li> 
+                        <li class="modal__li"><strong>Teléfono:</strong> <span id="organizacion-telefono"></span></li> 
+                        <li class="modal__li"><strong>Ubicación:</strong> <span id="organizacion-ubicacion"></span></li> 
+                        <li class="modal__li"><strong>Sector económico:</strong> <span id="organizacion-sector"></span></li> 
+                        <li class="modal__li"><strong>Actividad principal:</strong> <span id="organizacion-actividad"></span></li> 
                     </ul>
                 </div>
 
