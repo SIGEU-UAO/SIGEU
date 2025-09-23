@@ -1,4 +1,6 @@
 import Alert from "/static/js/modules/Alert.js";
+import { telefonoRegex, passwordRegex } from "/static/js/base.js";
+import { validarFormData, formDataToJSON } from "/static/js/modules/forms/utils.js";
     const form = document.querySelector("form.form");
     const editBtn = document.querySelector(".form__edit");
     const cancelBtn = document.getElementById("cancelBtn");
@@ -24,12 +26,11 @@ import Alert from "/static/js/modules/Alert.js";
         initialValues[field.id] = field.value;
         field.disabled = true;
     });
-    // Container for form messages
-    let messageContainer = document.createElement("div");
-    messageContainer.classList.add("form__message");
-    form.prepend(messageContainer);
+    // Container for form messages (initialized in initPerfilForm)
+    let messageContainer;
 
     function showMessage(text, type = "error") {
+        if (!messageContainer) return;
         messageContainer.textContent = text;
         messageContainer.style.color = type === "error" ? "red" : "green";
         messageContainer.style.marginBottom = "10px";
@@ -37,20 +38,38 @@ import Alert from "/static/js/modules/Alert.js";
 
    
 
-    // create error message containers for each field
-    editableFields.forEach(field => {
-        let err = document.createElement("div");
-        err.classList.add("field-error");
-        err.style.color = "red";
-        err.style.fontSize = "0.9em";
-        err.style.marginTop = "2px";
-        field.parentNode.appendChild(err);
-    });
+    // Inicialización de contenedores y mensajes
+    function initPerfilForm() {
+        if (!form) return;
+        // Crear contenedor de mensajes si no existe
+        if (!messageContainer) {
+            messageContainer = document.createElement("div");
+            messageContainer.classList.add("form__message");
+            form.prepend(messageContainer);
+        }
+        // Crear contenedores de error por campo si no existen
+        editableFields.forEach(field => {
+            if (!field) return;
+            let err = field.parentNode.querySelector('.field-error');
+            if (!err) {
+                err = document.createElement('div');
+                err.classList.add('field-error');
+                err.style.color = 'red';
+                err.style.fontSize = '0.9em';
+                err.style.marginTop = '2px';
+                field.parentNode.appendChild(err);
+            }
+        });
+    }
+
+    // Ejecutar inicialización al cargar el módulo
+    initPerfilForm();
 
     
 
     // enable editing
-    editBtn.addEventListener("click", () => {
+    function handleEdit(e) {
+        e.preventDefault();
         editableFields.forEach(field => {
             field.disabled = false;
             field.removeAttribute('disabled');
@@ -60,53 +79,31 @@ import Alert from "/static/js/modules/Alert.js";
         if (editableFields.length > 0) {
             editableFields[0].focus();
         }
-        
-        // clear previous messages
-        
-        
-        // show action buttons
-        
+        if (formActions) {
             formActions.classList.remove("hide");
-       
-    
-    });
+        }
+    }
+    editBtn.addEventListener("click", handleEdit);
 
     // cancel changes
-    cancelBtn.addEventListener("click", () => {
+    function handleCancel(e) {
+        e.preventDefault();
         editableFields.forEach(field => {
             field.value = initialValues[field.id];
             field.disabled = true;
             field.setAttribute('disabled', 'true');
         });
-        
-        
-        
-        // hide action buttons
-      
+        if (formActions) {
             formActions.classList.add("hide");
-        
-    });
+        }
+    }
+    cancelBtn.addEventListener("click", handleCancel);
 
     // save changes
     async function handleSubmit(e) {
         e.preventDefault();
 
-        let valid = true;
-        editableFields.forEach(field => {
-            const isPasswordField = passwordFieldEl && field === passwordFieldEl;
-            // allow empty password field (means no change)
-            if (isPasswordField) return;
-            if (!field.value.trim()) {
-                const errNode = field.parentNode.querySelector(".field-error");
-                if (errNode) {
-                    errNode.textContent = `El campo "${field.name}" no puede estar vacío.`;
-                }
-                valid = false;
-            }
-        });
-        if (!valid) return;
-
-        // confirm if password is being changed
+        // Confirmación si se cambiará la contraseña (basado en el input, no en FormData)
         if (passwordFieldEl && passwordFieldEl.value.trim().length > 0) {
             const result = await Alert.confirmationAlert({
                 title: "Cambiar contraseña",
@@ -116,7 +113,6 @@ import Alert from "/static/js/modules/Alert.js";
             });
             const confirmed = (result && typeof result === 'object') ? !!result.isConfirmed : !!result;
             if (!confirmed) {
-                // go back to  initial state
                 editableFields.forEach(field => {
                     field.disabled = true;
                     field.setAttribute('disabled', 'true');
@@ -124,32 +120,48 @@ import Alert from "/static/js/modules/Alert.js";
                 if (formActions) {
                     formActions.classList.add("hide");
                 }
-                return; // cancel sending
+                return;
             }
         }
-        //  create FormData with all fields (including disabled ones)
-        const formData = new FormData();
-        
-        // add CSRF token if present
-        const csrf = form.querySelector("input[name=csrfmiddlewaretoken]");
-        if (csrf) {
-            formData.append('csrfmiddlewaretoken', csrf.value);
+
+        // Construir FormData desde el formulario
+        const formData = new FormData(form);
+
+        // Si la contraseña está vacía, eliminarla para que no falle la validación por vacío (campo opcional)
+        const pwdVal = (formData.get('contraseña') || '').trim();
+        if (!pwdVal) {
+            formData.delete('contraseña');
         }
-        
-        // add all form inputs to formData
-        const allInputs = form.querySelectorAll('input, select, textarea');
-        allInputs.forEach(input => {
-            if (input.name && input.name !== 'csrfmiddlewaretoken') {
-                formData.append(input.name, input.value || '');
-            }
-        });
+
+        // Reglas de validación adicionales usando utilidades compartidas
+        const rules = {
+            telefono: [
+                { check: value => telefonoRegex.test(value), msg: "Teléfono inválido" }
+            ]
+        };
+        if (pwdVal) {
+            rules['contraseña'] = [
+                { check: value => passwordRegex.test(value), msg: "Contraseña inválida" }
+            ];
+        }
+
+        // Validación genérica (también verifica vacíos para campos presentes)
+        if (!validarFormData(formData, rules)) return;
+
+        // Preparar headers y body JSON al estilo estándar (enviar CSRF en headers)
+        const csrf = (form.querySelector("input[name=csrfmiddlewaretoken]") || {}).value || "";
+        const bodyData = formDataToJSON(formData);
+
         try {
             const res = await fetch("/perfil/", {
                 method: "POST",
                 headers: {
                     "X-Requested-With": "XMLHttpRequest",
+                    "X-CSRFToken": csrf,
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
                 },
-                body: formData
+                body: bodyData
             });
 
             if (!res.ok) {
