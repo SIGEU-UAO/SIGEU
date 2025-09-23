@@ -56,3 +56,4 @@ class UsersAPI():
 
             return JsonResponse({"error": "No se encontró ningun usuario."}, status=401)
         return JsonResponse({"error": "Método no permitido"}, status=405)
+
