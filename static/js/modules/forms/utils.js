@@ -45,3 +45,9 @@ export function getCookie(name) {
     }
     return cookieValue;
 }
+
+export function cleanContainer(container){
+  while (container.firstElementChild) {
+    container.firstElementChild.remove();
+  }
+}

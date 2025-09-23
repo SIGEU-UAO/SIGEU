@@ -21,3 +21,13 @@ class OrganizacionExternaService:
             raise ValueError("Error de integridad en el registro de organización.") from e
 
         return org.idOrganizacion
+
+    @staticmethod
+    def listar():
+        return list(OrganizacionExterna.objects.values())
+    
+    @staticmethod
+    def filtrar_por_nit(nit):
+        if not nit:
+            return []
+        return list(OrganizacionExterna.objects.filter(nit__contains=nit).values())

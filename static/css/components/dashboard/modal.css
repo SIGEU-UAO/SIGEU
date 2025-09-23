@@ -1,0 +1,178 @@
+.modal {
+  width: 100%;
+  height: 100dvh;
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+  border: none;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal[open] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal__content {
+  width: 500px;
+  background: white;
+  border-radius: 8px;
+  transform: scale(0.8);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.modal[open] .modal__content {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.modal__header{
+  padding: 16px 16px 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal__header h3{
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--black);
+}
+
+.modal__close--icon{
+  width: 24px;
+  height: 24px;
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  transition: .3s ease-in-out scale;
+}
+
+.modal__close--icon label i{
+  cursor: pointer;
+}
+
+.modal__close--icon:hover{
+  scale: 1.5;
+}
+
+.modal__main{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Steps */
+.modal__step {
+  display: none;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .22s ease, transform .22s ease;
+}
+
+/* Mostrar el step correspondiente según el radio (inputs están *antes* de .modal__main) */
+#step1:checked ~ .modal__main .modal__step--1,
+#step2:checked ~ .modal__main .modal__step--2,
+#step3:checked ~ .modal__main .modal__step--3 {
+  display: flex;
+  flex-direction: column;
+  padding: 0px 24px;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Barra de progreso */
+.progress {
+  height: 6px;
+  background-color: #eee;
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 16px 24px;
+}
+
+.progress__bar {
+  width: 0%;
+  height: 100%;
+  transition: width .28s ease;
+  background-color: var(--primary);
+}
+
+/* ancho de la barra por step */
+#step1:checked ~ .modal__main .progress__bar { width: 33%; }
+#step2:checked ~ .modal__main .progress__bar { width: 66%; }
+#step3:checked ~ .modal__main .progress__bar { width: 100%; }
+
+.modal__paragraph{
+  margin-bottom: 16px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.modal__form{
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form__group.form__group--search{
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+}
+
+.form__group.form__group--search button[type='submit']{
+  padding: 0 16px;
+  height: 48px;
+  border-radius: 8px;
+  font-size: 16px;
+  background-color: var(--primary);
+  color: #fff;
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+.group__content{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.modal__footer{
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+}
+
+.modal__btn, .modal__close--btn, .organization__btn{
+  padding: 8px 16px;
+  background-color: transparent;
+  border: 1px solid var(--pale-gray);
+  border-radius: 3px;
+  color: var(--black);
+  cursor: pointer;
+  outline: none;
+  font-weight: 500;
+}
+
+.modal__btn--primary{
+  background-color: var(--primary);
+  color: #fff;
+}
+
+.modal__btn label, .organization__btn label{
+    cursor: pointer;
+}

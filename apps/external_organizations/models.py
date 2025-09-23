@@ -2,7 +2,7 @@ from django.db import models
 
 class OrganizacionExterna(models.Model):
     idOrganizacion = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-    nit = models.CharField(max_length=12) 
+    nit = models.CharField(max_length=12, unique=True) 
     nombre = models.CharField(max_length=100)
     representanteLegal = models.CharField(max_length=100)
     telefono = models.CharField(max_length=10)
