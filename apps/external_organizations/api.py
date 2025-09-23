@@ -1,5 +1,4 @@
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
 from .forms import RegistroForm
 from .service import OrganizacionExternaService
 from .models import OrganizacionExterna
@@ -26,11 +25,14 @@ class OrganizacionesExternasAPI:
         return JsonResponse({"error": "Método no permitido"}, status=405)
 
     def listar(request):
+        # Check for query parameters
         if request.method == "GET":
             if request.GET:
                 nitSearch = request.GET.get("nit")
                 if nitSearch:
                     organizaciones = OrganizacionExternaService.filtrar_por_nit(nitSearch)
+
+                     # No results found
                     if not organizaciones:
                         return JsonResponse({
                             "organizaciones": organizaciones,
@@ -38,6 +40,7 @@ class OrganizacionesExternasAPI:
                             "messageType": "info"
                         }, status=200)
                     else:
+                        # Return all the organizations
                         return JsonResponse({
                             "organizaciones": organizaciones,
                             "message": "Búsqueda completada correctamente!",
@@ -51,10 +54,9 @@ class OrganizacionesExternasAPI:
 
         return JsonResponse({"error": "Método no permitido"}, status=405)
 
-    def detalle(request, id):
-        if request.method == "GET":
-            org = get_object_or_404(OrganizacionExterna, idOrganizacion=id)
-           
+    def obtener_por_id(request, id):
+            if request.method == "GET":
+                org = OrganizacionExternaService.obtener_por_id(id)
             data = {
                 "organizacion": {  
                     "idOrganizacion": org.idOrganizacion,
@@ -69,4 +71,3 @@ class OrganizacionesExternasAPI:
             }
             return JsonResponse(data, status=200)
 
-        return JsonResponse({"error": "Método no permitido"}, status=405)
