@@ -18,7 +18,7 @@ class UsuarioManager(BaseUserManager):
 
 class Usuario(AbstractBaseUser, PermissionsMixin):
     idUsuario = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-    numeroIdentificacion = models.CharField(max_length=10, unique=True)
+    numeroIdentificacion = models.CharField(max_length=10, unique=True, verbose_name="Número de Identificación")
     nombres = models.CharField(max_length=100)
     apellidos = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
@@ -28,7 +28,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["nombres", "apellidos", "telefono"]
+    REQUIRED_FIELDS = ["numeroIdentificacion", "nombres", "apellidos", "telefono"]
 
     objects = UsuarioManager()
 
