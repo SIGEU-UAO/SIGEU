@@ -153,10 +153,9 @@ import { validarFormData, formDataToJSON } from "/static/js/modules/forms/utils.
         const bodyData = formDataToJSON(formData);
 
         try {
-            const res = await fetch("/perfil/", {
+            const res = await fetch("/users/api/perfil/", {
                 method: "POST",
                 headers: {
-                    "X-Requested-With": "XMLHttpRequest",
                     "X-CSRFToken": csrf,
                     "Content-Type": "application/json",
                     "Accept": "application/json"
@@ -166,23 +165,24 @@ import { validarFormData, formDataToJSON } from "/static/js/modules/forms/utils.
 
             if (!res.ok) {
                 let errorJson = await res.json().catch(() => null);
-                if (errorJson && errorJson.errors) {
-                    // show field-specific errors
-                    for (let key in errorJson.errors) {
-                        let field = document.getElementById(`id_${key}`);
-                        if (field) {
-                            const errNode = field.parentNode.querySelector(".field-error");
-                            if (errNode) {
-                                errNode.textContent = errorJson.errors[key].join(", ");
+                if (errorJson && errorJson.error) {
+                    const err = errorJson.error;
+                    // Si error es un dict de errores por campo, pintarlos
+                    if (typeof err === 'object' && err !== null) {
+                        for (let key in err) {
+                            let field = document.getElementById(`id_${key}`);
+                            if (field) {
+                                const errNode = field.parentNode.querySelector(".field-error");
+                                if (errNode) {
+                                    const msgs = Array.isArray(err[key]) ? err[key] : [String(err[key])];
+                                    errNode.textContent = msgs.join(", ");
+                                }
                             }
                         }
+                        return;
                     }
-                    
-                    return;
-                }
-                // Si viene un error general en formato { error: "mensaje" }, mostrarlo arriba del formulario
-                if (errorJson && errorJson.error) {
-                    showMessage(errorJson.error, "error");
+                    // Si es un string, mostrarlo arriba del formulario
+                    showMessage(String(err), "error");
                     return;
                 }
                 // Si no hay JSON o estructura conocida, mostrar mensaje genérico pero no como error de red
