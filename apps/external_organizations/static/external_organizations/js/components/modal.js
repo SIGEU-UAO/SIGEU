@@ -1,15 +1,27 @@
-import Alert from "/static/js/modules/Alert.js";
-import Loader from "/static/js/modules/Loader.js";
-import Modal from "/static/js/modules/Modal.js";
+import Alert from "/static/js/modules/classes/Alert.js";
+import Loader from "/static/js/modules/classes/Loader.js";
+import Modal from "/static/js/modules/classes/Modal.js";
+import API from "/static/js/modules/classes/API.js";
 import { cleanContainer } from "/static/js/modules/forms/utils.js";
-
-//* Variables
-let lastNitSearchValue = "";
 
 //* Selectores
 const searchOrgsLoader = document.querySelector("#search-orgs-form .loader")
 const searchOrgsResult = document.querySelector("#search-orgs-form .form__results")
 const searchOrgsSuggest = document.querySelector("#search-orgs-form .form__suggest")
+
+//Steps
+const step1 = document.querySelector("#step1");
+const step2 = document.querySelector("#step2");
+const step3 = document.querySelector("#step3");
+
+//* Step-2
+const nitSpan = document.getElementById("organizacion-nit");
+const nombreSpan = document.getElementById("organizacion-nombre");
+const representanteSpan = document.getElementById("organizacion-representante");
+const telefonoSpan = document.getElementById("organizacion-telefono");
+const ubicacionSpan = document.getElementById("organizacion-ubicacion");
+const sectorSpan = document.getElementById("organizacion-sector");
+const actividadSpan = document.getElementById("organizacion-actividad");
 
 //* Functions
 function toggleSearchState(loader, result) {
@@ -27,69 +39,54 @@ export async function handleOrgsFormSubmit(e) {
         Alert.error(`El campo de busqueda es obligatorio`);
         return;
     }
-    if (searchInputValue == lastNitSearchValue) return;
 
-    // Save current value as last search
-    lastNitSearchValue = searchInputValue;
-
+    //Set default classes
     searchOrgsResult.classList.add("hide");
     searchOrgsSuggest.classList.add("hide");
     Loader.toggleLoader(searchOrgsLoader);
 
-    try {
-        let res = await fetch(`/orgs/api/?nit=${searchInputValue}`);
-        let json = await res.json();
-        if (!res.ok) {
-            Alert.error(json.error || "Error en el registro");
-            setTimeout(() => toggleSearchState(searchOrgsLoader, searchOrgsResult), 1500);
-            return;   
-        }
-
-        //* Display cards with organizations
-        const { organizaciones, message, messageType } = json;
-
-        // If there are no organizations, display message and return
-        if (messageType === "info") {
-            Alert.info(message);
-            setTimeout(() => {
-                Loader.toggleLoader(searchOrgsLoader);
-                searchOrgsSuggest.classList.remove("hide")
-            }, 1500);
-            return;
-        }
-
-        //* Show organizations & alert
-        displayOrganizationsCards(searchOrgsResult, organizaciones);
-        Alert.success(message)
-        toggleSearchState(searchOrgsLoader, searchOrgsResult);
-    } catch (err) {
-        Alert.error("Error de red. Intenta de nuevo.", err);
-        console.error(err);
+    //Fetch the endpoint
+    const result = await API.fetchGet(`/orgs/api/?nit=${searchInputValue}`)
+    if (result.error) {
+        setTimeout(() => toggleSearchState(searchOrgsLoader, searchOrgsResult), 1500);
+        return; 
     }
+
+    //* Display cards with organizations
+    const { organizaciones, message, messageType } = result.data; 
+
+    // If there are no organizations, display message and return
+    if (messageType === "info") {
+        Alert.info(message);
+        setTimeout(() => {
+            Loader.toggleLoader(searchOrgsLoader);
+            searchOrgsSuggest.classList.remove("hide")
+        }, 1500);
+        return;
+    }
+
+    // Show organizations & alert
+    displayOrganizationsCards(searchOrgsResult, organizaciones);
+    Alert.success(message)
+    toggleSearchState(searchOrgsLoader, searchOrgsResult);
 }
 
 export async function getExternalOrganization(id){
-    try {
-        let res = await fetch(`/orgs/api/${id}/`);
-        let json = await res.json();
-
-        if (!res.ok) {
-            Alert.error(json.error || "No se pudo obtener la organización");
-            return;
-        }
-
-        const org = json.organizacion;
-        document.getElementById("organizacion-nit").textContent = org.nit;
-        document.getElementById("organizacion-nombre").textContent = org.nombre;
-        document.getElementById("organizacion-representante").textContent = org.representanteLegal;
-        document.getElementById("organizacion-telefono").textContent = org.telefono;
-        document.getElementById("organizacion-ubicacion").textContent = org.ubicacion;
-        document.getElementById("organizacion-sector").textContent = org.sectorEconomico;
-        document.getElementById("organizacion-actividad").textContent = org.actividadPrincipal;
-    } catch (err) {
-        console.error(err);
-        Alert.error("Error de red al cargar datos de la organización.");
+    //Fetch the endpoint
+    const result = await API.fetchGet(`/orgs/api/${id}`)
+    if (result.error) {
+        step1.checked = true;
+        return; 
     }
+
+    const { nit, nombre, representanteLegal, telefono, ubicacion, sectorEconomico, actividadPrincipal } = result.data.organizacion;
+    nitSpan.textContent = nit;
+    nombreSpan.textContent = nombre;
+    representanteSpan.textContent = representanteLegal;
+    telefonoSpan.textContent = telefono;
+    ubicacionSpan.textContent = ubicacion;
+    sectorSpan.textContent = sectorEconomico;
+    actividadSpan.textContent = actividadPrincipal;
 }
 
 //* Function to display the organizations in the modal

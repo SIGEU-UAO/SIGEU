@@ -1,5 +1,5 @@
 import { handleOrgsFormSubmit } from "/static/external_organizations/js/components/modal.js";
-import Modal from "/static/js/modules/Modal.js";
+import Modal from "/static/js/modules/classes/Modal.js";
 
 //* Selectors
 const modals = document.querySelectorAll('.modal');

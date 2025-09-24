@@ -23,6 +23,10 @@
     flex-direction: column;
 }
 
+.sidebar__list a {
+    text-decoration: none;
+}
+
 .sidebar__item{
     padding: 14px 24px 14px 20px;
     cursor: pointer;
@@ -67,6 +71,10 @@
 
 .item__sublist{
     list-style: none;
+}
+
+.item__sublist a{
+    text-decoration: none;
 }
 
 .item__sublist .item__info h4{

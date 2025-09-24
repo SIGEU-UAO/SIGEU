@@ -1,6 +1,6 @@
 import { logoutUrl, loginUrl } from "/static/js/base.js";
 import { getCookie } from "/static/js/modules/forms/utils.js";
-import Alert from "/static/js/modules/Alert.js";
+import Alert from "/static/js/modules/classes/Alert.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     const logoutBtn = document.getElementById("boton-cerrar-sesion");
