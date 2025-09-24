@@ -1,5 +1,6 @@
 from django.db import IntegrityError
-from .models import *
+from .models import OrganizacionExterna
+from django.shortcuts import get_object_or_404
 
 class OrganizacionExternaService:
     @staticmethod
@@ -25,9 +26,27 @@ class OrganizacionExternaService:
     @staticmethod
     def listar():
         return list(OrganizacionExterna.objects.values())
-    
+
     @staticmethod
     def filtrar_por_nit(nit):
         if not nit:
             return []
         return list(OrganizacionExterna.objects.filter(nit__contains=nit).values())
+
+    @staticmethod
+    def filtrar_por_nit(nit):
+        if not nit:
+         return []
+        return list(
+            OrganizacionExterna.objects
+            .filter(nit__icontains=nit)  
+            .values(
+                "idOrganizacion",   
+                "nit",
+                "nombre"
+            )
+        )
+    @staticmethod
+    def obtener_por_id(id_organizacion):
+        return get_object_or_404(OrganizacionExterna, idOrganizacion=id_organizacion)
+    

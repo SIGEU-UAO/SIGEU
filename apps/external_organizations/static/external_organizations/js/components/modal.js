@@ -68,9 +68,28 @@ export async function handleOrgsFormSubmit(e) {
     }
 }
 
-//TODO: AQUI VA EL CODIGO DE BETA
 export async function getExternalOrganization(id){
-    alert(`El id de la organizacion externa es: ${id}`)
+    try {
+        let res = await fetch(`/orgs/api/${id}/`);
+        let json = await res.json();
+
+        if (!res.ok) {
+            Alert.error(json.error || "No se pudo obtener la organización");
+            return;
+        }
+
+        const org = json.organizacion;
+        document.getElementById("organizacion-nit").textContent = org.nit;
+        document.getElementById("organizacion-nombre").textContent = org.nombre;
+        document.getElementById("organizacion-representante").textContent = org.representanteLegal;
+        document.getElementById("organizacion-telefono").textContent = org.telefono;
+        document.getElementById("organizacion-ubicacion").textContent = org.ubicacion;
+        document.getElementById("organizacion-sector").textContent = org.sectorEconomico;
+        document.getElementById("organizacion-actividad").textContent = org.actividadPrincipal;
+    } catch (err) {
+        console.error(err);
+        Alert.error("Error de red al cargar datos de la organización.");
+    }
 }
 
 //* Function to display the organizations in the modal
@@ -79,7 +98,7 @@ function displayOrganizationsCards(resultContainer, organizations){
 
     organizations.forEach(organization => {
         const { idOrganizacion, nit, nombre } = organization;
-        
+
         //* Container div
         const organizationCard = document.createElement("DIV")
         organizationCard.classList.add("organization__card");
