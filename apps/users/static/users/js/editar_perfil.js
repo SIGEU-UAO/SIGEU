@@ -103,7 +103,7 @@ import { validarFormData, formDataToJSON } from "/static/js/modules/forms/utils.
     async function handleSubmit(e) {
         e.preventDefault();
 
-        // Confirmación si se cambiará la contraseña (basado en el input, no en FormData)
+        // password confirmation if changed
         if (passwordFieldEl && passwordFieldEl.value.trim().length > 0) {
             const result = await Alert.confirmationAlert({
                 title: "Cambiar contraseña",
@@ -124,16 +124,16 @@ import { validarFormData, formDataToJSON } from "/static/js/modules/forms/utils.
             }
         }
 
-        // Construir FormData desde el formulario
+        //buildear formData 
         const formData = new FormData(form);
 
-        // Si la contraseña está vacía, eliminarla para que no falle la validación por vacío (campo opcional)
+        // if password is empty, remove it from formData to avoid overwriting with empty
         const pwdVal = (formData.get('contraseña') || '').trim();
         if (!pwdVal) {
             formData.delete('contraseña');
         }
 
-        // Reglas de validación adicionales usando utilidades compartidas
+        // rules for validation
         const rules = {
             telefono: [
                 { check: value => telefonoRegex.test(value), msg: "Teléfono inválido" }
@@ -145,10 +145,10 @@ import { validarFormData, formDataToJSON } from "/static/js/modules/forms/utils.
             ];
         }
 
-        // Validación genérica (también verifica vacíos para campos presentes)
+        // generic form validation
         if (!validarFormData(formData, rules)) return;
 
-        // Preparar headers y body JSON al estilo estándar (enviar CSRF en headers)
+        // prepare headers and body json
         const csrf = (form.querySelector("input[name=csrfmiddlewaretoken]") || {}).value || "";
         const bodyData = formDataToJSON(formData);
 
@@ -167,7 +167,7 @@ import { validarFormData, formDataToJSON } from "/static/js/modules/forms/utils.
                 let errorJson = await res.json().catch(() => null);
                 if (errorJson && errorJson.error) {
                     const err = errorJson.error;
-                    // Si error es un dict de errores por campo, pintarlos
+                    // if error is a dict of field errors, paint them
                     if (typeof err === 'object' && err !== null) {
                         for (let key in err) {
                             let field = document.getElementById(`id_${key}`);
@@ -181,11 +181,11 @@ import { validarFormData, formDataToJSON } from "/static/js/modules/forms/utils.
                         }
                         return;
                     }
-                    // Si es un string, mostrarlo arriba del formulario
+                    // If it's a string, show it above the form
                     showMessage(String(err), "error");
                     return;
                 }
-                // Si no hay JSON o estructura conocida, mostrar mensaje genérico pero no como error de red
+                // If there's no JSON or known structure, show a generic message but not as a network error
                 showMessage("No se pudo procesar la solicitud. Revisa los datos e inténtalo de nuevo.", "error");
                 return;
             }
