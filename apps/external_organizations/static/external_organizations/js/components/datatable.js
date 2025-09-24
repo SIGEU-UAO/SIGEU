@@ -1,4 +1,4 @@
-import Alert from "./Alert.js"
+import Alert from "/static/js/modules/classes/Alert.js";
 
 export default class Datatable{
     static initDatatable(url){

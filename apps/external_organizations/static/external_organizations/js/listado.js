@@ -1,3 +1,3 @@
-import Datatable from "/static/js/modules/classes/Datatable.js"
+import Datatable from "./components/datatable.js"
 
 document.addEventListener("DOMContentLoaded", () => Datatable.initDatatable("/orgs/api/datatables/"))
