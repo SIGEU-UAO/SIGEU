@@ -1,6 +1,8 @@
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from .service import UserService
+from django.contrib.auth.decorators import login_required
+from sigeu.decorators import no_superuser_required
 import json
 
 class UsersAPI():
@@ -57,6 +59,7 @@ class UsersAPI():
             return JsonResponse({"error": "No se encontró ningun usuario."}, status=401)
         return JsonResponse({"error": "Método no permitido"}, status=405)
     
+    @login_required()
     def logout(request):
         if request.method == "POST":
             logout(request)

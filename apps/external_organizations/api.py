@@ -1,10 +1,13 @@
 from django.http import JsonResponse
 from .forms import RegistroForm
 from .service import OrganizacionExternaService
-from .models import OrganizacionExterna
+from django.contrib.auth.decorators import login_required
+from sigeu.decorators import no_superuser_required, organizador_required
 import json
 
 class OrganizacionesExternasAPI:
+    @login_required()
+    @organizador_required
     def registro(request):
         if request.method == "POST":
             try:
@@ -24,6 +27,8 @@ class OrganizacionesExternasAPI:
 
         return JsonResponse({"error": "Método no permitido"}, status=405)
 
+    @login_required()
+    @organizador_required
     def listar(request):
         # Check for query parameters
         if request.method == "GET":
@@ -54,6 +59,8 @@ class OrganizacionesExternasAPI:
 
         return JsonResponse({"error": "Método no permitido"}, status=405)
 
+    @login_required()
+    @organizador_required
     def obtener_por_id(request, id):
         if request.method == "GET":
             org = OrganizacionExternaService.obtener_por_id(id)

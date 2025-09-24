@@ -6,10 +6,6 @@ from .forms import RegistroForm, InicioSesionForm
 from django.contrib.auth.decorators import login_required
 from sigeu.decorators import no_superuser_required
 
-# Solo permite acceso a usuarios que NO sean superuser
-def not_superuser(user):
-    return not user.is_superuser
-
 def formulario_registro(request):
     if request.method == "GET":
         form = RegistroForm()
