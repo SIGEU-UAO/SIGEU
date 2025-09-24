@@ -127,6 +127,33 @@ sigeu/
 
 ---
 
+## 🏗 Arquitectura de SIGEU
+
+El sistema está diseñado bajo el patrón **MVT (Model–View–Template)** nativo de Django, complementado con una **Services Layer** adicional que refuerza la separación de responsabilidades y facilita la escalabilidad.
+
+### 🔹 Modelo MVT
+
+- **Models (`models.py`)**  
+  Definen la estructura de datos y se comunican con la base de datos mediante el ORM de Django.  
+  Ejemplo: usuarios, eventos, organizaciones externas, notificaciones.
+
+- **Views (`views.py`)**  
+  Manejan la lógica de presentación. Procesan solicitudes HTTP, interactúan con los *services* y retornan respuestas HTML renderizadas con plantillas DTL (Django Template Language).  
+
+- **Templates (`templates/`)**  
+  Contienen la capa de interfaz de usuario. Se basan en layouts reutilizables y componentes modulares (dashboard, formularios, listas, etc.).
+
+### 🔹 Services Layer
+
+Además del esquema clásico MVT, SIGEU implementa una **capa de servicios por aplicación**. Su propósito es centralizar la **lógica de negocio**, de modo que las *views* solo deleguen responsabilidades.  
+
+Ejemplos:
+- `apps/users/service.py`: validación de credenciales, recuperación de contraseñas, asignación de roles.
+- `apps/events/service.py`: gestión de estados (borrador → enviado → aprobado/rechazado), validación de avales PDF, publicación automática de eventos.
+- `apps/external_organizations/service.py`: creación, edición y asociación de organizaciones externas
+
+---
+
 ## 🌿 Flujo de Trabajo con Git
 
 - Ramas principales:
