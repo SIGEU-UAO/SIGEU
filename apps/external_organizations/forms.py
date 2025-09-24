@@ -10,12 +10,12 @@ class RegistroForm(forms.Form):
     nit = forms.CharField(
         label="NIT",
         required=True,
-        max_length=12,
+        max_length=10,
         min_length=10,
         validators=[nit_validator],
         widget=forms.TextInput(attrs={
             "class": "numeric-field",
-            "pattern": r'^[0-9]{8,10}-[0-9]$',
+            "pattern": r'^[0-9]{8}-[0-9]$',
             "title": "El documento debe contener entre 8 y 10 números"
         })
     )

@@ -3,13 +3,19 @@ import Loader from "/static/js/modules/Loader.js";
 import Modal from "/static/js/modules/Modal.js";
 import { cleanContainer } from "/static/js/modules/forms/utils.js";
 
-//* Variables
-let lastNitSearchValue = "";
-
 //* Selectores
 const searchOrgsLoader = document.querySelector("#search-orgs-form .loader")
 const searchOrgsResult = document.querySelector("#search-orgs-form .form__results")
 const searchOrgsSuggest = document.querySelector("#search-orgs-form .form__suggest")
+
+//* Step-2
+const nitSpan = document.getElementById("organizacion-nit");
+const nombreSpan = document.getElementById("organizacion-nombre");
+const representanteSpan = document.getElementById("organizacion-representante");
+const telefonoSpan = document.getElementById("organizacion-telefono");
+const ubicacionSpan = document.getElementById("organizacion-ubicacion");
+const sectorSpan = document.getElementById("organizacion-sector");
+const actividadSpan = document.getElementById("organizacion-actividad");
 
 //* Functions
 function toggleSearchState(loader, result) {
@@ -27,10 +33,6 @@ export async function handleOrgsFormSubmit(e) {
         Alert.error(`El campo de busqueda es obligatorio`);
         return;
     }
-    if (searchInputValue == lastNitSearchValue) return;
-
-    // Save current value as last search
-    lastNitSearchValue = searchInputValue;
 
     searchOrgsResult.classList.add("hide");
     searchOrgsSuggest.classList.add("hide");
@@ -78,14 +80,14 @@ export async function getExternalOrganization(id){
             return;
         }
 
-        const org = json.organizacion;
-        document.getElementById("organizacion-nit").textContent = org.nit;
-        document.getElementById("organizacion-nombre").textContent = org.nombre;
-        document.getElementById("organizacion-representante").textContent = org.representanteLegal;
-        document.getElementById("organizacion-telefono").textContent = org.telefono;
-        document.getElementById("organizacion-ubicacion").textContent = org.ubicacion;
-        document.getElementById("organizacion-sector").textContent = org.sectorEconomico;
-        document.getElementById("organizacion-actividad").textContent = org.actividadPrincipal;
+        const { nit, nombre, representanteLegal, telefono, ubicacion, sectorEconomico, actividadPrincipal } = json.organizacion;
+        nitSpan.textContent = nit;
+        nombreSpan.textContent = nombre;
+        representanteSpan.textContent = representanteLegal;
+        telefonoSpan.textContent = telefono;
+        ubicacionSpan.textContent = ubicacion;
+        sectorSpan.textContent = sectorEconomico;
+        actividadSpan.textContent = actividadPrincipal;
     } catch (err) {
         console.error(err);
         Alert.error("Error de red al cargar datos de la organización.");

@@ -55,8 +55,8 @@ class OrganizacionesExternasAPI:
         return JsonResponse({"error": "Método no permitido"}, status=405)
 
     def obtener_por_id(request, id):
-            if request.method == "GET":
-                org = OrganizacionExternaService.obtener_por_id(id)
+        if request.method == "GET":
+            org = OrganizacionExternaService.obtener_por_id(id)
             data = {
                 "organizacion": {  
                     "idOrganizacion": org.idOrganizacion,
@@ -70,4 +70,4 @@ class OrganizacionesExternasAPI:
                 }
             }
             return JsonResponse(data, status=200)
-
+        return JsonResponse({"error": "Método no permitido"}, status=405)
