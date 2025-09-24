@@ -7,4 +7,4 @@ export const emailRegex = /^[A-Za-z0-9._%+-]+@uao\.edu\.co$/;
 export const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/m
 export const codigoRegex = /^[0-9]{7}$/
 export const telefonoRegex = /^[0-9]{1,10}$/
-export const nitRegex = /^[0-9]{8}-[0-9]$/;
+export const nitRegex = /^[0-9]{9}-[0-9]$/;

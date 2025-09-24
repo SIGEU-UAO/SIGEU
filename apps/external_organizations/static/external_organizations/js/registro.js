@@ -1,7 +1,8 @@
 import { telefonoRegex, nitRegex } from "/static/js/base.js";
-import { validarFormData, formDataToJSON } from "/static/js/modules/forms/utils.js";
+import { validarFormData } from "/static/js/modules/forms/utils.js";
 
-import Alert from "/static/js/modules/Alert.js";
+import Alert from "/static/js/modules/classes/Alert.js";
+import API from "/static/js/modules/classes/API.js";
 
 //* Variables
 const validationRules = {
@@ -24,34 +25,14 @@ form.addEventListener("submit", handleSubmit);
 async function handleSubmit(e) {
     e.preventDefault();
 
-    // Validar formulario
+    // Validate form
     let formData = new FormData(form);
     if (!validarFormData(formData, validationRules)) return;
 
-    const csrf = (form.querySelector("input[name=csrfmiddlewaretoken]") || {}).value || "";
-    const bodyData = formDataToJSON(formData);
+    //Fetch the endpoint
+    const result = await API.post("/orgs/api/registro/", formData);
+    if (result.error) return;
 
-    try {
-        let res = await fetch("/orgs/api/registro/", {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": csrf,
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            body: bodyData
-        });
-
-        let json = await res.json();
-
-        if (res.ok) {
-            Alert.success("Organización registrada exitosamente");
-            form.reset();
-        } else {
-            Alert.error(json.error || "Error en el registro");
-        }
-    } catch (err) {
-        Alert.error("Error de red. Intenta de nuevo.", err);
-        console.error(err);
-    }
+    Alert.success("Organización registrada exitosamente");
+    form.reset();
 }

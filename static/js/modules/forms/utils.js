@@ -1,4 +1,4 @@
-import Alert from "../Alert.js"
+import Alert from "../classes/Alert.js"
 
 //* Valida campos de un FormData (Reutilizable para todos los forms)
 export function validarFormData(formData, rules = {}) {

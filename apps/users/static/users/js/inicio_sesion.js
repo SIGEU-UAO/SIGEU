@@ -1,7 +1,8 @@
 import { dashboardUrl, emailRegex, passwordRegex } from "/static/js/base.js";
 import { handlePasswordVisibility } from "./modules/utils.js";
-import { validarFormData, formDataToJSON } from "/static/js/modules/forms/utils.js";
-import Alert from "/static/js/modules/Alert.js";
+import { validarFormData } from "/static/js/modules/forms/utils.js";
+import Alert from "/static/js/modules/classes/Alert.js";
+import API from "/static/js/modules/classes/API.js";
 
 //* Variables
 const validationRules = {
@@ -15,8 +16,6 @@ const validationRules = {
 
 //* Selectors
 let form = document.querySelector("form.form");
-let emailInput = document.getElementById("id_email");
-let passwordInput = document.getElementById("id_password");
 
 //Icons
 const passwordEyeBtns = document.querySelector(".form__group:has(.password-field) .icon__btn:first-of-type")
@@ -33,30 +32,10 @@ async function handleSubmit(e) {
   let formData = new FormData(form);
   if (!validarFormData(formData, validationRules)) return;
 
-  const csrf = (form.querySelector("input[name=csrfmiddlewaretoken]") || {}).value || "";
-  const bodyData = formDataToJSON(formData)
+  //Fetch the endpoint
+  const result = await API.post("/users/api/inicio-sesion/", formData);
+  if (result.error) return;
 
-  try {
-    let res = await fetch("/users/api/inicio-sesion/", {
-      method: "POST",
-      headers: {
-        "X-CSRFToken": csrf,
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-      },
-      body: bodyData
-    });
-
-    let json = await res.json();
-
-    if (res.ok) {
-      Alert.success("Inicio de sesión completado!");
-      setTimeout(() => { window.location.href = dashboardUrl; }, 1500);
-    } else {
-      Alert.error(json.error || "Error en el inicio de sesión");
-    }
-  } catch (err) {
-    Alert.error("Error de red. Intenta de nuevo.", err);
-    console.error(err);
-  }
+  Alert.success("Inicio de sesión completado!");
+  setTimeout(() => { window.location.href = dashboardUrl; }, 1500);
 }
