@@ -1,0 +1,33 @@
+.dataTables_wrapper{
+    max-width: 1200px !important;
+}
+
+.dataTables_length{
+    margin-bottom: 32px;
+}
+
+.main__table tbody tr.child td.child{
+    width: 0;
+}
+
+/* Botones de acción */
+.main__table tr td:last-child {
+    display: flex;
+    gap: 8px;
+}
+
+.main__table td a,
+.main__table td button {
+    display: flex;
+    width: 36px;
+    height: 36px;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--primary);
+    color: #fff;
+    border-radius: 6px;
+    font-size: 18px;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+}

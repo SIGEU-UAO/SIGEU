@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 
 class OrganizacionExternaService:
     @staticmethod
-    def registrar(data):
+    def registrar(request, data):
         try:
             org = OrganizacionExterna.objects.create(
                 nit=data["nit"],
@@ -14,6 +14,7 @@ class OrganizacionExternaService:
                 ubicacion=data["ubicacion"],
                 sectorEconomico=data["sector_economico"],
                 actividadPrincipal=data["actividad_principal"],
+                creador=request.user
             )
         except IntegrityError as e:
             s = str(e).lower()
@@ -25,7 +26,7 @@ class OrganizacionExternaService:
 
     @staticmethod
     def listar():
-        return list(OrganizacionExterna.objects.values())
+        return OrganizacionExterna.objects.values()
 
     @staticmethod
     def filtrar_por_nit(nit):

@@ -1,4 +1,5 @@
 from django.db import models
+from apps.users.models import Usuario
 
 class OrganizacionExterna(models.Model):
     idOrganizacion = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
@@ -9,6 +10,7 @@ class OrganizacionExterna(models.Model):
     ubicacion = models.CharField(max_length=100)
     sectorEconomico = models.CharField(max_length=100)
     actividadPrincipal = models.CharField(max_length=100)
+    creador = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="organizaciones_creadas")
 
     def __str__(self):
         return f"{self.nombre} - Representante: {self.representanteLegal}"
