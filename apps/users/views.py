@@ -1,10 +1,16 @@
+from pyexpat.errors import messages
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render ,redirect
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from .forms import RegistroForm, InicioSesionForm
+
+from .forms import RegistroForm, InicioSesionForm, EditarPerfil
 from django.contrib.auth.decorators import login_required
 from sigeu.decorators import no_superuser_required
+from .service import UserService, validate_new_password, save_password_history
+from django.db import IntegrityError
+
+import json
 
 def formulario_registro(request):
     if request.method == "GET":
@@ -33,3 +39,43 @@ def dashboard(request):
             "active_page": "dashboard"
         })
     return JsonResponse({"error": "Método no permitido"}, status=405)
+
+@no_superuser_required
+@login_required()
+def editar_perfil(request):
+    if request.method == "GET":
+        # Obtener código de estudiante si el usuario es estudiante
+        codigo_estudiante = ""
+        if hasattr(request.user, 'estudiante'):
+            codigo_estudiante = request.user.estudiante.codigo_estudiante
+        
+        initial_data = {
+            "numeroIdentificacion": request.user.numeroIdentificacion,
+            "nombres": request.user.nombres,
+            "apellidos": request.user.apellidos,
+            "email": request.user.email,
+            "telefono": request.user.telefono,
+            "contraseña": "",   
+            "codigo_estudiante": codigo_estudiante
+        }
+        form = EditarPerfil(initial=initial_data, user=request.user)
+        return render(request, "users/editar_perfil.html", {"form": form, "active_page": "perfil"})
+    return JsonResponse({"error": "Método no permitido"}, status=405)
+ 
+@login_required
+def change_password(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Formato JSON inválido."}, status=400)
+
+    new_password = data.get("new_password")
+    if not new_password:
+        return JsonResponse({"error": "La nueva contraseña es requerida"}, status=400)
+
+    try:
+        UserService.cambiar_password(request.user, new_password)
+        return JsonResponse({"success": "Contraseña actualizada con éxito"}, status=200)
+    except ValueError as e:
+        return JsonResponse({"error": str(e)}, status=400)
