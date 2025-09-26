@@ -61,6 +61,19 @@ document.addEventListener('DOMContentLoaded', function() {
         messageContainer.style.color = type === "error" ? "red" : "green";
         messageContainer.style.backgroundColor = type === "error" ? "#ffe6e6" : "#e6ffe6";
     }
+
+    function clearMessage() {
+        if (messageContainer) {
+            messageContainer.remove();
+            messageContainer = null;
+        }
+    }
+
+    function clearFieldErrors() {
+        document.querySelectorAll('.field-error').forEach(node => {
+            node.textContent = '';
+        });
+    }
     
     // Inicialización de contenedores y mensajes
     function initPerfilForm() {
@@ -88,6 +101,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleEdit(e) {
         e.preventDefault();
         console.log('Botón de editar clickeado');
+
+        // Limpiar mensajes y errores viejos al iniciar edición
+        clearMessage();
+        clearFieldErrors();
         
         editableFields.forEach(field => {
             if (field) {
@@ -126,6 +143,9 @@ document.addEventListener('DOMContentLoaded', function() {
             formActions.classList.add("hide");
             console.log('Botones de acción ocultados');
         }
+        // Limpiar mensajes y errores al cancelar
+        clearMessage();
+        clearFieldErrors();
     }
     
     // save changes
@@ -150,19 +170,46 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // build formData 
         const formData = new FormData(form);
+        console.log('FormData creado');
+        
+        // Log all form data
+        console.log('=== DATOS DEL FORMULARIO ===');
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}: ${value}`);
+        }
         
         // if password is empty, remove it from formData to avoid overwriting with empty
         const pwdVal = (formData.get('contraseña') || '').trim();
         if (!pwdVal) {
             formData.delete('contraseña');
+            console.log('Campo contraseña eliminado (estaba vacío)');
         }
         
         // prepare headers and body json
         const csrf = (form.querySelector("input[name=csrfmiddlewaretoken]") || {}).value || "";
+        console.log('CSRF token:', csrf);
+        
         const bodyData = {};
         for (let [key, value] of formData.entries()) {
             bodyData[key] = value;
         }
+
+        // Ensure disabled-but-required fields are present
+        const readVal = (name) => {
+            const el = form.querySelector(`input[name="${name}"]`);
+            return el ? el.value : "";
+        };
+        if (!bodyData.numeroIdentificacion) bodyData.numeroIdentificacion = readVal("numeroIdentificacion");
+        if (!bodyData.nombres) bodyData.nombres = readVal("nombres");
+        if (!bodyData.apellidos) bodyData.apellidos = readVal("apellidos");
+        if (!bodyData.email) bodyData.email = readVal("email");
+        // Nota: Si el campo codigo_estudiante no existe en el DOM, no lo enviamos.
+        if (document.querySelector('input[name="codigo_estudiante"]')) {
+            if (!bodyData.codigo_estudiante) bodyData.codigo_estudiante = readVal("codigo_estudiante");
+        }
+        
+        console.log('=== DATOS A ENVIAR ===');
+        console.log(JSON.stringify(bodyData, null, 2));
         
         try {
             // Usar la URL correcta: /perfil/ en lugar de /users/api/perfil/
@@ -176,8 +223,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify(bodyData)
             });
             
+            console.log('Respuesta recibida:', res.status, res.statusText);
+            
             if (!res.ok) {
                 let errorJson = await res.json().catch(() => null);
+                console.log('Error JSON:', errorJson);
+                
                 if (errorJson && errorJson.error) {
                     const err = errorJson.error;
                     // if error is a dict of field errors, paint them
@@ -204,6 +255,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             const data = await res.json();
+            console.log('Respuesta exitosa:', data);
+            // Limpiar errores previos antes de mostrar éxito
+            clearFieldErrors();
             showMessage("Perfil actualizado correctamente!", "success");
             
             // clean the password field
@@ -236,6 +290,14 @@ document.addEventListener('DOMContentLoaded', function() {
     if (cancelBtn) {
         cancelBtn.addEventListener("click", handleCancel);
         console.log('Event listener agregado al botón de cancelar');
+    }
+
+    // Limpiar error de contraseña cuando el usuario escribe
+    if (passwordFieldEl) {
+        passwordFieldEl.addEventListener('input', () => {
+            const errNode = passwordFieldEl.parentNode.querySelector('.field-error');
+            if (errNode) errNode.textContent = '';
+        });
     }
     
     form.addEventListener("submit", handleSubmit);

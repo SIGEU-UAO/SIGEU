@@ -205,8 +205,9 @@ class EditarPerfil(forms.Form):
         validators=[password_validator],
         widget=forms.PasswordInput(attrs={
             "class": "password-field",
-            "pattern": r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$",
-            "title": "La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula, una minúscula y un número"
+            "pattern": r"^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$",
+            "title": "La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula, una minúscula y un número",
+            "placeholder": "Dejar vacío si no desea cambiar"
         }),
     )
 
