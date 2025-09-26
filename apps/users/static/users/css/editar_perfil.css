@@ -1,0 +1,155 @@
+@import url('/static/css/components/forms/form.css');
+
+.form{
+    max-width: 800px;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    box-shadow: 0 10px 60px rgba(252, 252, 255, 0.5);
+    border-radius: 30px;
+    overflow: hidden;
+    position: relative;
+}
+
+.form__bg{
+    height: 120px;
+    background-image: url("../assets/img/profile-background.webp");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: relative;
+}
+
+.form__wrapper{
+    padding: 40px;
+    position: relative;
+}
+
+.form__edit{
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 20px;
+    background-color: var(--primary);
+    border: none;
+    outline: none;
+    cursor: pointer;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    transition: all 0.3s ease;
+}
+
+.form__edit:hover{
+    background-color: var(--primary-dark, #0056b3);
+    transform: scale(1.05);
+}
+
+.form__title{
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--black);
+    margin-bottom: 32px;
+    text-align: center;
+}
+
+.form__groups{
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form__optional{
+    width: 100%;
+}
+
+/* Estilos para campos editables */
+.form__group input:not([disabled]):not([readonly]) {
+    background-color: #fff;
+    border-color: var(--primary);
+    cursor: text;
+    transition: all 0.3s ease;
+}
+
+.form__group input[disabled], 
+.form__group input[readonly] {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    cursor: not-allowed;
+    border-color: #e9ecef;
+}
+
+/* Botones de acción - ocultos por defecto */
+.form__actions{
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 32px;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+}
+
+.form__actions:not(.hide){
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.form__actions.hide{
+    display: none;
+}
+
+/* Estilos para los botones */
+.form__button{
+    padding: 0 32px;
+    height: 54px;
+    background-color: var(--primary);
+    border-radius: 12px;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.form__button:hover{
+    background-color: var(--primary-dark, #0056b3);
+    transform: translateY(-2px);
+}
+
+.form__button--secondary{
+    background-color: transparent;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+}
+
+.form__button--secondary:hover{
+    background-color: var(--primary);
+    color: #fff;
+}
+
+/* Animación para campos cuando se habilitan */
+.form__group input:not([disabled]):not([readonly]) {
+    animation: enableField 0.3s ease;
+}
+
+@keyframes enableField {
+    from {
+        background-color: #f8f9fa;
+        border-color: #e9ecef;
+    }
+    to {
+        background-color: #fff;
+        border-color: var(--primary);
+    }
+}

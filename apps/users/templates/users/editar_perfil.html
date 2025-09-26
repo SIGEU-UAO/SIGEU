@@ -1,0 +1,61 @@
+{% extends 'layouts/dashboard.html' %}
+{% load static %}
+
+{% block page_title %} SIGEU | Perfil {% endblock page_title %}
+
+{% block css_files %}
+    <link rel="stylesheet" href="{% static 'users/css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'users/css/editar_perfil.css' %}">
+    <link rel="stylesheet" href="{% static 'css/components/dashboard/modalConfirmation.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+
+{% endblock css_files %}
+{% block js_files %}
+  <script defer src="{% static 'users/js/editar_perfil.js' %}"></script>
+{% endblock js_files %}
+
+{% block content %}
+
+    <form class="form" method="POST">
+        {% csrf_token %}
+        <div class="form__bg"></div>
+  
+        <div class="form__wrapper">
+            <button type="button" class="form__edit"><i class="ri-pencil-fill"></i></button>
+
+            <h1 class="form__title">Información de Perfil</h1>
+            
+            <div class="form__groups">
+                <div class="form__row">
+                    {% include "components/form/input.html" with field=form.numeroIdentificacion %}
+                    {% include "components/form/input.html" with field=form.nombres %}
+                </div>
+
+                <div class="form__row">
+                    {% include "components/form/input.html" with field=form.apellidos %}
+                    {% include "components/form/input.html" with field=form.email %}
+                </div>
+
+                <div class="form__row">
+                    {% include "components/form/input.html" with field=form.telefono %}
+                    {% include "components/form/input.html" with field=form.contraseña %}
+                </div>
+
+                {% if form.codigo_estudiante %}
+                    <div class="form__group form__optional">
+                        {% include "components/form/input.html" with field=form.codigo_estudiante %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form__actions hide">
+                <button type="submit" class="form__button form__button--norounded">Guardar Cambios</button>
+                <button id="cancelBtn" type="button" class="form__button form__button--norounded form__button--secondary">Cancelar</button>
+            </div>
+        </div>
+    </form>
+{% endblock content %}
+
+
+
+
