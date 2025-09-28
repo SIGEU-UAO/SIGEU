@@ -8,5 +8,5 @@ const modals = document.querySelectorAll('.modal');
 const searchOrgsForm = document.getElementById("search-orgs-form");
 
 //* Event Listeners
-modals.forEach(modal => modal.querySelectorAll('.modal__close').forEach(btn => btn.addEventListener("click", e => Modal.closeModal(modal))))
-searchOrgsForm.addEventListener("submit", handleOrgsFormSubmit)
+//modals.forEach(modal => modal.querySelectorAll('.modal__close').forEach(btn => btn.addEventListener("click", e => Modal.closeModal(modal))))
+//searchOrgsForm.addEventListener("submit", handleOrgsFormSubmit)

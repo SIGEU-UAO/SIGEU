@@ -12,5 +12,28 @@
 {% endblock js_files %}
 
 {% block content %}
-    {% include 'external_organizations/components/modal.html' %}
+    {% comment "Modal de buscar organizacion" %}{% include 'external_organizations/components/modal.html' %}{% endcomment %}
+
+    <form class="form" method="POST" >
+        {% csrf_token %}
+
+        <div class="form__row">
+            {% include "components/form/input.html" with field=form.nombre %}
+            {% include "components/form/input.html" with field=form.tipo %}
+        </div>
+
+        <div class="form__row">
+            {% include "components/form/input.html" with field=form.descripcion %}
+            {% include "components/form/input.html" with field=form.fecha %}
+        </div>
+
+        <div class="form__row">
+            {% include "components/form/input.html" with field=form.horaInicio %}
+            {% include "components/form/input.html" with field=form.horaFin %}
+        </div>
+
+        <div class="form__actions">
+            <button type="submit" class="form__button form__button--norounded">Registrar evento</button>
+        </div>
+    </form>
 {% endblock content %}
