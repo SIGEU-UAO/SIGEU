@@ -46,7 +46,7 @@
 }
 
 .form__edit:hover{
-    background-color: var(--primary-dark, #0056b3);
+    background-color: var(--pale-primary, #FF9EBB);
     transform: scale(1.05);
 }
 
@@ -123,7 +123,7 @@
 }
 
 .form__button:hover{
-    background-color: var(--primary-dark, #0056b3);
+    background-color: var(--pale-primary, #FF9EBB);
     transform: translateY(-2px);
 }
 
@@ -134,7 +134,7 @@
 }
 
 .form__button--secondary:hover{
-    background-color: var(--primary);
+    background-color: var(--pale-primary, #FF9EBB);
     color: #fff;
 }
 

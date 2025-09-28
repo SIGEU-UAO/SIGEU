@@ -13,5 +13,5 @@ urlpatterns = [
     path("users/api/registro/", UsersAPI.registro, name="registro_api"),
     path("users/api/inicio-sesion/", UsersAPI.login, name="inicio_sesion_api"),
     path("users/api/logout/", UsersAPI.logout, name="logout"),
-    path("users/api/perfil/", UsersAPI.editar_perfil, name="perfil"),
+    path("users/api/editar-perfil/", UsersAPI.editar_perfil, name="perfil"),
 ]

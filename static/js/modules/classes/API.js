@@ -28,8 +28,8 @@ export default class API {
             const json = await res.json();
 
             if (!res.ok) {
-                Alert.error(json.error || `¡Error en la operación!`)
-                return { error: true };
+                // Do not alert here to avoid duplicate toasts; let caller decide how to show errors
+                return { error: true, data: json };
             }
 
             return { error: false, data: json };

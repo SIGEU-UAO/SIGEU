@@ -59,6 +59,10 @@ class UserService:
      
         rol = data.get("rol")
 
+        # Pre-validations for unique fields
+        if Usuario.objects.filter(telefono=data["telefono"]).exists():
+            raise ValueError("El teléfono ya está registrado.")
+
         try:
             usuario = Usuario.objects.create_user(
                 email=data["email"],
@@ -74,6 +78,8 @@ class UserService:
                 raise ValueError("El correo electrónico ya está registrado.") from e
             if "numeroidentificacion" in s or "numero_identificacion" in s:
                 raise ValueError("El documento de identidad ya está registrado.") from e
+            if "telefono" in s or "phone" in s:
+                raise ValueError("El teléfono ya está registrado.") from e
             raise ValueError("Datos duplicados en el usuario.") from e
         
         # --- ave the initial password in the history ---

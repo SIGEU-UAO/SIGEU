@@ -190,10 +190,9 @@ class EditarPerfilForm(forms.Form):
     contraseña = forms.CharField(
         label="Contraseña",
         required=False,
-        validators=[password_validator],
         widget=forms.PasswordInput(attrs={
             "class": "password-field",
-            "pattern": r"^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$",
+            "pattern": r"^(?:|(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,})$",
             "title": "La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula, una minúscula y un número",
             "placeholder": "Dejar vacío si no desea cambiar"
         }),
@@ -209,3 +208,15 @@ class EditarPerfilForm(forms.Form):
         # if the user is not a strudent, remove field
         if not user or user.rol != "Estudiante":
             self.fields.pop("codigo_estudiante", None)
+
+    def clean_contraseña(self):
+        value = self.cleaned_data.get("contraseña", "")
+        if value is None:
+            value = ""
+        value = value.strip()
+        # If empty, do not enforce complexity
+        if value == "":
+            return ""
+        # Enforce complexity only when provided
+        password_validator(value)
+        return value

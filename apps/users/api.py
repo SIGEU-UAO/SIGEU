@@ -4,6 +4,7 @@ from .service import UserService
 from django.contrib.auth.decorators import login_required
 from sigeu.decorators import no_superuser_required
 from .forms import EditarPerfilForm
+from .models import Usuario
 import json
 
 class UsersAPI():
@@ -95,13 +96,19 @@ class UsersAPI():
                 return JsonResponse({"error": form.errors}, status=400)
 
             cd = form.cleaned_data
+
+            # Validate phone uniqueness (excluding current user)
+            new_phone = cd["telefono"]
+            if Usuario.objects.filter(telefono=new_phone).exclude(pk=request.user.pk).exists():
+                return JsonResponse({"error": {"telefono": ["El teléfono ya está registrado."]}}, status=400)
+
             # Update basic data
             request.user.nombres = cd["nombres"]
             request.user.apellidos = cd["apellidos"]
-            request.user.telefono = cd["telefono"]
+            request.user.telefono = new_phone
 
             
-
+            
             # Password change with history validation (optional)
             if cd.get("contraseña"):
                 try:
