@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from .forms import RegistroForm, InicioSesionForm, EditarPerfil
+from .forms import RegistroForm, InicioSesionForm, EditarPerfilForm
 from django.contrib.auth.decorators import login_required
 from sigeu.decorators import no_superuser_required
 from .service import UserService
@@ -43,7 +43,7 @@ def dashboard(request):
 @login_required()
 def editar_perfil(request):
     if request.method == "GET":
-        # Obtener código de estudiante si el usuario es estudiante
+        # Get student code if user is student
         codigo_estudiante = ""
         if hasattr(request.user, 'estudiante'):
             codigo_estudiante = request.user.estudiante.codigo_estudiante
@@ -57,14 +57,14 @@ def editar_perfil(request):
             "contraseña": "",   
             "codigo_estudiante": codigo_estudiante
         }
-        form = EditarPerfil(initial=initial_data, user=request.user)
+        form = EditarPerfilForm(initial=initial_data, user=request.user)
         return render(request, "users/editar_perfil.html", {"form": form, "active_page": "perfil"})
     
     elif request.method == "POST":
-        # Logs básicos del request (no sensibles)
+        # Basic request logs (non-sensitive)
         logger.info("POST /perfil/ recibido. Content-Type=%s", request.content_type)
         
-        # Manejar actualización de perfil vía AJAX
+        # Handle profile update via AJAX
         if not request.user.is_authenticated:
             return JsonResponse({"error": "No autenticado"}, status=401)
         
@@ -75,20 +75,20 @@ def editar_perfil(request):
             logger.warning("Formato JSON inválido: %s", e)
             return JsonResponse({"error": "Formato JSON inválido."}, status=400)
 
-        # Asegurar que los campos deshabilitados/requeridos estén incluidos
+        # Ensure that disabled/required fields are included
         post_data = dict(data) if isinstance(data, dict) else {}
         for fld in ["numeroIdentificacion", "nombres", "apellidos", "email", "telefono"]:
             if not post_data.get(fld):
                 post_data[fld] = getattr(request.user, fld, "")
         
-        # Incluir codigo_estudiante si el usuario es estudiante y no viene
+        # Include codigo_estudiante if user is student and not provided
         if "codigo_estudiante" not in post_data and hasattr(request.user, 'estudiante'):
             post_data["codigo_estudiante"] = getattr(getattr(request.user, 'estudiante', None), 'codigo_estudiante', "")
 
         logger.debug("Datos finales para validación: %s", post_data)
 
-        # Validar con el mismo formulario usado en la vista
-        form = EditarPerfil(post_data, user=request.user)
+        # Validate with the same form used in the view
+        form = EditarPerfilForm(post_data, user=request.user)
         if not form.is_valid():
             # Log detallado de errores
             try:
@@ -101,17 +101,17 @@ def editar_perfil(request):
         cd = form.cleaned_data
         logger.debug("Datos validados: %s", cd)
         
-        # Actualizar datos básicos
+        # Update basic data
         request.user.nombres = cd["nombres"]
         request.user.apellidos = cd["apellidos"]
         request.user.telefono = cd["telefono"]
 
-        # Actualizar código de estudiante si aplica
+        # Update student code if applicable
         if "codigo_estudiante" in cd and hasattr(request.user, 'estudiante'):
             request.user.estudiante.codigo_estudiante = cd["codigo_estudiante"]
             request.user.estudiante.save()
 
-        # Cambio de contraseña con validación de historial (opcional)
+        # Password change with history validation (optional)
         if cd.get("contraseña"):
             try:
                 UserService.cambiar_password(request.user, cd["contraseña"])
@@ -121,7 +121,7 @@ def editar_perfil(request):
         else:
             request.user.save()
 
-        # Respuesta
+        # Response
         codigo_estudiante = ""
         if hasattr(request.user, 'estudiante'):
             codigo_estudiante = request.user.estudiante.codigo_estudiante

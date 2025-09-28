@@ -149,7 +149,7 @@ class InicioSesionForm(forms.Form):
         for field in self.fields.values():
             field.widget.attrs["autocomplete"] = "off"
 
-class EditarPerfil(forms.Form):  
+class EditarPerfilForm(forms.Form):
     numeroIdentificacion = forms.CharField(
         label="Documento de Identidad",
         required=True,
@@ -184,20 +184,8 @@ class EditarPerfil(forms.Form):
             "disabled": "true"
         })
     )
-    #* Estudiante
-    codigo_estudiante = forms.CharField(
-        label="Código de estudiante",
-        required=False,
-        min_length=7,
-        max_length=7,
-        validators=[codigo_validator],
-        widget=forms.TextInput(attrs={
-            "class": "numeric-field",
-            "pattern": r"[0-9]{7}",
-            "title": "El código de estudiante debe tener exactamente 7 dígitos",
-            "disabled": "true"
-        })
-    )
+  
+    
 
     contraseña = forms.CharField(
         label="Contraseña",

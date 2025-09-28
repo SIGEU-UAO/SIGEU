@@ -11,7 +11,7 @@
 
 {% endblock css_files %}
 {% block js_files %}
-  <script defer src="{% static 'users/js/editar_perfil.js' %}"></script>
+  <script defer type="module" src="{% static 'users/js/editar_perfil.js' %}"></script>
 {% endblock js_files %}
 
 {% block content %}
@@ -50,6 +50,7 @@
         </div>
     </form>
 {% endblock content %}
+
 
 
 
