@@ -13,10 +13,31 @@
 
 {% block content %}
     <div class="main__steps">
-        <input type="radio" name="steps" id="step1" hidden checked>
+        <input type="radio" name="steps" id="step1" hidden>
         <input type="radio" name="steps" id="step2" hidden>
         <input type="radio" name="steps" id="step3" hidden>
+        <input type="radio" name="steps" id="step4" hidden>
 
+        <div class="stepper">
+            <div class="step step--1">
+                <div class="step__circle">1</div>
+                <div class="step__label">Datos básicos</div>
+            </div>
+            <div class="step step--2">
+                <div class="step__circle">2</div>
+                <div class="step__label">Detalles</div>
+            </div>
+            <div class="step step--3">
+                <div class="step__circle">3</div>
+                <div class="step__label">Confirmación</div>
+            </div>
+            <div class="step step--4">
+                <div class="step__circle">4</div>
+                <div class="step__label">Finalizar</div>
+            </div>
+        </div>          
+
+        {% comment "Step 1" %}-------------- STEP 1 --------------{% endcomment %}
         <form class="form main__step main__step--1" id="main-form" method="POST" >
             {% csrf_token %}
     
@@ -40,10 +61,10 @@
             </div>
         </form>
     
+        {% comment "Step 1" %}-------------- STEP 1 --------------{% endcomment %}
         <section class="main__step main__step--2">
-            Hola soy el step 2
+            {% include "events/layouts/step-section.html" with title="Asignar instalaciones físicas" subtitle="Espacios físicos asignados" row_btn="Asignar una nueva instalación física" modal="instalacion_fisica" %}
         </section>
     </div>
-    {% comment "Modal de buscar organizacion" %}{% include 'external_organizations/components/modal.html' %}{% endcomment %}
 
 {% endblock content %}

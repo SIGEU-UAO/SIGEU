@@ -3,6 +3,7 @@ import Modal from "/static/js/modules/classes/Modal.js";
 import { validarFormData } from "/static/js/modules/forms/utils.js";
 import Alert from "/static/js/modules/classes/Alert.js";
 import API from "/static/js/modules/classes/API.js";
+import { goStep } from "./components/stepper.js";
 
 //* Variables
 const validationRules = {
@@ -20,17 +21,22 @@ let eventoID;
 const mainForm = document.getElementById("main-form");
 const modals = document.querySelectorAll('.modal');
 
-//* Steps radios
-const step1 = document.querySelector("#step1");
-const step2 = document.querySelector("#step2");
-const step3 = document.querySelector("#step3");
-
-//* Associate organizations modals
-const searchOrgsForm = document.getElementById("search-orgs-form");
+//* Steps buttons
+const prevStepButtons = document.querySelectorAll(".step__button--prev")
+const nextStepButtons = document.querySelectorAll(".step__button--next")
 
 //* Event Listeners
+
+//TODO: DEFINIR LUEGO DE ACABAR TODO, STEP1, STEP2 Y STEP3 CON DISPLAY NONE PARA QUE NO APAREZCAN EN LA CARGA DE LA PAGINA
+document.addEventListener("DOMContentLoaded", () => goStep(1));
+prevStepButtons.forEach(button => button.addEventListener("click", () => goStep("prev")))
+nextStepButtons.forEach(button => button.addEventListener("click", () => goStep("next")))
+modals.forEach(modal => modal.querySelectorAll('.modal__close').forEach(btn => btn.addEventListener("click", e => Modal.closeModal(modal))))
 mainForm.addEventListener("submit", handleSubmit);
-//modals.forEach(modal => modal.querySelectorAll('.modal__close').forEach(btn => btn.addEventListener("click", e => Modal.closeModal(modal))))
+
+//* Associate organizations modal
+const searchOrgsForm = document.getElementById("search-orgs-form");
+
 //searchOrgsForm.addEventListener("submit", handleOrgsFormSubmit)
 
 //* Functions
@@ -47,7 +53,6 @@ async function handleSubmit(e) {
 
     Alert.success("Evento registrado en estado borrador");
     eventoID = result.data.evento; //Get the event id
-    step1.checked = false;
-    step2.checked = true;
+    goStep("next")
     mainForm.reset();
 }

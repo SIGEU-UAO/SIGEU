@@ -1,0 +1,30 @@
+<h2 class="step__title">{{ title }}</h2>
+<div class="step__row">
+    <h3 class="step__subtitle">{{ subtitle }}</h3>
+    <button type="button" class="step__button step__button--associate" id="asignar-instalacion-btn">{{ row_btn }}</button>
+</div>
+<div class="step__cards">
+    {% comment "Template JS Card" %}{% endcomment %}
+     <div class="step__card">
+        <div class="card__content">
+            <div class="card__header">
+                <span class="card__annotation">Salón</span>
+                <h4 class="card__title">Ubicación del Salón</h4>
+            </div>
+            <div class="card__list"></div>
+            <div class="card__buttons">
+                <button type="button" class="card__button">Ver más detalles</button>
+                <button type="button" class="card__button card__button--danger">Desvincular</button>
+            </div>
+        </div>
+        <div class="card__icon">
+            <i class="ri-map-pin-2-fill"></i>
+        </div>
+     </div>
+</div>
+<div class="step__actions">
+    <button class="step__button step__button--prev">Atrás</button>
+    <button class="step__button step__button--next">Siguiente</button>
+</div>
+
+{% comment "Aqui va el modal de la instalacion fisica, el include con los with" %}{% endcomment %}

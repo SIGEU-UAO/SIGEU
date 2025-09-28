@@ -1,0 +1,72 @@
+.stepper {
+    max-width: 900px;
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin: 24px 0 36px 0;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+}
+
+.step__circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    z-index: 1;
+}
+
+.step__label {
+    margin-top: 0.5rem;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.step:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 20px;
+    width: 100%;
+    height: 3px;
+    background-color: #ddd;
+    z-index: 0;
+    transform: translateX(50%);
+}
+
+.step--active ~ .step::after {
+    background-color: #ddd;
+}  
+
+/* Step 1 activo */
+#step1:checked ~ .stepper .step--1 .step__circle { background-color: var(--blue); color: #fff; }
+
+/* Step 2 activo, colorea anterior y actual */
+#step2:checked ~ .stepper .step--1 .step__circle,
+#step2:checked ~ .stepper .step--1::after,
+#step2:checked ~ .stepper .step--2 .step__circle { background-color: var(--blue); color: #fff; }
+
+/* Step 3 activo, colorea todos anteriores y actual */
+#step3:checked ~ .stepper .step--1 .step__circle,
+#step3:checked ~ .stepper .step--1::after,
+#step3:checked ~ .stepper .step--2 .step__circle,
+#step3:checked ~ .stepper .step--2::after,
+#step3:checked ~ .stepper .step--3 .step__circle { background-color: var(--blue); color: #fff; }
+
+/* Step 4 activo, colorea todos anteriores y actual */
+#step4:checked ~ .stepper .step--1 .step__circle,
+#step4:checked ~ .stepper .step--1::after,
+#step4:checked ~ .stepper .step--2 .step__circle,
+#step4:checked ~ .stepper .step--2::after,
+#step4:checked ~ .stepper .step--3 .step__circle,
+#step4:checked ~ .stepper .step--3::after
+#step4:checked ~ .stepper .step--4 .step__circle { background-color: var(--blue); color: #fff; }
