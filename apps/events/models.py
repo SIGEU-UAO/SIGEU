@@ -17,8 +17,8 @@ class Evento(models.Model):
 
     # Fields
     idEvento = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-    descripcion = models.TextField()
     nombre = models.CharField(max_length=100)
+    descripcion = models.TextField()
     estado = models.CharField(max_length=10, choices=ESTADOS, default="Borrador")
     tipo = models.CharField(max_length=100, choices=TIPOS)
     fecha = models.DateField()

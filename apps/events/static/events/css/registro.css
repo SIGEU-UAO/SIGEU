@@ -9,3 +9,21 @@
     flex-direction: column;
     gap: 24px;
 }
+
+button label{
+    cursor: pointer;
+}
+
+/* Steps */
+.main__step {
+    display: none;
+    opacity: 0;
+    transition: opacity 2s ease;
+}
+
+.main__steps:has(#step1:checked) .main__step--1,
+.main__steps:has(#step2:checked) .main__step--2,
+.main__steps:has(#step3:checked) .main__step--3 {
+    display: flex;
+    opacity: 1;
+}
