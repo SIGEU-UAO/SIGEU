@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 
 class Facultad(models.Model):
@@ -35,3 +36,26 @@ class UnidadAcademica(models.Model):
         db_table = "unidades_academicas"
         verbose_name = "unidad_academica"
         verbose_name_plural = "unidades_academicas"
+
+class InstalacionFisica(models.Model):
+    # Enumerations
+    TIPOS = [ 
+        ("Salon", "Salón"),
+        ("Auditorio", "Auditorio"),
+        ("Laboratorio", "Laboratorio"),
+        ("Cancha", "Cancha"),
+    ]
+    
+    #Fields
+    idInstalacion = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    ubicacion = models.CharField(max_length=100)
+    capacidad = models.IntegerField(validators=[MinValueValidator(0)])
+    tipo = models.CharField(max_length=11, choices=TIPOS)
+
+    def __str__(self):
+        return f"{self.nombre} - {self.ubicacion} ({self.tipo})"
+
+    class Meta:
+        db_table = "instalaciones_fisicas"
+        verbose_name = "instalacion_fisica"
+        verbose_name_plural = "instalaciones_fisicas"
