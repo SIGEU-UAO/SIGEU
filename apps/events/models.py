@@ -1,5 +1,6 @@
 from django.db import models
 from apps.users.models import Usuario
+from apps.core.models import InstalacionFisica
 
 class Evento(models.Model):
     # Enumerations
@@ -33,3 +34,19 @@ class Evento(models.Model):
         db_table = "eventos"
         verbose_name = "evento"
         verbose_name_plural = "eventos"
+
+class InstalacionesAsignadas(models.Model):
+    evento = models.ForeignKey(Evento, on_delete=models.CASCADE)
+    instalacion = models.ForeignKey(InstalacionFisica, on_delete=models.CASCADE)
+    
+    # Simular PK Compuesta
+    class Meta:
+        db_table = "instalaciones_asignadas"
+        verbose_name = "instalacion_asignada"
+        verbose_name_plural = "instalaciones_asignadas"
+        constraints = [
+            models.UniqueConstraint(
+                fields=['evento', 'instalacion'],
+                name='unique_evento_instalacion'
+            )
+        ]

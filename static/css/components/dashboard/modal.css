@@ -17,6 +17,7 @@
 .modal[open] {
   opacity: 1;
   pointer-events: auto;
+  z-index: 99;
 }
 
 .modal__content {
@@ -76,20 +77,11 @@
 /* Steps */
 .modal__step {
   display: none;
+  flex-direction: column;
+  padding: 0 24px;
   opacity: 0;
   transform: translateY(8px);
   transition: opacity .22s ease, transform .22s ease;
-}
-
-/* Mostrar el step correspondiente según el radio (inputs están *antes* de .modal__main) */
-#step1:checked ~ .modal__main .modal__step--1,
-#step2:checked ~ .modal__main .modal__step--2,
-#step3:checked ~ .modal__main .modal__step--3 {
-  display: flex;
-  flex-direction: column;
-  padding: 0px 24px;
-  opacity: 1;
-  transform: translateY(0);
 }
 
 /* Barra de progreso */
@@ -101,17 +93,10 @@
   margin: 16px 24px;
 }
 
-.progress__bar {
-  width: 0%;
-  height: 100%;
-  transition: width .28s ease;
+.progress__bar{
   background-color: var(--primary);
+  height: 100%;
 }
-
-/* ancho de la barra por step */
-#step1:checked ~ .modal__main .progress__bar { width: 33%; }
-#step2:checked ~ .modal__main .progress__bar { width: 66%; }
-#step3:checked ~ .modal__main .progress__bar { width: 100%; }
 
 .modal__paragraph{
   margin-bottom: 16px;
@@ -157,7 +142,7 @@
   padding: 16px 0;
 }
 
-.modal__btn, .modal__close--btn, .organization__btn{
+.modal__btn, .modal__close--btn, .entity__btn{
   padding: 8px 16px;
   background-color: transparent;
   border: 1px solid var(--pale-gray);
@@ -175,4 +160,88 @@
 
 .modal__btn label, .organization__btn label{
     cursor: pointer;
+}
+
+.form__results.hide, .form__suggest.hide{
+  display: none
+}
+
+/* Cards */
+
+.form__results{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.entity__card{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.entity__info{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.entity__icon{
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.entity__description{
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.entity__description h5{
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--black);
+}
+
+.entity__description span{
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--light-gray);
+}
+
+/* Form Suggest */
+.form__suggest{
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Modal Details */
+
+.modal__details{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal__details h4{
+  font-size: 18px;
+}
+
+.modal__list{
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal__li span{
+  font-weight: 400;
 }

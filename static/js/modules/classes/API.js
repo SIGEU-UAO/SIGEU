@@ -2,16 +2,17 @@ import { formDataToJSON, getCookie } from "../forms/utils.js";
 import Alert from "./Alert.js";
 
 export default class API {
-    /**
-     * Realiza una petición POST a la URL dada con el formData o JSON proporcionado.
-     * Retorna un objeto { error, data }.
-     */
-    static async post(url, formData) {
+    static async post(url, requestBody) {
         // Get csrf token
         const csrf = getCookie("csrftoken")
 
+        // Detect whether the body is FormData or an object/JSON
+        const isFormData = requestBody instanceof FormData;
+
+        let jsonBody = requestBody; 
+        
         //Convert the formData to JSON
-        const jsonBody = formDataToJSON(formData);
+        if (isFormData) jsonBody = formDataToJSON(jsonBody);
 
         try {
             // Fetch the endpoint
@@ -39,6 +40,28 @@ export default class API {
             return { error: true };
         }
     }
+
+    static async postFormData(url, formData) {
+        const csrf = getCookie("csrftoken");
+    
+        try {
+            const res = await fetch(url, {
+                method: "POST",
+                headers: { "X-CSRFToken": csrf },
+                body: formData
+            });
+    
+            const json = await res.json();
+            if (!res.ok) {
+                Alert.error(json.error || "¡Error en la operación!");
+                return { error: true };
+            }
+            return { error: false, data: json };
+        } catch (err) {
+            Alert.error(err.message || "¡Error de Red!");
+            return { error: true };
+        }
+    }    
 
     static async fetchGet(url) {
         try {

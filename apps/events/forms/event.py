@@ -1,5 +1,5 @@
 from django import forms
-from .models import *
+from ..models import *
 
 class RegistroEventoForm(forms.Form):
     nombre = forms.CharField(label="Nombre", required=True, max_length=100)

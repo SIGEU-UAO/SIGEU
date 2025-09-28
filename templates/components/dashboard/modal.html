@@ -1,0 +1,73 @@
+<dialog class="modal" id="{{ modal_id }}">
+    <div class="modal__content">
+        <input type="radio" name="steps" value="1" hidden checked>
+        {% if modal_type != "Instalación Física" %}
+            <input type="radio" name="steps" value="2" hidden>
+            <input type="radio" name="steps" value="3" hidden>
+        {% endif %}
+
+        <header class="modal__header">
+            <h3>{{ modal_title }}</h3>
+            <button class="modal__close modal__close--icon">
+                <label for="openModal"><i class="ri-close-fill"></i></label>
+            </button>
+        </header>
+
+        <main class="modal__main">
+            {% if modal_type != "Instalación Física" %} <div class="progress"><div class="progress__bar"></div></div> {% endif %}
+
+            <div class="modal__step" data-step="1">
+                <p class="modal__paragraph">{{ modal_paragraph }}</p>
+                <form class="modal__form" id="{{ modal_search_form_id }}">
+                    <div class="form__group form__group--search">
+                        <div class="group__content">
+                            {% include "components/form/input.html" with field=search_field %}
+                        </div>
+                        <button type="submit">Buscar</button>
+                    </div>
+                    <span class="loader hide"></span>
+                    <div class="form__results hide" id="{{ modal_search_results_id }}"></div>
+                    {% if modal_type == "Organización Externa" %}
+                        <div class="form__suggest hide">
+                            <h4 class="suggest__title">¿No encuentras la organización que buscas?</h4>
+                            <a href="{% url 'registrar_org' %}" class="suggest__cta" target="_blank">Crear Organización Externa</a>
+                        </div>
+                    {% endif %}
+                </form>
+
+                <footer class="modal__footer">
+                    <button class="modal__close modal__close--btn">Cerrar</button>
+                </footer>
+            </div>
+
+            {% if modal_type != "Instalación Física" %}
+                <div class="modal__step" data-step="2">
+                    <div class="modal__details">
+                        <h4>Datos {{ modal__type }}</h4>
+                        {% comment "Se deberia renderizar con JS" %}{% endcomment %}
+                        <ul class="modal__list">
+                            <li class="modal__li"><strong>NIT:</strong> <span id="organizacion-nit"></span></li> 
+                            <li class="modal__li"><strong>Nombre:</strong> <span id="organizacion-nombre"></span></li> 
+                            <li class="modal__li"><strong>Representante Legal:</strong> <span id="organizacion-representante"></span></li> 
+                            <li class="modal__li"><strong>Teléfono:</strong> <span id="organizacion-telefono"></span></li> 
+                            <li class="modal__li"><strong>Ubicación:</strong> <span id="organizacion-ubicacion"></span></li> 
+                            <li class="modal__li"><strong>Sector económico:</strong> <span id="organizacion-sector"></span></li> 
+                            <li class="modal__li"><strong>Actividad principal:</strong> <span id="organizacion-actividad"></span></li> 
+                        </ul>
+                    </div>
+
+                    <footer class="modal__footer">
+                        <button class="modal__btn modal__btn--cancel"><label for="{{ modal_id }}-step1">Atrás</label></button>
+                        {% if modal_type == "Instalación Física" %}
+                            <button class="modal__btn modal__btn--primary" id="asignar-instalacion-fisica">Asignar Instalación Física</button>
+                        {% else %}
+                            <button class="modal__btn modal__btn--primary"><label for="{{ modal_id }}-step3">Asociar {{ modal__type }}</label></button>
+                        {% endif %}
+                    </footer>
+                </div>
+
+                {% comment "Nuevo step" %}{% endcomment %}
+            {% endif %}
+        </main>
+    </div>
+</dialog>

@@ -1,9 +1,11 @@
-import { handleOrgsFormSubmit } from "/static/external_organizations/js/components/modal.js";
+import { modalsConfig } from "/static/js/modules/components/modalsConfig.js";
+import { goStep } from "./modules/components/stepper.js";
 import Modal from "/static/js/modules/classes/Modal.js";
+import API from "/static/js/modules/classes/API.js";
+import dataStore from "./modules/dataStore.js";
+import AssociatedRecords from "./modules/components/associatedRecords.js";
 import { validarFormData } from "/static/js/modules/forms/utils.js";
 import Alert from "/static/js/modules/classes/Alert.js";
-import API from "/static/js/modules/classes/API.js";
-import { goStep } from "./components/stepper.js";
 
 //* Variables
 const validationRules = {
@@ -15,32 +17,47 @@ const validationRules = {
     ],
 };
 
-let eventoID;
-
 //* Selectors
 const mainForm = document.getElementById("main-form");
 const modals = document.querySelectorAll('.modal');
 
 //* Steps buttons
-const prevStepButtons = document.querySelectorAll(".step__button--prev")
 const nextStepButtons = document.querySelectorAll(".step__button--next")
 
 //* Event Listeners
+document.addEventListener("DOMContentLoaded", () => {
+    //* Init step form
+    goStep(1);
 
-//TODO: DEFINIR LUEGO DE ACABAR TODO, STEP1, STEP2 Y STEP3 CON DISPLAY NONE PARA QUE NO APAREZCAN EN LA CARGA DE LA PAGINA
-document.addEventListener("DOMContentLoaded", () => goStep(1));
-prevStepButtons.forEach(button => button.addEventListener("click", () => goStep("prev")))
-nextStepButtons.forEach(button => button.addEventListener("click", () => goStep("next")))
-modals.forEach(modal => modal.querySelectorAll('.modal__close').forEach(btn => btn.addEventListener("click", e => Modal.closeModal(modal))))
-mainForm.addEventListener("submit", handleSubmit);
+    //* Init modals
+    Modal.initModals(modalsConfig.map(c => ({ buttonId: c.buttonId, modalId: c.modalId })));
 
-//* Associate organizations modal
-const searchOrgsForm = document.getElementById("search-orgs-form");
+    modalsConfig.forEach(c => {
+        Modal.handleSearchFormSubmit({
+            formSelector: c.formSelector,
+            loaderSelector: c.loaderSelector,
+            resultSelector: c.resultSelector,
+            suggestSelector: c.suggestSelector,
+            endpoint: c.endpoint,
+            valueField: c.valueField,
+            displayCallback: (container, items) => {
+                Modal.displayCards(container, items, c.icon, c.fields, c.stepLabel, c.onClickCallback);
+            }
+        });
+    });
 
-//searchOrgsForm.addEventListener("submit", handleOrgsFormSubmit)
+    //* Others add event listeners
+    nextStepButtons.forEach(button => button.addEventListener("click", () => goStep("next")))
+    mainForm.addEventListener("submit", handleMainFormSubmit);
+
+    //* Events listeners to associate records to the DB
+    const associatePhysicalInstallationsBtn = nextStepButtons[0];
+    
+    if (!associatePhysicalInstallationsBtn.dataset.skip) associatePhysicalInstallationsBtn.addEventListener("click", () => AssociatedRecords.saveDBRecords("/eventos/api/asignar-instalaciones/", "instalaciones"))
+});
 
 //* Functions
-async function handleSubmit(e) {
+async function handleMainFormSubmit(e) {
     e.preventDefault();
 
     // Validate form
@@ -52,7 +69,7 @@ async function handleSubmit(e) {
     if (result.error) return;
 
     Alert.success("Evento registrado en estado borrador");
-    eventoID = result.data.evento; //Get the event id
+    dataStore.eventoId = result.data.evento; // Save the event ID
     goStep("next")
     mainForm.reset();
 }

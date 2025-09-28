@@ -53,7 +53,7 @@ class InstalacionFisica(models.Model):
     tipo = models.CharField(max_length=11, choices=TIPOS)
 
     def __str__(self):
-        return f"{self.nombre} - {self.ubicacion} ({self.tipo})"
+        return f"{self.ubicacion} ({self.tipo})"
 
     class Meta:
         db_table = "instalaciones_fisicas"

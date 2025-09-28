@@ -1,11 +1,11 @@
 from django.http import JsonResponse
-from ..forms import RegistroEventoForm
-from ..services.organizadorService import OrganizadorService
+from ..forms.event import RegistroEventoForm
+from ..services.event import EventoService
 from django.contrib.auth.decorators import login_required
 from sigeu.decorators import organizador_required
 import json
 
-class OrganizadorAPI:
+class EventoAPI:
     @login_required()
     @organizador_required
     def registro(request):
@@ -18,7 +18,7 @@ class OrganizadorAPI:
             form = RegistroEventoForm(data)
             if form.is_valid():
                 try:
-                    evento_id = OrganizadorService.registrar(request, form.cleaned_data)
+                    evento_id = EventoService.registrar(request, form.cleaned_data)
                     return JsonResponse({"evento": evento_id, "message": "Evento registrado"}, status=201)
                 except ValueError as e:
                     return JsonResponse({"error": str(e)}, status=400)

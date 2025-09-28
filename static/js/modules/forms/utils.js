@@ -1,6 +1,6 @@
 import Alert from "../classes/Alert.js"
 
-//* Valida campos de un FormData (Reutilizable para todos los forms)
+//* Validate fields in FormData (Reusable for all forms)
 export function validarFormData(formData, rules = {}) {
   for (let [campo, valor] of formData.entries()) {
     let val = valor.trim();
@@ -24,7 +24,7 @@ export function validarFormData(formData, rules = {}) {
   return true;
 }
 
-//* Retorna un JSON a partir de un formData
+//* Returns a JSON from a formData
 export function formDataToJSON(formData) {
   let obj = {};
   formData.forEach((val, key) => obj[key] = val.trim());
@@ -44,6 +44,20 @@ export function getCookie(name) {
         }
     }
     return cookieValue;
+}
+
+// * Convert an array of FormData into a single FormData container
+export function mergeFormDataArray(records, type) {
+  const bigForm = new FormData();
+
+  records.forEach((form, i) => {
+      for (const [key, value] of form.entries()) {
+          // Each field is stored as records[0][key], records[1][key]...
+          bigForm.append(`${type}[${i}][${key}]`, value);
+      }
+  });
+
+  return bigForm;
 }
 
 export function cleanContainer(container){

@@ -1,11 +1,14 @@
 from django.urls import path
 from . import views
-from .api.organizadorAPI import OrganizadorAPI
+from .api.event import EventoAPI
+from .api.associations.instalacionFisica import InstalacionesAsignadasAPI
 
 urlpatterns = [
     # --- Views ---
     path("eventos/registro/", views.formulario_registro, name="registrar_evento"),           
 
     # --- API ---
-    path("eventos/api/registro/", OrganizadorAPI.registro, name="registro_evento_api"),
+    path("eventos/api/registro/", EventoAPI.registro, name="registro_evento_api"),
+
+    path("eventos/api/asignar-instalaciones/", InstalacionesAsignadasAPI.asignar_instalaciones_fisicas, name="asignar_instalaciones_api")
 ]

@@ -1,7 +1,7 @@
 from django.db import IntegrityError
 from ..models import Evento
 
-class OrganizadorService:
+class EventoService:
     @staticmethod
     def registrar(request, data):
         try:

@@ -3,7 +3,7 @@ from .forms import RegistroForm
 from .service import OrganizacionExternaService
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
-from sigeu.decorators import no_superuser_required, organizador_required
+from sigeu.decorators import organizador_required
 import json
 
 class OrganizacionesExternasAPI:
@@ -34,21 +34,20 @@ class OrganizacionesExternasAPI:
         # Check for query parameters
         if request.method == "GET":
             if request.GET:
-                nitSearch = request.GET.get("nit")
+                nitSearch = request.GET.get("q")
                 if nitSearch:
                     organizaciones = OrganizacionExternaService.filtrar_por_nit(nitSearch)
 
                      # No results found
                     if not organizaciones:
                         return JsonResponse({
-                            "organizaciones": organizaciones,
                             "message": "No se encontraron organizaciones externas",
                             "messageType": "info"
                         }, status=200)
                     else:
                         # Return all the organizations
                         return JsonResponse({
-                            "organizaciones": organizaciones,
+                            "items": organizaciones,
                             "message": "Búsqueda completada correctamente!",
                             "messageType": "success"
                         }, status=200)
@@ -56,7 +55,7 @@ class OrganizacionesExternasAPI:
                     return JsonResponse({"error": "No se envió el query param adecuado"}, status=400)
             else:
                 organizaciones = list(OrganizacionExternaService.listar())
-                return JsonResponse({"organizaciones": organizaciones}, status=200)
+                return JsonResponse({"items": organizaciones}, status=200)
 
         return JsonResponse({"error": "Método no permitido"}, status=405)
     
