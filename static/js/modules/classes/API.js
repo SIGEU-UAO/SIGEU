@@ -47,7 +47,7 @@ export default class API {
             const json = await res.json();
 
             if (!res.ok) {
-                Alert.error(json.error || `¡Error en la operación!`)
+                Alert.error(`¡Error en la operación!`);
                 return { error: true };
             }
 

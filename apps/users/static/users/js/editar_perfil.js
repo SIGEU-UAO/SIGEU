@@ -28,9 +28,9 @@ cancelBtn.addEventListener("click", handleCancel);
 form.addEventListener("submit", handleSubmit);
 
 // Clear password error when user types
-passwordFieldEl.addEventListener('input', () => {
+
     // Mantener listener por compatibilidad; sin acciones ya que los errores se muestran por alertas
-});
+
 
 // Initialize form
 editableFields.forEach(field => {
@@ -103,18 +103,12 @@ async function handleSubmit(e) {
     }
     // Use API.post method which handles CSRF automatically
     const result = await API.post("/users/api/editar-perfil/", formData);
+
     
     if (result.error) {
-        // Mostrar mensajes de error mediante alertas (ej. teléfono duplicado)
-        let msg = '¡Error actualizando el perfil!';
-        if (result.data && result.data.error) {
-            const err = result.data.error;
-            if (typeof err === 'string') {
-                msg = err;
-            } else if (err.telefono && err.telefono.length) {
-                msg = err.telefono[0] || 'El teléfono ya está registrado.';
-            }
-        }
+        const msg = (result && result.data && (result.data.error || result.data.message))
+            ? (result.data.error || result.data.message)
+            : '¡Error actualizando el perfil!';
         Alert.error(msg);
         return;
     }

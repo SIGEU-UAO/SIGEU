@@ -153,7 +153,15 @@ class EditarPerfilForm(forms.Form):
     numeroIdentificacion = forms.CharField(
         label="Documento de Identidad",
         required=True,
-        widget=forms.TextInput(attrs={"readonly": "true"})
+        min_length=8,
+        max_length=10,
+        validators=[numero_identificacion_validator],
+        widget=forms.TextInput(attrs={
+            "readonly": "true",
+            "class": "numeric-field",
+            "pattern": r"[0-9]{8,10}",
+            "title": "El documento debe contener entre 8 y 10 números"
+        })
     )
     nombres = forms.CharField(
         label="Nombres",
@@ -205,9 +213,7 @@ class EditarPerfilForm(forms.Form):
         for field in self.fields.values():
             field.widget.attrs["autocomplete"] = "off"
 
-        # if the user is not a strudent, remove field
-        if not user or user.rol != "Estudiante":
-            self.fields.pop("codigo_estudiante", None)
+
 
     def clean_contraseña(self):
         value = self.cleaned_data.get("contraseña", "")
