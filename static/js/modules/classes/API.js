@@ -28,8 +28,22 @@ export default class API {
             const json = await res.json();
 
             if (!res.ok) {
-                // Do not alert here to avoid duplicate toasts; let caller decide how to show errors
-                return { error: true, data: json };
+                // Normalize error messages from backend (can be string or object of arrays)
+                let msg = (json && json.error) || null;
+                if (msg && typeof msg === 'object') {
+                    try {
+                        // Flatten values (strings or arrays) and join
+                        const parts = Object.values(msg).flatMap(v => Array.isArray(v) ? v : [String(v)]);
+                        msg = parts.join(' ');
+                    } catch (_) {
+                        msg = "¡Error en la operación!";
+                    }
+                }
+                if (!msg || typeof msg !== 'string') {
+                    msg = "¡Error en la operación!";
+                }
+                Alert.error(msg)
+                return { error: true, data: json }
             }
 
             return { error: false, data: json };
@@ -47,7 +61,7 @@ export default class API {
             const json = await res.json();
 
             if (!res.ok) {
-                Alert.error(`¡Error en la operación!`);
+                Alert.error(json.error ||`¡Error en la operación!`)
                 return { error: true };
             }
 

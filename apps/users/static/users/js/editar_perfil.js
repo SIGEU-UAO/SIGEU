@@ -1,6 +1,8 @@
 // Import Alert class for Notyf notifications
 import Alert from "/static/js/modules/classes/Alert.js";
 import API from "/static/js/modules/classes/API.js";
+import { logoutUrl, loginUrl } from "/static/js/base.js";
+import { getCookie } from "/static/js/modules/forms/utils.js";
 
 //* Variables
 let initialValues = {};
@@ -26,11 +28,6 @@ const passwordFieldEl = document.querySelector('input[name="contraseña"]');
 editBtn.addEventListener("click", handleEdit);
 cancelBtn.addEventListener("click", handleCancel);
 form.addEventListener("submit", handleSubmit);
-
-// Clear password error when user types
-
-    // Mantener listener por compatibilidad; sin acciones ya que los errores se muestran por alertas
-
 
 // Initialize form
 editableFields.forEach(field => {
@@ -84,6 +81,7 @@ async function handleSubmit(e) {
         });
         
         if (!result.isConfirmed) {
+            
             editableFields.forEach(field => {
                 field.disabled = true;
                 field.setAttribute('disabled', 'true');
@@ -98,6 +96,7 @@ async function handleSubmit(e) {
     
     // If password is empty, remove it from formData to avoid overwriting with empty
     const pwdVal = (formData.get('contraseña') || '').trim();
+    const changedPassword = !!pwdVal;
     if (!pwdVal) {
         formData.delete('contraseña');
     }
@@ -106,15 +105,39 @@ async function handleSubmit(e) {
 
     
     if (result.error) {
-        const msg = (result && result.data && (result.data.error || result.data.message))
-            ? (result.data.error || result.data.message)
-            : '¡Error actualizando el perfil!';
-        Alert.error(msg);
+        
         return;
     }
     
     // Success case
     Alert.success("Perfil actualizado correctamente!");
+
+    // If password was changed, log the user out and redirect to login
+    if (changedPassword) {
+        try {
+            const response = await fetch(logoutUrl, {
+                method: "POST",
+                headers: { "X-CSRFToken": getCookie("csrftoken") },
+                credentials: "same-origin"
+            });
+
+            if (response.ok) {
+                Alert.success("La contraseña fue actualizada. Se cerrará la sesión...");
+                setTimeout(() => {
+                    window.location.href = loginUrl;
+                }, 1500);
+                return; // avoid continuing UI updates as we will redirect
+            } else {
+                // If logout API failed, notify the user but keep them logged in
+                let data;
+                try { data = await response.json(); } catch {}
+                Alert.error((data && data.error) || "No se pudo cerrar sesión automáticamente. Por favor, cierra sesión manualmente.");
+            }
+        } catch (err) {
+            Alert.error("Error de red al cerrar sesión. Intenta de nuevo o cierra sesión manualmente.");
+            console.error(err);
+        }
+    }
     
     // Clean the password field
     passwordFieldEl.value = "";

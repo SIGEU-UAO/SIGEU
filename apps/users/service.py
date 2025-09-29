@@ -1,7 +1,6 @@
 from django.db import IntegrityError
 from django.contrib.auth.models import Group
 from django.contrib.auth.hashers import check_password
-from django.conf import settings
 from .models import *
 
 # Password history limit
