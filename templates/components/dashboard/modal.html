@@ -1,6 +1,6 @@
-<dialog class="modal" id="{{ modal_id }}">
+<dialog class="modal" id="modal-{{ modal_plural_name|lower }}">
     <div class="modal__content">
-        <input type="radio" name="steps" value="1" hidden checked>
+        <input type="radio" name="steps" value="1" hidden>
         {% if modal_type != "Instalación Física" %}
             <input type="radio" name="steps" value="2" hidden>
             <input type="radio" name="steps" value="3" hidden>
@@ -18,7 +18,7 @@
 
             <div class="modal__step" data-step="1">
                 <p class="modal__paragraph">{{ modal_paragraph }}</p>
-                <form class="modal__form" id="{{ modal_search_form_id }}">
+                <form class="modal__form" id="search-{{ modal_plural_name|lower }}-form">
                     <div class="form__group form__group--search">
                         <div class="group__content">
                             {% include "components/form/input.html" with field=search_field %}
@@ -26,8 +26,8 @@
                         <button type="submit">Buscar</button>
                     </div>
                     <span class="loader hide"></span>
-                    <div class="form__results hide" id="{{ modal_search_results_id }}"></div>
-                    {% if modal_type == "Organización Externa" %}
+                    <div class="form__results hide" id="{{ modal_plural_name|lower }}-container"></div>
+                    {% if modal_type == "Organizaciones Externas" %}
                         <div class="form__suggest hide">
                             <h4 class="suggest__title">¿No encuentras la organización que buscas?</h4>
                             <a href="{% url 'registrar_org' %}" class="suggest__cta" target="_blank">Crear Organización Externa</a>
@@ -43,30 +43,36 @@
             {% if modal_type != "Instalación Física" %}
                 <div class="modal__step" data-step="2">
                     <div class="modal__details">
-                        <h4>Datos {{ modal__type }}</h4>
-                        {% comment "Se deberia renderizar con JS" %}{% endcomment %}
-                        <ul class="modal__list">
-                            <li class="modal__li"><strong>NIT:</strong> <span id="organizacion-nit"></span></li> 
-                            <li class="modal__li"><strong>Nombre:</strong> <span id="organizacion-nombre"></span></li> 
-                            <li class="modal__li"><strong>Representante Legal:</strong> <span id="organizacion-representante"></span></li> 
-                            <li class="modal__li"><strong>Teléfono:</strong> <span id="organizacion-telefono"></span></li> 
-                            <li class="modal__li"><strong>Ubicación:</strong> <span id="organizacion-ubicacion"></span></li> 
-                            <li class="modal__li"><strong>Sector económico:</strong> <span id="organizacion-sector"></span></li> 
-                            <li class="modal__li"><strong>Actividad principal:</strong> <span id="organizacion-actividad"></span></li> 
-                        </ul>
+                        <h4>Datos {{ modal_type }}</h4>
+                        <ul class="modal__list"></ul>
                     </div>
 
                     <footer class="modal__footer">
-                        <button class="modal__btn modal__btn--cancel"><label for="{{ modal_id }}-step1">Atrás</label></button>
+                        <button class="modal__btn modal__btn--prev">Atrás</button>
                         {% if modal_type == "Instalación Física" %}
                             <button class="modal__btn modal__btn--primary" id="asignar-instalacion-fisica">Asignar Instalación Física</button>
                         {% else %}
-                            <button class="modal__btn modal__btn--primary"><label for="{{ modal_id }}-step3">Asociar {{ modal__type }}</label></button>
+                            <button class="modal__btn modal__btn--primary">Asociar {{ modal_type }}</button>
                         {% endif %}
                     </footer>
                 </div>
 
-                {% comment "Nuevo step" %}{% endcomment %}
+                <div class="modal__step" data-step="3">
+                    <form class="modal__form" id="asociar-{{ modal_type|lower }}-form" enctype='multipart/form-data'>
+                        {% csrf_token %}
+    
+                        {% for field in modal_associate_form %}
+                            <div class="form__row">
+                                {% include "components/form/input.html" with field=field type="file" %}
+                            </div>
+                        {% endfor %}
+
+                        <footer class="modal__footer">
+                            <button class="modal__btn modal__btn--prev">Atrás</button>
+                            <button type="submit" class="modal__btn modal__btn--primary">Guardar</button>
+                        </footer>
+                    </form>
+                </div>
             {% endif %}
         </main>
     </div>

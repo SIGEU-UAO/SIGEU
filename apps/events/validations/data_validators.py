@@ -1,3 +1,5 @@
+from django.core.exceptions import ValidationError
+
 def validate_collection(data, schema):
     if not isinstance(data, list) or len(data) == 0:
         return False
@@ -28,3 +30,7 @@ SCHEMAS = {
         "types": {"id": int}
     }
 }
+
+def validate_pdf(file):
+    if not file.name.lower().endswith('.pdf'):
+        raise ValidationError("Solo se permiten archivos PDF.")

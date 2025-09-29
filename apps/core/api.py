@@ -35,25 +35,3 @@ class CoreAPI:
                 return JsonResponse({"items": instalaciones}, status=200)
 
         return JsonResponse({"error": "Método no permitido"}, status=405)
-
-"""
-    @login_required()
-    @organizador_required
-    def obtener_por_id(request, id):
-        if request.method == "GET":
-            org = OrganizacionExternaService.obtener_por_id(id)
-            data = {
-                "organizacion": {  
-                    "idOrganizacion": org.idOrganizacion,
-                    "nit": org.nit,
-                    "nombre": org.nombre,
-                    "representanteLegal": org.representanteLegal,
-                    "telefono": org.telefono,
-                    "ubicacion": org.ubicacion,
-                    "sectorEconomico": org.sectorEconomico,
-                    "actividadPrincipal": org.actividadPrincipal,
-                }
-            }
-            return JsonResponse(data, status=200)
-        return JsonResponse({"error": "Método no permitido"}, status=405)
-"""

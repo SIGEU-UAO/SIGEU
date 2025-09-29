@@ -1,10 +1,11 @@
 const steps = document.querySelectorAll(".stepper .step")
-const radios = document.querySelectorAll('input[name="steps"]');
+const radios = document.querySelectorAll('input[name="stepper"]');
 const sections = document.querySelectorAll('.main__step');
 
 export function goStep(direction) {
     // Find the current index
     let currentIndex = Array.from(radios).findIndex(r => r.checked);
+    if (currentIndex < 0) currentIndex = 0;
 
     // Determine the new index
     let newIndex;

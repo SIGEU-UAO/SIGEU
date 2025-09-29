@@ -1,5 +1,6 @@
 import AssociatedRecords from "/static/events/js/modules/components/associatedRecords.js";
 import Modal from "../classes/Modal.js";
+import API from "../classes/API.js";
 
 //* Container selectors that store associated/assigned records
 const assignedPhysicalInstallationsContainer = document.querySelector(".main__step--2 .step__cards")
@@ -12,7 +13,6 @@ export const modalsConfig = [
         formSelector: '#search-instalaciones-form',
         loaderSelector: '#search-instalaciones-form .loader',
         resultSelector: '#search-instalaciones-form .form__results',
-        suggestSelector: '#search-instalaciones-form .form__suggest',
         endpoint: '/instalaciones/api/',
         valueField: 'ubicacion',
         fields: [
@@ -28,22 +28,27 @@ export const modalsConfig = [
         }
     },
     {
-        buttonId: 'asignar-org-btn',
-        modalId: 'modal-organizaciones',
-        formSelector: '#search-orgs-form',
-        loaderSelector: '#search-orgs-form .loader',
-        resultSelector: '#search-orgs-form .form__results',
-        suggestSelector: '#search-orgs-form .form__suggest',
-        endpoint: '/orgs/api/',
-        valueField: 'nit',
+        buttonId: 'asignar-organizador-btn',
+        modalId: 'modal-organizadores',
+        formSelector: '#search-organizadores-form',
+        loaderSelector: '#search-organizadores-form .loader',
+        resultSelector: '#search-organizadores-form .form__results',
+        endpoint: '/organizadores/api/',
+        valueField: 'nombre_completo',
         fields: [
-            { key: 'nombre', label: 'Nombre', tag: 'H5' },
-            { key: 'nit', label: 'NIT' },
-            { key: 'sector', label: 'Sector' }
+            { key: 'nombre_completo', label: '', tag: 'H5' },
+            { key: 'numeroIdentificacion', label: 'Número identificación' },
+            { key: 'rol', label: 'Rol' }
         ],
-        icon: 'ri-building-fill',
+        icon: 'ri-map-pin-user-fill',
         stepLabel: 'Visualizar datos',
-        //onClickCallback: item => getExternalOrganization(item.idOrganizacion)
+        onClickCallback: async function(resultContainer, item) {
+            const modal = resultContainer.closest("dialog")
+            const result = await API.fetchGet(`/organizadores/api/${item.idUsuario}`)
+            if (result.error) return; 
+            Modal.renderDetailStep(modal, result.data.organizador)
+            Modal.goStep(modal, "next");
+        }
     },
     {
         buttonId: 'asignar-usuario-btn',

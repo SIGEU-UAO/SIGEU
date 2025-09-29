@@ -48,25 +48,25 @@
 }  
 
 /* Step 1 activo */
-#step1:checked ~ .stepper .step--1 .step__circle { background-color: var(--blue); color: #fff; }
+#stepper-step--1:checked ~ .stepper .step--1 .step__circle { background-color: var(--blue); color: #fff; }
 
 /* Step 2 activo, colorea anterior y actual */
-#step2:checked ~ .stepper .step--1 .step__circle,
-#step2:checked ~ .stepper .step--1::after,
-#step2:checked ~ .stepper .step--2 .step__circle { background-color: var(--blue); color: #fff; }
+#stepper-step--2:checked ~ .stepper .step--1 .step__circle,
+#stepper-step--2:checked ~ .stepper .step--1::after,
+#stepper-step--2:checked ~ .stepper .step--2 .step__circle { background-color: var(--blue); color: #fff; }
 
 /* Step 3 activo, colorea todos anteriores y actual */
-#step3:checked ~ .stepper .step--1 .step__circle,
-#step3:checked ~ .stepper .step--1::after,
-#step3:checked ~ .stepper .step--2 .step__circle,
-#step3:checked ~ .stepper .step--2::after,
-#step3:checked ~ .stepper .step--3 .step__circle { background-color: var(--blue); color: #fff; }
+#stepper-step--3:checked ~ .stepper .step--1 .step__circle,
+#stepper-step--3:checked ~ .stepper .step--1::after,
+#stepper-step--3:checked ~ .stepper .step--2 .step__circle,
+#stepper-step--3:checked ~ .stepper .step--2::after,
+#stepper-step--3:checked ~ .stepper .step--3 .step__circle { background-color: var(--blue); color: #fff; }
 
 /* Step 4 activo, colorea todos anteriores y actual */
-#step4:checked ~ .stepper .step--1 .step__circle,
-#step4:checked ~ .stepper .step--1::after,
-#step4:checked ~ .stepper .step--2 .step__circle,
-#step4:checked ~ .stepper .step--2::after,
-#step4:checked ~ .stepper .step--3 .step__circle,
-#step4:checked ~ .stepper .step--3::after
-#step4:checked ~ .stepper .step--4 .step__circle { background-color: var(--blue); color: #fff; }
+#stepper-step--4:checked ~ .stepper .step--1 .step__circle,
+#stepper-step--4:checked ~ .stepper .step--1::after,
+#stepper-step--4:checked ~ .stepper .step--2 .step__circle,
+#stepper-step--4:checked ~ .stepper .step--2::after,
+#stepper-step--4:checked ~ .stepper .step--3 .step__circle,
+#stepper-step--4:checked ~ .stepper .step--3::after
+#stepper-step--4:checked ~ .stepper .step--4 .step__circle { background-color: var(--blue); color: #fff; }

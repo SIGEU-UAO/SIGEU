@@ -4,7 +4,7 @@ import Modal from "/static/js/modules/classes/Modal.js";
 import API from "/static/js/modules/classes/API.js";
 import dataStore from "./modules/dataStore.js";
 import AssociatedRecords from "./modules/components/associatedRecords.js";
-import { validarFormData } from "/static/js/modules/forms/utils.js";
+import { validarFormData, handleFileInputsInfo } from "/static/js/modules/forms/utils.js";
 import Alert from "/static/js/modules/classes/Alert.js";
 
 //* Variables
@@ -19,7 +19,7 @@ const validationRules = {
 
 //* Selectors
 const mainForm = document.getElementById("main-form");
-const modals = document.querySelectorAll('.modal');
+const fileInputs = document.querySelectorAll('input.input-file');
 
 //* Steps buttons
 const nextStepButtons = document.querySelectorAll(".step__button--next")
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     goStep(1);
 
     //* Init modals
-    Modal.initModals(modalsConfig.map(c => ({ buttonId: c.buttonId, modalId: c.modalId })));
+    Modal.initModals();
 
     modalsConfig.forEach(c => {
         Modal.handleSearchFormSubmit({
@@ -46,9 +46,10 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    //* Others add event listeners
+    //* Others event listeners
     nextStepButtons.forEach(button => button.addEventListener("click", () => goStep("next")))
     mainForm.addEventListener("submit", handleMainFormSubmit);
+    fileInputs.forEach(input => handleFileInputsInfo(input))
 
     //* Events listeners to associate records to the DB
     const associatePhysicalInstallationsBtn = nextStepButtons[0];

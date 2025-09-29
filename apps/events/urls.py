@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
 from .api.event import EventoAPI
-from .api.associations.instalacionFisica import InstalacionesAsignadasAPI
+from .api.associations.instalacion_fisica import InstalacionesAsignadasAPI
 
 urlpatterns = [
     # --- Views ---

@@ -2,7 +2,6 @@ from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from .service import UserService
 from django.contrib.auth.decorators import login_required
-from sigeu.decorators import no_superuser_required
 import json
 
 class UsersAPI():
@@ -64,4 +63,55 @@ class UsersAPI():
         if request.method == "POST":
             logout(request)
             return JsonResponse({"message": "Cierre de sesión exitoso"}, status=200)
+        return JsonResponse({"error": "Método no permitido"}, status=405)
+
+    # * Método para listar organizadores
+    @login_required()
+    def listar_organizadores(request):
+        # Check for query parameters
+        if request.method == "GET":
+            if request.GET:
+                nombreCompletoSearch = request.GET.get("q")
+                if nombreCompletoSearch:
+                    organizadores = UserService.filtrar_organizadores_por_nombre_completo(nombreCompletoSearch, request.user.idUsuario)
+
+                     # No results found
+                    if not organizadores:
+                        return JsonResponse({
+                            "message": "No se encontraron usuarios organizadores",
+                            "messageType": "info"
+                        }, status=200)
+                    else:
+                        # Return all the organizations
+                        return JsonResponse({
+                            "items": organizadores,
+                            "message": "Búsqueda completada correctamente!",
+                            "messageType": "success"
+                        }, status=200)
+                else:
+                    return JsonResponse({"error": "No se envió el query param adecuado"}, status=400)
+            else:
+                organizadores = list(UserService.listar_organizadores())
+                return JsonResponse({"items": organizadores}, status=200)
+
+        return JsonResponse({"error": "Método no permitido"}, status=405)
+
+    @login_required()
+    def obtener_por_id(request, id):
+        if request.method == "GET":
+            user = UserService.obtener_por_id(id)
+            if not user: return JsonResponse({"error": "No se encontró ningun usuario"}, status=404)
+            
+            data = {
+                "organizador": {  
+                    "idUsuario": user["idUsuario"],
+                    "numeroIdentificacion": user["numeroIdentificacion"],
+                    "nombres": user["nombres"],
+                    "apellidos": user["apellidos"],
+                    "email": user["email"],
+                    "telefono": user["telefono"],
+                    "rol": user["rol"]
+                }
+            }
+            return JsonResponse(data, status=200)
         return JsonResponse({"error": "Método no permitido"}, status=405)

@@ -80,8 +80,6 @@
   flex-direction: column;
   padding: 0 24px;
   opacity: 0;
-  transform: translateY(8px);
-  transition: opacity .22s ease, transform .22s ease;
 }
 
 /* Barra de progreso */
@@ -96,6 +94,7 @@
 .progress__bar{
   background-color: var(--primary);
   height: 100%;
+  transition: .3s ease-in-out width;
 }
 
 .modal__paragraph{
@@ -108,6 +107,14 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+}
+
+.modal__form .form__row{
+  justify-content: flex-start;
+}
+
+.modal__form .form__row .form__group{
+  width: 80%;
 }
 
 .form__group.form__group--search{

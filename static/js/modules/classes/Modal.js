@@ -3,53 +3,59 @@ import Alert from "./Alert.js";
 import Loader from "./Loader.js"
 
 const modalOpeners = [
-    { buttonId: 'asignar-instalacion-btn', modalId: 'modal-instalaciones' }
+    { buttonId: 'asignar-instalacion-btn', modalId: 'modal-instalaciones' },
+    { buttonId: 'asignar-organizador-btn', modalId: 'modal-organizadores' }
 ];
 
 export default class Modal{
     //* Initialize all modals and their steps/progress
     static initModals() {
         modalOpeners.forEach(({ buttonId, modalId }) => {
-            const button = document.getElementById(buttonId);
+            const btn   = document.getElementById(buttonId);
             const modal = document.getElementById(modalId);
-            if (!button || !modal) return;
-    
-            const radios = modal.querySelectorAll('input[name="steps"]');
-            const steps = modal.querySelectorAll('.modal__step');
-            const progressBar = modal.querySelector('.progress__bar');
-            const totalSteps = radios.length;
-    
-            // Handles any search form in a generic way
-            const updateSteps = () => {
-                let activeIndex = 0;
-                radios.forEach((radio, i) => {
-                    if (radio.checked) activeIndex = i;
-                });
-    
-                steps.forEach((step, i) => {
-                    const active = i === activeIndex;
-                    step.style.display = active ? 'flex' : 'none';
-                    step.style.opacity = active ? '1' : '0';
-                    step.style.transform = active ? 'translateY(0)' : 'translateY(20px)';
-                });
-    
-                if (progressBar) {
-                    progressBar.style.width = `${Math.round(((activeIndex + 1) / totalSteps) * 100)}%`;
-                }
-            };
-    
-            // Listen to radio changes
-            radios.forEach(radio => radio.addEventListener('change', updateSteps));
-    
-            // Open modal and force initial step to be displayed
-            button.addEventListener('click', () => {
-                modal.show();
-                updateSteps();
-            });
-    
-            // Initialize modal close buttons
-            this.initCloseButtons(modal);
+
+            const update = () => Modal.changeStep(modal);
+
+            btn.addEventListener('click', () => { modal.show(); update(); });
+            modal.querySelectorAll('input[name="steps"]').forEach(r => r.addEventListener('change', update));
+            modal.querySelectorAll('.modal__btn--prev').forEach(btn => btn.addEventListener('click', () => Modal.goStep(modal, "prev")));
+            Modal.initCloseButtons(modal);
         });
+    }
+
+    //* Display the current step and update the progress bar */
+    static changeStep(modal) {
+        const radios = [...modal.querySelectorAll('input[name="steps"]')];
+        const steps  = [...modal.querySelectorAll('.modal__step')];
+        const bar    = modal.querySelector('.progress__bar');
+        
+        if (radios.length && !radios.some(r => r.checked)) radios[0].checked = true
+        
+        const current = modal.querySelector('input[name="steps"]:checked');
+        const idx = radios.indexOf(current);
+
+        steps.forEach((s, i) => {
+            const active = i === idx;
+            s.style.display   = active ? 'flex' : 'none';
+            s.style.opacity   = active ? '1'   : '0';
+            s.style.transform = active ? 'translateY(0)' : 'translateY(20px)';
+        });
+
+        if (bar) bar.style.width = `${((idx + 1) / radios.length) * 100}%`;
+    }
+
+    static goStep(modal, direction) {
+        const radios = [...modal.querySelectorAll('input[name="steps"]')];
+        let idx = radios.findIndex(r => r.checked);
+        if (idx < 0) idx = 0;
+
+        let target = direction === 'prev' ? idx - 1 : idx + 1;
+
+        target = Math.max(0, Math.min(target, radios.length - 1));
+        if (!radios[target]) return;
+
+        radios[target].checked = true;
+        radios[target].dispatchEvent(new Event('change', { bubbles: true }));
     }
     
     //* Init close modal buttons
@@ -143,7 +149,7 @@ export default class Modal{
 
             fields.forEach(f => {
                 const fieldEl = document.createElement(f.tag || 'SPAN');
-                fieldEl.textContent = `${f.label}: ${item[f.key]}`;
+                fieldEl.textContent = f.label === "" ? `${item[f.key]}` : `${f.label}: ${item[f.key]}`;
                 if (f.key === "capacidad") fieldEl.textContent = `${f.label}: ${item[f.key]} personas`;
                 descriptionDiv.appendChild(fieldEl);
             });
@@ -164,5 +170,33 @@ export default class Modal{
 
             resultContainer.appendChild(card);
         });
+    }
+
+    static renderDetailStep(modal, item){
+        const list = modal.querySelector('.modal__list');
+
+        // Clear any previous content
+        list.innerHTML = '';
+
+        // We go through the properties of the object
+        Object.entries(item).forEach(([key, value]) => {
+            // Skip those beginning with “id”
+            if (key.toLowerCase().startsWith('id')) return;
+
+            // Create the <li>
+            const li = document.createElement('li');
+            li.classList.add('modal__li');
+
+            const label = key
+                .replace(/([A-Z])/g, ' $1')   // Separate camelCase
+                .replace(/^./, c => c.toUpperCase()) + ':'; // Initial capital letter
+
+            li.innerHTML = `<strong>${label}</strong> <span>${value ?? ''}</span>`;
+            list.appendChild(li);
+        });
+
+        //* Add Event Listener to associate button
+        const stepDetailButton = modal.querySelector(".modal__step[data-step='2'] .modal__btn--primary");
+        stepDetailButton.addEventListener("click", () => Modal.goStep(modal, "next"))
     }
 }

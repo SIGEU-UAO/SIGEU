@@ -16,6 +16,9 @@ export default class AssociatedRecords{
             return;
         }
 
+        const step = container.closest('.main__step');
+        const buttonStep = step.querySelector('.step__actions .step__button--next');
+
         const stepCard = document.createElement("DIV");
         stepCard.classList.add("step__card")
 
@@ -48,6 +51,7 @@ export default class AssociatedRecords{
             cardButtonViewMore.onclick = () => alert("Mostrando más cositas", id)
         }
 
+        //* Disassociate button
         const cardButtonDisassociate = document.createElement("BUTTON");
         cardButtonDisassociate.type = "button";
         cardButtonDisassociate.classList.add("card__button", "card__button--danger")
@@ -63,6 +67,11 @@ export default class AssociatedRecords{
             if (!result.isConfirmed) return;
             dataStore.removeRecord(type, id);
             stepCard.remove();
+
+            if (dataStore[type].length === 0) {
+                buttonStep.setAttribute('data-skip', '');
+                buttonStep.textContent = 'Omitir';
+            }
         };
 
         if (cardButtonViewMore) cardButtons.appendChild(cardButtonViewMore);
@@ -79,10 +88,6 @@ export default class AssociatedRecords{
         stepCard.appendChild(cardIcon)
 
         container.appendChild(stepCard)
-        
-        //Change step button textcontent
-        const step = container.closest('.main__step');
-        const buttonStep = step.querySelector('.step__actions .step__button--next');
 
         if (buttonStep.hasAttribute('data-skip')) {
             buttonStep.removeAttribute('data-skip');

@@ -29,6 +29,67 @@
     font-size: 18px;
 }
 
+/* File Input Styles */
+
+input.input-file {
+    display: none !important;
+}
+
+.add-file-btn {
+    max-width: 60%;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--primary);
+    color: #fff !important;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 0.5rem;
+    user-select: none;
+    box-shadow:
+        0 4px 6px -1px #488aec31,
+        0 2px 4px -1px #488aec17;
+    transition: all 0.3s ease;
+}
+
+.add-file-btn:hover {
+    box-shadow:
+        0 10px 15px -3px #488aec4f,
+        0 4px 6px -2px #488aec17;
+}
+
+.add-file-btn:focus,
+.add-file-btn:active {
+    opacity: 0.85;
+    box-shadow: none;
+}
+
+.add-file-btn svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    stroke: white;
+}
+
+.file-info {
+    max-width: 100%;
+    margin-top: 6px;
+    font-size: 14px;
+    color: var(--light-gray);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-info i {
+    font-size: 16px;
+    color: rgb(15, 175, 15);
+}
+
+
+/* End File Input Styles */
+
 .form__group .numeric-field {
     font-family: Arial, Helvetica, sans-serif;
 }

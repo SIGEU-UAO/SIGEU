@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from ...services.associations.instalacionFisica import InstalacionesAsignadasService
+from ...services.associations.instalacion_fisica import InstalacionesAsignadasService
 from apps.core.service import InstalacionesFisicasService;
 from ...validations.data_validators import validate_collection, SCHEMAS
 from django.contrib.auth.decorators import login_required
@@ -24,6 +24,8 @@ class InstalacionesAsignadasAPI:
 
             errores = []
             guardadas = []
+
+            print(instalaciones)
 
             # * Try to assign all facilities
             for item in instalaciones:

@@ -44,5 +44,8 @@ class OrganizacionExternaService:
         
     @staticmethod
     def obtener_por_id(id_organizacion):
-        return get_object_or_404(OrganizacionExterna, idOrganizacion=id_organizacion)
+        try:
+            return OrganizacionExterna.objects.get(idUsuario=id_organizacion)
+        except OrganizacionExterna.DoesNotExist:
+            return False
     

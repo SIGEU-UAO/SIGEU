@@ -60,6 +60,21 @@ export function mergeFormDataArray(records, type) {
   return bigForm;
 }
 
+export function handleFileInputsInfo(input) {
+  const fileLabel = input.closest('.form__group').querySelector('.add-file-btn');
+  const infoDiv = document.createElement('div');
+  infoDiv.classList.add('file-info');
+  fileLabel.insertAdjacentElement('afterend', infoDiv);
+
+  input.addEventListener('change', () => {
+    if (input.files.length > 0) {
+      infoDiv.innerHTML = `<i class="ri-file-check-fill"></i> ${input.files[0].name}`
+    } else {
+      infoDiv.textContent = '';
+    }
+  });
+}
+
 export function cleanContainer(container){
   while (container.firstElementChild) {
     container.firstElementChild.remove();
