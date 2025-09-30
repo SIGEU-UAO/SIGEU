@@ -2,9 +2,11 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from .forms import RegistroForm, InicioSesionForm
+from .forms import RegistroForm, InicioSesionForm, EditarPerfilForm
 from django.contrib.auth.decorators import login_required
 from sigeu.decorators import no_superuser_required
+from .service import UserService
+import json
 
 def formulario_registro(request):
     if request.method == "GET":
@@ -32,4 +34,20 @@ def dashboard(request):
             "header_paragraph": "Bienvenido de vuelta a SIGEU",
             "active_page": "dashboard"
         })
+    return JsonResponse({"error": "Método no permitido"}, status=405)
+
+@no_superuser_required
+@login_required()
+def editar_perfil(request):
+    if request.method == "GET":
+        initial_data = {
+            "numeroIdentificacion": request.user.numeroIdentificacion,
+            "nombres": request.user.nombres,
+            "apellidos": request.user.apellidos,
+            "email": request.user.email,
+            "telefono": request.user.telefono,
+            "contraseña": ""
+        }
+        form = EditarPerfilForm(initial=initial_data, user=request.user)
+        return render(request, "users/editar_perfil.html", {"form": form, "active_page": "perfil"})
     return JsonResponse({"error": "Método no permitido"}, status=405)

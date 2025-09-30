@@ -3,6 +3,9 @@ from django.contrib.auth import authenticate, login, logout
 from .service import UserService
 from django.contrib.auth.decorators import login_required
 from sigeu.decorators import no_superuser_required
+from .forms import EditarPerfilForm
+from .models import Usuario
+from django.db import IntegrityError
 import json
 
 class UsersAPI():
@@ -11,7 +14,7 @@ class UsersAPI():
             try:
                 data = json.loads(request.body)
             except json.JSONDecodeError:
-                return JsonResponse({"error": "Formato JSON inválido."}, status=400)
+                return JsonResponse({"error": "Formato JSON inválido"}, status=400)
 
             rol = data.get("rol")
 
@@ -46,7 +49,7 @@ class UsersAPI():
             try:
                 data = json.loads(request.body)
             except json.JSONDecodeError:
-                return JsonResponse({"error": "Formato JSON inválido."}, status=400)
+                return JsonResponse({"error": "formato JSON inválido"}, status=400)
 
             email = data.get("email")
             password = data.get("password")
@@ -65,3 +68,64 @@ class UsersAPI():
             logout(request)
             return JsonResponse({"message": "Cierre de sesión exitoso"}, status=200)
         return JsonResponse({"error": "Método no permitido"}, status=405)
+    
+    
+    @login_required()
+    @no_superuser_required
+    def editar_perfil(request):
+        # Profile update via API (POST JSON)
+        if request.method == "POST":
+            if not request.user.is_authenticated:
+                return JsonResponse({"error": "No autenticado"}, status=401)
+            try:
+                data = json.loads(request.body)
+            except json.JSONDecodeError:
+                return JsonResponse({"error": "formato JSON inválido."}, status=400)
+
+            # Ensure that disabled/required fields are included
+            post_data = dict(data) if isinstance(data, dict) else {}
+            for fld in ["numeroIdentificacion", "nombres", "apellidos", "email", "telefono"]:
+                if not post_data.get(fld):
+                    post_data[fld] = getattr(request.user, fld, "")
+        
+        
+            # Validate with the same form used in the view
+            
+            form = EditarPerfilForm(post_data, user=request.user)
+            if not form.is_valid():
+                return JsonResponse({"error": form.errors}, status=400)
+
+            cd = form.cleaned_data
+
+            new_phone = cd["telefono"]
+
+            # Update basic data
+            request.user.nombres = cd["nombres"]
+            request.user.apellidos = cd["apellidos"]
+            request.user.telefono = new_phone
+
+            # Password change with history validation (optional)
+            if cd.get("contraseña"):
+                try:
+                    UserService.cambiar_password(request.user, cd["contraseña"])
+                except ValueError as e:
+                    return JsonResponse({"error": {"contraseña": [str(e)]}}, status=400)
+                except IntegrityError:
+                    return JsonResponse({"error": "Violación de unicidad al actualizar el perfil."}, status=400)
+            else:
+                # Save and rely on DB unique constraints
+                try:
+                    request.user.save()
+                except IntegrityError:
+                    return JsonResponse({"error": "Violación de unicidad al actualizar el perfil."}, status=400)
+
+            # Response
+            return JsonResponse({
+                "success": True,
+                "nombres": request.user.nombres,
+                "apellidos": request.user.apellidos,
+                "telefono": request.user.telefono,
+            }, status=200)
+
+        return JsonResponse({"error": "Metodo no permitido"}, status=405)
+

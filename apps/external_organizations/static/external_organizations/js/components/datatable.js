@@ -16,7 +16,6 @@ export default class Datatable{
                     callback(json);
                 } catch (err) {
                     Alert.error("Error cargando organizaciones");
-                    console.log(err);
                     callback({ data: [] });
                 }
             },

@@ -148,3 +148,81 @@ class InicioSesionForm(forms.Form):
         # Force autocomplete=off on all fields
         for field in self.fields.values():
             field.widget.attrs["autocomplete"] = "off"
+
+class EditarPerfilForm(forms.Form):
+    numeroIdentificacion = forms.CharField(
+        label="Documento de Identidad",
+        required=True,
+        min_length=8,
+        max_length=10,
+        validators=[numero_identificacion_validator],
+        widget=forms.TextInput(attrs={
+            "readonly": "true",
+            "class": "numeric-field",
+            "pattern": r"[0-9]{8,10}",
+            "title": "El documento debe contener entre 8 y 10 números"
+        })
+    )
+    nombres = forms.CharField(
+        label="Nombres",
+        required=True,
+        widget=forms.TextInput(attrs={"disabled": "true"})
+    )
+    apellidos = forms.CharField(
+        label="Apellidos",
+        required=True,
+        widget=forms.TextInput(attrs={"disabled": "true"})
+    )
+    email = forms.EmailField(
+        label="Email",
+        required=True,
+        widget=forms.EmailInput(attrs={"disabled": "true"})
+    )
+    telefono = forms.CharField(
+        label="Teléfono",
+        required=True,
+        min_length=10,
+        max_length=10,
+        validators=[telefono_validator],
+        widget=forms.TextInput(attrs={
+            "type": "tel",
+            "class": "numeric-field",
+            "pattern": r"[0-9]{1,10}",
+            "title": "El teléfono debe contener 10 números",
+            "disabled": "true"
+        })
+    )
+  
+    
+
+    contraseña = forms.CharField(
+        label="Contraseña",
+        required=False,
+        widget=forms.PasswordInput(attrs={
+            "class": "password-field",
+            "pattern": r"^(?:|(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,})$",
+            "title": "La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula, una minúscula y un número",
+            "placeholder": "Dejar vacío si no desea cambiar"
+        }),
+    )
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
+        # Force autocomplete=off on all fields
+        for field in self.fields.values():
+            field.widget.attrs["autocomplete"] = "off"
+
+
+
+    def clean_contraseña(self):
+        value = self.cleaned_data.get("contraseña", "")
+        if value is None:
+            value = ""
+        value = value.strip()
+        # If empty, do not enforce complexity
+        if value == "":
+            return ""
+        # Enforce complexity only when provided
+        password_validator(value)
+        return value
