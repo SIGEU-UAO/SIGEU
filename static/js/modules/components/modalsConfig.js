@@ -12,6 +12,7 @@ export const modalsConfig = [
     {
         buttonId: 'asignar-instalacion-btn',
         modalId: 'modal-instalaciones',
+        type: 'instalaciones',
         formSelector: '#search-instalaciones-form',
         loaderSelector: '#search-instalaciones-form .loader',
         resultSelector: '#search-instalaciones-form .form__results',
@@ -23,16 +24,18 @@ export const modalsConfig = [
             { key: 'capacidad', label: 'Capacidad' }
         ],
         icon: 'ri-map-fill',
-        stepLabel: 'Asignar instalación',
+        modalStepLabel: 'Asignar instalación',
         assignedRecordsContainerSelector: ".main__step--2 .step__cards",
         onClickCallback: function(resultContainer, item) {
-            AssociatedRecords.addRecord({ id: item["idInstalacion"], ubicacion: item["ubicacion"], tipo: item["tipo"] }, "instalaciones", this.assignedRecordsContainerSelector)
+            AssociatedRecords.addRecord({ id: item["idInstalacion"], ubicacion: item["ubicacion"], tipo: item["tipo"] }, this.type, this.assignedRecordsContainerSelector)
             Modal.closeModal(resultContainer.closest("dialog"))
         }
     },
     {
         buttonId: 'asignar-organizador-btn',
         modalId: 'modal-organizadores',
+        type: "organizadores",
+        editable: true,
         formSelector: '#search-organizadores-form',
         loaderSelector: '#search-organizadores-form .loader',
         resultSelector: '#search-organizadores-form .form__results',
@@ -44,20 +47,20 @@ export const modalsConfig = [
             { key: 'rol', label: 'Rol' }
         ],
         icon: 'ri-map-pin-user-fill',
-        stepLabel: 'Visualizar datos',
+        modalStepLabel: 'Visualizar datos',
         assignedRecordsContainerSelector: ".main__step--3 .step__cards",
         onClickCallback: async function(resultContainer, item) {
             const modal = resultContainer.closest("dialog")
             const result = await API.fetchGet(`/organizadores/api/${item.idUsuario}`)
             if (result.error) return; 
-            Modal.renderDetailStep(modal, result.data.organizador, "organizadores") // The 1 represents the index of this position in the array, which is used to obtain the modalConfig.
+            Modal.renderDetailStep(modal, result.data.organizador, this.type)
             Modal.goStep(modal, "next");
         },
+        associateFormSelector: "#asociar-organizador-form",
         associateValidationRules: {
-            aval: [{ check: (val) => val instanceof File && val.name, msg: "Debes subir un archivo PDF"}],
+            aval: [{ check: (val) => val instanceof File && val.name.endsWith('.pdf'), msg: "Debes subir un archivo PDF"}],
             id: [{ check: (val) => !isNaN(Number(val)) && Number(val) > 0, msg: "El ID debe ser un número válido mayor que 0"}]
         },
-        extraFormDataFields: ["rol"],
         fieldsRecordUI: ["rol"]
     },
     {

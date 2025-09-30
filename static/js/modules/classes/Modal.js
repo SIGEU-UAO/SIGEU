@@ -1,7 +1,8 @@
 import API from "./API.js";
 import Alert from "./Alert.js";
 import Loader from "./Loader.js"
-import { validarFormData } from "../forms/utils.js";
+import dataStore from "/static/events/js/modules/dataStore.js";
+import { validarFormData, handleFileInputsInfo } from "../forms/utils.js";
 import { modalOpeners, modalsConfig } from "../components/modalsConfig.js";
 import AssociatedRecords from "/static/events/js/modules/components/associatedRecords.js";
 
@@ -65,6 +66,54 @@ export default class Modal{
         );
     }
 
+    static openEditModal(modalId, stepIndex = 3) {
+        const modal = document.getElementById(modalId);
+        modal.show();
+
+        // Go to the third step
+        Modal.goStep(modal, stepIndex)
+
+        // Hide progress bar if it exists
+        const progress = modal.querySelector('.progress');
+        progress.style.display = 'none';
+
+        // Hide prev buttons in all steps
+        modal.querySelectorAll('.modal__btn--prev').forEach(btn => btn.style.display = 'none');
+
+        // Change the text on the main button to “Update.”
+        const footerBtn = modal.querySelector(`.modal__step[data-step="${stepIndex}"] .modal__btn--primary`);
+        if (footerBtn) footerBtn.textContent = 'Actualizar';
+
+        // Listener to close and reset the modal
+        const closeBtns = modal.querySelectorAll('.modal__close');
+        closeBtns.forEach(btn => {
+            const handler = () => Modal.resetEditModal(modal, stepIndex);
+            btn.addEventListener('click', handler, { once: true });
+        });
+
+        return modal;
+    }
+
+    static loadEditModalForm(record, form, type, callback, modalConfig, isCurrentUser = false){
+        for (let [key, value] of record.entries()) {
+            const input = form.querySelector(`[name="${key}"]`);
+            if (!input) continue;
+
+            if (input.type === "file") {
+                // Display file name in file info
+                const fileObj = record instanceof FormData ? record.get(key) : null;
+                input.removeAttribute("required");
+                handleFileInputsInfo(input, fileObj);
+            } else if (input.type === "checkbox" || input.type === "radio") {
+                input.checked = input.value == value;
+            } else {
+                input.value = value;
+            }
+        }
+
+        form.onsubmit = (e) => callback(e, record, type, form, modalConfig, isCurrentUser);
+    }
+
     static closeModal(modal){
         modal.close()
     }
@@ -81,6 +130,34 @@ export default class Modal{
 
         Modal.goStep(modal, 0) // Go to the first modal step
         Modal.closeModal(modal)
+    }
+
+    // todo: ressetear required aqui
+    static resetEditModal(modal, currentStep = 3) {
+        setTimeout(() => {
+            // Go to first step
+            Modal.goStep(modal, 0)
+
+            // Restore progress bar
+            const progress = modal.querySelector('.progress');
+            progress.style.display = '';
+
+            // Restore prev buttons
+            modal.querySelectorAll('.modal__btn--prev').forEach(btn => btn.style.display = '');
+
+            // Restore main button text
+            const footerBtn = modal.querySelector(`.modal__step[data-step="${currentStep}"] .modal__btn--primary`);
+            if (footerBtn) footerBtn.textContent = 'Guardar';
+
+            // Clear the associate form
+            const form = modal.querySelector(`.modal__step[data-step="${currentStep}"] .modal__form`);
+            form.onsubmit = null;
+            if (form) form.reset();
+            form.querySelectorAll('input[type="file"]').forEach(input => input.setAttribute('required', ''));
+            form.querySelectorAll('.file-info').forEach(div => div.textContent = '');
+
+            modal.close();
+        }, 500);
     }
 
     //* Toggle loader and results
@@ -141,16 +218,16 @@ export default class Modal{
     }
 
     //* Display cards generically in a modal
-    static displayCards(resultContainer, items, icon, fields, stepLabel = "Ver más", onClickCallback = () => {}) {
-        // Limpiar contenedor
+    static displayCards(resultContainer, items, icon, fields, stepLabel, onClickCallback = () => {}) {
+        // Clean container
         resultContainer.innerHTML = '';
 
         items.forEach(item => {
-            // Card principal
+            // Main card
             const card = document.createElement("DIV");
             card.classList.add("entity__card");
 
-            // Left div con icono e info
+            // Left div with icon and info
             const infoDiv = document.createElement("DIV");
             infoDiv.classList.add("entity__info");
 
@@ -171,7 +248,7 @@ export default class Modal{
             infoDiv.appendChild(iconDiv);
             infoDiv.appendChild(descriptionDiv);
 
-            // Right div botón
+            // Right div button
             const btn = document.createElement("BUTTON");
             btn.type = "button";
             btn.classList.add("entity__btn");
@@ -186,6 +263,7 @@ export default class Modal{
         });
     }
 
+    //* View more details
     static renderDetailStep(modal, item, type){
         const list = modal.querySelector('.modal__list');
 
@@ -223,32 +301,81 @@ export default class Modal{
         associateForm.onsubmit = (e) => Modal.handleAssociateForm(e, id, item, type);
     }
 
+    //* New Associate Record
     static handleAssociateForm(e, itemID, item, type){
         e.preventDefault();
 
         const form = e.currentTarget;
         const formData = new FormData(form);
-        const modalConfigIndex = type === "organizadores" ? 1 : 2;
+        const modalConfig = modalsConfig.find(config => config.type === type);
 
         // Add the id field
         formData.append('id', itemID);
 
         // Add extra form data fields
-        modalsConfig[modalConfigIndex].extraFormDataFields.forEach(field => formData.append(field, item[field]))
+        if (modalConfig.extraFormDataFields) modalConfig.extraFormDataFields.forEach(field => formData.append(field, item[field]))
 
         // Validate FormData
-        if (!validarFormData(formData, modalsConfig[modalConfigIndex].associateValidationRules)) return;
+        if (!validarFormData(formData, modalConfig.associateValidationRules)) return;
 
         // Add record        
         const recordUI = {};
-        modalsConfig[modalConfigIndex].fieldsRecordUI.forEach(field => recordUI[field] = item[field]);
+        modalConfig.fieldsRecordUI.forEach(field => recordUI[field] = item[field]);
         if (item.nombres && item.apellidos) recordUI.nombreCompleto = `${item.nombres} ${item.apellidos}`;
 
-        const containerSelector = modalsConfig[modalConfigIndex].assignedRecordsContainerSelector;
+        const containerSelector = modalConfig.assignedRecordsContainerSelector;
         AssociatedRecords.addRecord(formData, type, containerSelector, recordUI);
 
         //Reset the modal
-        const modal = document.getElementById(modalsConfig[modalConfigIndex].modalId);
+        const modal = document.getElementById(modalConfig.modalId);
         Modal.resetModal(modal, form)
     }
+
+    //* Request to edit record
+    static editRecordHandler(type, id) {
+        const modalConfig = modalsConfig.find(config => config.type === type && config.editable);
+        const modal = Modal.openEditModal(modalConfig.modalId);
+        const form = modal.querySelector(modalConfig.associateFormSelector);
+    
+        let record = dataStore.getByID(type, id);
+        const isCurrentUser = window.currentUser && window.currentUser.id == id;
+    
+        if (!record && isCurrentUser) {
+            record = new FormData();
+            record.append('id', id);
+        }
+    
+        if (!record) {
+            Alert.error("No se encontró el registro para editar");
+            Modal.resetEditModal(modal);
+            return;
+        }
+    
+        // Load the form and assign the submit function
+        Modal.loadEditModalForm(record, form, modalConfig.type, Modal.prepareFormDataForEdit, modalConfig, isCurrentUser);
+    }    
+
+    static prepareFormDataForEdit(e, record, type, form, modalConfig, isCurrentUser = false) {
+        e.preventDefault();
+    
+        // Clone original record
+        const updatedRecord = new FormData();
+        for (let [key, value] of record.entries()) {
+            updatedRecord.append(key, value);
+        }
+    
+        // Overwrite with form fields
+        new FormData(form).forEach((value, key) => {
+            if (form.querySelector(`[name="${key}"]`)?.type === "file" && !value.name) return;
+            updatedRecord.set(key, value);
+        });
+    
+        // Call the method that updates dataStore and UI
+        const containerSelector = modalConfig.assignedRecordsContainerSelector;
+        AssociatedRecords.editRecord(updatedRecord, type, containerSelector, form, isCurrentUser);
+
+        //Reset the modal
+        const modal = document.getElementById(modalConfig.modalId);
+        Modal.resetModal(modal, form)
+    }    
 }

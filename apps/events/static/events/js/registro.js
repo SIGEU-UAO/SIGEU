@@ -2,8 +2,9 @@ import { modalsConfig } from "/static/js/modules/components/modalsConfig.js";
 import { goStep, skipHandler } from "./modules/components/stepper.js";
 import Modal from "/static/js/modules/classes/Modal.js";
 import API from "/static/js/modules/classes/API.js";
-import dataStore from "./modules/dataStore.js";
 import { validarFormData, handleFileInputsInfo } from "/static/js/modules/forms/utils.js";
+import AssociatedRecords from "./modules/components/associatedRecords.js";
+import dataStore from "./modules/dataStore.js";
 import Alert from "/static/js/modules/classes/Alert.js";
 
 //* Variables
@@ -25,8 +26,11 @@ const nextStepBtns = document.querySelectorAll(".step__button--next[data-skip]")
 
 //* Event Listeners
 document.addEventListener("DOMContentLoaded", () => {
+    if (!window.currentUser) window.location.reload();
+    const currentUser = window.currentUser;
+
     //* Init step form
-    goStep(3);
+    goStep(1);
 
     //* Init modals
     Modal.initModals();
@@ -40,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
             endpoint: c.endpoint,
             valueField: c.valueField,
             displayCallback: (container, items) => {
-                Modal.displayCards(container, items, c.icon, c.fields, c.stepLabel, c.onClickCallback.bind(c));
+                Modal.displayCards(container, items, c.icon, c.fields, c.modalStepLabel, c.onClickCallback.bind(c));
             }
         });
     });
@@ -49,6 +53,16 @@ document.addEventListener("DOMContentLoaded", () => {
     mainForm.addEventListener("submit", handleMainFormSubmit);
     nextStepBtns.forEach(btn => btn.addEventListener("click", skipHandler))
     fileInputs.forEach(input => handleFileInputsInfo(input))
+
+    //* Load the current user as the default/main organizer
+    const assignedOrganizatorsContainer = document.querySelector(".main__step--3 .step__cards");
+
+    const recordUI = {
+        nombreCompleto: currentUser.nombreCompleto,
+        rol: currentUser.rol
+    };
+
+    AssociatedRecords.addRecordToUI(currentUser.id, recordUI, "organizadores", false, assignedOrganizatorsContainer, true)
 });
 
 //* Functions

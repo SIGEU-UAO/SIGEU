@@ -1,6 +1,8 @@
 import dataStore from "../dataStore.js";
 import { validateCollection } from "../utils/validations.js";
-import { mergeFormDataArray } from "/static/js/modules/forms/utils.js";
+import { mergeFormDataArray, handleFileInputsInfo } from "/static/js/modules/forms/utils.js";
+import { modalsConfig } from "/static/js/modules/components/modalsConfig.js";
+import Modal from "/static/js/modules/classes/Modal.js";
 import API from "/static/js/modules/classes/API.js";
 import Alert from "/static/js/modules/classes/Alert.js";
 import { goStep, toggleSkip } from "./stepper.js";
@@ -28,13 +30,15 @@ export default class AssociatedRecords{
         // Extract id
         const id = isFormData ? data.get("id") : data["id"];
         const record = isFormData ? data : { id: data["id"] }
-        const added = dataStore.addRecord(type, record, id);
+        const result = dataStore.addRecord(type, record, id);
 
         //If it already exists, return
-        if (!added) {
+        if (!result) {
             Alert.error(`El registro con id ${id} ya fue agregado`)
             return;
         }
+
+        Alert.success(result.message);
 
         //* Append to the UI
         const container = document.querySelector(containerSelector);
@@ -42,67 +46,39 @@ export default class AssociatedRecords{
         this.addRecordToUI(id, dataUI, type, isFormData, container)
     }
 
-    static addRecordToUI(id, data, type, isFormData, container){
-        const step = container.closest('.main__step');
-        const buttonStep = step.querySelector('.step__actions .step__button--next');
-
-        const stepCard = document.createElement("DIV");
-        stepCard.classList.add("step__card")
-        stepCard.dataset.id = id;
-
-        const cardContent = document.createElement("DIV");
-        cardContent.classList.add("card__content");
-
-        const cardHeader = document.createElement("DIV");
-        cardHeader.classList.add("card__header")
-
-        const cardAnnotation = document.createElement("SPAN");
-        cardAnnotation.classList.add("card__annotation")
-        cardAnnotation.textContent = data[stepDataKeys[type]["annotation"]];
-
-        const cardTitle = document.createElement("H4");
-        cardTitle.classList.add("card__title")
-        cardTitle.textContent = data[stepDataKeys[type]["title"]];
-
-        cardHeader.appendChild(cardAnnotation);
-        cardHeader.appendChild(cardTitle);
-
-        const cardButtons = document.createElement("DIV");
-        cardButtons.classList.add("card__buttons");
-        
-        let cardButtonViewMore;
-        if (type !== "instalaciones") {
-            cardButtonViewMore = document.createElement("BUTTON");
-            cardButtonViewMore.type = "button";
-            cardButtonViewMore.classList.add("card__button")
-            cardButtonViewMore.textContent = "Ver más detalle";
-            cardButtonViewMore.onclick = () => alert("Mostrando más cositas", id)
+    static editRecord(record, type, containerSelector, form, isCurrentUser = false) {
+        const id = record instanceof FormData ? record.get('id') : record.id;
+        const container = document.querySelector(containerSelector);
+        const buttonStep = container.nextElementSibling.lastElementChild;
+    
+        // Update or add as appropriate and capture the result
+        let result;
+        if (!dataStore.getByID(type, id) && isCurrentUser) {
+            result = dataStore.addRecord(type, record, id);
+            this.updateStepBtn(type, buttonStep, container);
+        } else {
+            result = dataStore.updateRecord(type, record);
         }
-
-        //* Disassociate button
-        const cardButtonDisassociate = document.createElement("BUTTON");
-        cardButtonDisassociate.type = "button";
-        cardButtonDisassociate.classList.add("card__button", "card__button--danger")
-        cardButtonDisassociate.textContent = "Desvincular";
-        cardButtonDisassociate.onclick = () => this.removeRecord(type, id, stepCard, buttonStep, container);
-
-        if (cardButtonViewMore) cardButtons.appendChild(cardButtonViewMore);
-        cardButtons.appendChild(cardButtonDisassociate);
-
-        cardContent.appendChild(cardHeader);
-        cardContent.appendChild(cardButtons)
-
-        const cardIcon = document.createElement("DIV");
-        cardIcon.classList.add("card__icon");
-        cardIcon.innerHTML = `<i class="${stepDataKeys[type]["icon"]}"></i>`;
-
-        stepCard.appendChild(cardContent);
-        stepCard.appendChild(cardIcon)
-
-        container.appendChild(stepCard)
-
-        if (buttonStep.hasAttribute('data-skip')) toggleSkip(buttonStep, false, stepDataKeys[type].saveHandler(container))
-    }
+    
+        // Display message to user based on result
+        if (result) {
+            if (result.success) {
+                Alert.success(result.message);
+            } else {
+                Alert.error(result.message);
+                return;
+            }
+        }
+    
+        // Update the UI
+        if (type !== "organizadores") this.updateRecordUI(type, record, container);
+    
+        // Update file input info
+        form.querySelectorAll('input[type="file"]').forEach(input => {
+            const existingFile = record.get(input.name);
+            handleFileInputsInfo(input, existingFile);
+        });
+    }    
 
     static async removeRecord(type, id, stepCard, buttonStep, container){
         const result = await Alert.confirmationAlert({
@@ -113,10 +89,17 @@ export default class AssociatedRecords{
         });
     
         if (!result.isConfirmed) return;
-        dataStore.removeRecord(type, id);
-        stepCard.remove();
+        
+        const { success, message } = dataStore.removeRecord(type, id);
 
-        if (dataStore[type].length === 0) toggleSkip(buttonStep, true, stepDataKeys[type].saveHandler(container))
+        if (success) {
+            Alert.success(message);
+            stepCard.remove();
+        } else {
+            Alert.error(message);
+        }
+
+        this.updateStepBtn(type, buttonStep, container)
     }
 
     static async saveDBRecords(endpoint, type, container){
@@ -144,5 +127,102 @@ export default class AssociatedRecords{
 
         Alert.success(`Datos de ${type} guardados correctamente.`);
         goStep("next")
+    }
+
+    //TODO: DECIDIR SI ELIMINAR PARAMETRO ISFORMDATA
+    static addRecordToUI(id, data, type, isFormData, container, isCurrentUser = false){
+        const buttonStep = container.nextElementSibling.lastElementChild;
+
+        const stepCard = document.createElement("DIV");
+        stepCard.classList.add("step__card")
+        stepCard.dataset.id = id;
+
+        const cardContent = document.createElement("DIV");
+        cardContent.classList.add("card__content");
+
+        const cardHeader = document.createElement("DIV");
+        cardHeader.classList.add("card__header")
+
+        const cardAnnotation = document.createElement("SPAN");
+        cardAnnotation.classList.add("card__annotation")
+        cardAnnotation.textContent = data[stepDataKeys[type]["annotation"]];
+
+        const cardTitle = document.createElement("H4");
+        cardTitle.classList.add("card__title")
+        cardTitle.textContent = data[stepDataKeys[type]["title"]];
+
+        cardHeader.appendChild(cardAnnotation);
+        cardHeader.appendChild(cardTitle);
+
+        const cardButtons = document.createElement("DIV");
+        cardButtons.classList.add("card__buttons");
+        
+        let cardButtonEdit;
+        if (type !== "instalaciones") {
+            cardButtonEdit = document.createElement("BUTTON");
+            cardButtonEdit.type = "button";
+            cardButtonEdit.classList.add("card__button")
+            cardButtonEdit.textContent = "Editar";
+            cardButtonEdit.onclick = () => Modal.editRecordHandler(type, id)
+        }
+
+        //* Disassociate button
+        let cardButtonDisassociate;
+        if (!isCurrentUser) {
+            cardButtonDisassociate = document.createElement("BUTTON");
+            cardButtonDisassociate.type = "button";
+            cardButtonDisassociate.classList.add("card__button", "card__button--danger")
+            cardButtonDisassociate.textContent = "Desvincular";
+            cardButtonDisassociate.onclick = () => this.removeRecord(type, id, stepCard, buttonStep, container);   
+        }
+
+        if (cardButtonEdit) cardButtons.appendChild(cardButtonEdit);
+        if (cardButtonDisassociate) cardButtons.appendChild(cardButtonDisassociate);
+
+        cardContent.appendChild(cardHeader);
+        cardContent.appendChild(cardButtons)
+
+        const cardIcon = document.createElement("DIV");
+        cardIcon.classList.add("card__icon");
+        cardIcon.innerHTML = `<i class="${stepDataKeys[type]["icon"]}"></i>`;
+
+        stepCard.appendChild(cardContent);
+        stepCard.appendChild(cardIcon)
+
+        container.appendChild(stepCard)
+
+        this.updateStepBtn(type, buttonStep, container)
+    }
+
+    // TODO: ESTA FUNCION HAY QUE IMPLEMENTARLA CORRECTAMENTE PARA ORGANIZACIONES EXTERNAS
+    static updateRecordUI(type, record, container){
+        const id = record instanceof FormData ? record.get('id') : record.id;
+        const card = container.querySelector(`.step__card[data-id="${id}"]`);
+        if (!card) return;
+    
+        // Update visible fields
+        const annotationKey = stepDataKeys[type].annotation;
+        const titleKey = stepDataKeys[type].title;
+    
+        const annotation = record instanceof FormData ? record.get(annotationKey) : record[annotationKey];
+        const title = record instanceof FormData ? record.get(titleKey) : record[titleKey];
+    
+        const cardAnnotation = card.querySelector('.card__annotation');
+        const cardTitle = card.querySelector('.card__title');
+    
+        if (cardAnnotation) cardAnnotation.textContent = annotation;
+        if (cardTitle) cardTitle.textContent = title;
+    }    
+
+    static updateStepBtn(type, buttonStep, container){
+        const recordsLength = dataStore[type]?.length || 0;
+
+        if (recordsLength > 0) {
+            if (buttonStep.hasAttribute('data-skip')) {
+                toggleSkip(buttonStep, false, stepDataKeys[type].saveHandler(container));
+            }
+        } else {
+            toggleSkip(buttonStep, true, stepDataKeys[type].saveHandler(container));
+        }
     }
 }

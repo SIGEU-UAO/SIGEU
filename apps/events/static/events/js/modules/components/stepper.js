@@ -43,4 +43,4 @@ export function toggleSkip(button, enable, saveHandler) {
       button.removeEventListener("click", skipHandler);
       if (saveHandler) button.addEventListener("click", saveHandler);
     }
-  }
+}

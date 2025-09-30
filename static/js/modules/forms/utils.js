@@ -60,7 +60,7 @@ export function mergeFormDataArray(records, type) {
   return bigForm;
 }
 
-export function handleFileInputsInfo(input) {
+export function handleFileInputsInfo(input, existingFile = null) {
   const fileLabel = input.closest('.form__group').querySelector('.add-file-btn');
 
   // Check if infoDiv already exists to avoid duplication
@@ -71,14 +71,20 @@ export function handleFileInputsInfo(input) {
     fileLabel.insertAdjacentElement('afterend', infoDiv);
   }
 
-  // Update infoDiv when input changes
-  input.addEventListener('change', () => {
-    if (input.files.length > 0) {
-      infoDiv.innerHTML = `<i class="ri-file-check-fill"></i> ${input.files[0].name}`;
+  // Function to update infoDiv
+  const updateInfo = (file) => {
+    if (file) {
+      infoDiv.innerHTML = `<i class="ri-file-check-fill"></i> ${file.name}`;
     } else {
       infoDiv.textContent = '';
     }
-  });
+  };
+
+  // Display existing file if passed
+  if (existingFile) updateInfo(existingFile);
+
+  // Listener for future changes
+  input.addEventListener('change', () => updateInfo(input.files[0]));
 }
 
 export function cleanContainer(container){
