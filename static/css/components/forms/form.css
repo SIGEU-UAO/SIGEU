@@ -122,6 +122,7 @@ input.input-file {
     font-size: 22px;
 }
 
+
 .form__button--secondary{
     background-color: transparent;
     color: var(--primary);
