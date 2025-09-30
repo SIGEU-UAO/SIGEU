@@ -131,16 +131,7 @@ class InicioSesionForm(forms.Form):
     password = forms.CharField(
         label="Contraseña",
         required=True,
-        validators=[RegexValidator(
-            regex=password_validator.regex,
-            message=("La contraseña debe tener al menos 8 caracteres, "
-                     "incluyendo una mayúscula, una minúscula y un número.")
-        )],
-        widget=forms.PasswordInput(attrs={
-            "class": "password-field",
-            "pattern": r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$",
-            "title": "La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula, una minúscula y un número"
-        }),
+        widget=forms.PasswordInput(attrs={ "class": "password-field" }),
     )
 
     def __init__(self, *args, **kwargs):

@@ -2,10 +2,12 @@ import AssociatedRecords from "/static/events/js/modules/components/associatedRe
 import Modal from "../classes/Modal.js";
 import API from "../classes/API.js";
 
-//* Container selectors that store associated/assigned records
-const assignedPhysicalInstallationsContainer = document.querySelector(".main__step--2 .step__cards")
+// Configuration of all modes
+export const modalOpeners = [
+    { buttonId: 'asignar-instalacion-btn', modalId: 'modal-instalaciones' },
+    { buttonId: 'asignar-organizador-btn', modalId: 'modal-organizadores' }
+];
 
-// Configuración de todos los modales
 export const modalsConfig = [
     {
         buttonId: 'asignar-instalacion-btn',
@@ -22,9 +24,10 @@ export const modalsConfig = [
         ],
         icon: 'ri-map-fill',
         stepLabel: 'Asignar instalación',
+        assignedRecordsContainerSelector: ".main__step--2 .step__cards",
         onClickCallback: function(resultContainer, item) {
+            AssociatedRecords.addRecord({ id: item["idInstalacion"], ubicacion: item["ubicacion"], tipo: item["tipo"] }, "instalaciones", this.assignedRecordsContainerSelector)
             Modal.closeModal(resultContainer.closest("dialog"))
-            AssociatedRecords.addRecord({ id: item["idInstalacion"], annotation: item["tipo"], title: item["ubicacion"], icon: "ri-map-fill", type: "instalaciones" }, assignedPhysicalInstallationsContainer)
         }
     },
     {
@@ -42,13 +45,20 @@ export const modalsConfig = [
         ],
         icon: 'ri-map-pin-user-fill',
         stepLabel: 'Visualizar datos',
+        assignedRecordsContainerSelector: ".main__step--3 .step__cards",
         onClickCallback: async function(resultContainer, item) {
             const modal = resultContainer.closest("dialog")
             const result = await API.fetchGet(`/organizadores/api/${item.idUsuario}`)
             if (result.error) return; 
-            Modal.renderDetailStep(modal, result.data.organizador)
+            Modal.renderDetailStep(modal, result.data.organizador, "organizadores") // The 1 represents the index of this position in the array, which is used to obtain the modalConfig.
             Modal.goStep(modal, "next");
-        }
+        },
+        associateValidationRules: {
+            aval: [{ check: (val) => val instanceof File && val.name, msg: "Debes subir un archivo PDF"}],
+            id: [{ check: (val) => !isNaN(Number(val)) && Number(val) > 0, msg: "El ID debe ser un número válido mayor que 0"}]
+        },
+        extraFormDataFields: ["rol"],
+        fieldsRecordUI: ["rol"]
     },
     {
         buttonId: 'asignar-usuario-btn',

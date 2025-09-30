@@ -26,3 +26,21 @@ export function goStep(direction) {
     // Update visual stepper
     steps.forEach((s, i) => s.classList.toggle('step--active', i === newIndex));
 }
+
+export const skipHandler = () => goStep("next");
+
+export function toggleSkip(button, enable, saveHandler) {
+    if (enable) {
+      button.setAttribute("data-skip", "");
+      button.textContent = "Omitir";
+  
+      if (saveHandler) button.removeEventListener("click", saveHandler);
+      button.addEventListener("click", skipHandler);
+    } else {
+      button.removeAttribute("data-skip");
+      button.textContent = "Guardar";
+  
+      button.removeEventListener("click", skipHandler);
+      if (saveHandler) button.addEventListener("click", saveHandler);
+    }
+  }

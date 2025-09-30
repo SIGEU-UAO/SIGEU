@@ -3,7 +3,6 @@ from django.contrib.auth import authenticate, login, logout
 from .service import UserService
 from django.contrib.auth.decorators import login_required
 from .forms import EditarPerfilForm
-from .models import Usuario
 from django.db import IntegrityError
 import json
 
@@ -70,7 +69,6 @@ class UsersAPI():
     
     
     @login_required()
-    @no_superuser_required
     def editar_perfil(request):
         # Profile update via API (POST JSON)
         if request.method == "POST":
@@ -127,7 +125,6 @@ class UsersAPI():
             }, status=200)
 
         return JsonResponse({"error": "Metodo no permitido"}, status=405)
-
 
 
     # * Método para listar organizadores

@@ -3,10 +3,10 @@ import Alert from "../classes/Alert.js"
 //* Validate fields in FormData (Reusable for all forms)
 export function validarFormData(formData, rules = {}) {
   for (let [campo, valor] of formData.entries()) {
-    let val = valor.trim();
+    let val = valor instanceof File ? valor : valor.trim();
 
     // Default validation: empty
-    if (!val) {
+    if (!val || (val instanceof File && !val.name)) {
       Alert.error(`El campo ${campo} es obligatorio`);
       return false;
     }
@@ -62,13 +62,19 @@ export function mergeFormDataArray(records, type) {
 
 export function handleFileInputsInfo(input) {
   const fileLabel = input.closest('.form__group').querySelector('.add-file-btn');
-  const infoDiv = document.createElement('div');
-  infoDiv.classList.add('file-info');
-  fileLabel.insertAdjacentElement('afterend', infoDiv);
 
+  // Check if infoDiv already exists to avoid duplication
+  let infoDiv = fileLabel.nextElementSibling;
+  if (!infoDiv || !infoDiv.classList.contains('file-info')) {
+    infoDiv = document.createElement('div');
+    infoDiv.classList.add('file-info');
+    fileLabel.insertAdjacentElement('afterend', infoDiv);
+  }
+
+  // Update infoDiv when input changes
   input.addEventListener('change', () => {
     if (input.files.length > 0) {
-      infoDiv.innerHTML = `<i class="ri-file-check-fill"></i> ${input.files[0].name}`
+      infoDiv.innerHTML = `<i class="ri-file-check-fill"></i> ${input.files[0].name}`;
     } else {
       infoDiv.textContent = '';
     }

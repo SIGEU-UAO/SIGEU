@@ -35,7 +35,7 @@ class InstalacionesAsignadasAPI:
                     # If the installation was not found, add an error.
                     if not instalacion:
                         errores.append({
-                            "instalacion_id": item["id"],
+                            "id": item["id"],
                             "error": "Instalación no encontrada."
                         })
                         continue
@@ -47,7 +47,7 @@ class InstalacionesAsignadasAPI:
                 except Exception as e:
                     # Catch any other errors
                     errores.append({
-                        "instalacion_id": item.get("id"),
+                        "id": item.get("id"),
                         "error": str(e)
                     })
                     continue

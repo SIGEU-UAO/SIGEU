@@ -32,7 +32,11 @@
 /* File Input Styles */
 
 input.input-file {
-    display: none !important;
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    z-index: -1;
 }
 
 .add-file-btn {
@@ -86,7 +90,6 @@ input.input-file {
     font-size: 16px;
     color: rgb(15, 175, 15);
 }
-
 
 /* End File Input Styles */
 

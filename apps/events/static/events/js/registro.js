@@ -1,9 +1,8 @@
 import { modalsConfig } from "/static/js/modules/components/modalsConfig.js";
-import { goStep } from "./modules/components/stepper.js";
+import { goStep, skipHandler } from "./modules/components/stepper.js";
 import Modal from "/static/js/modules/classes/Modal.js";
 import API from "/static/js/modules/classes/API.js";
 import dataStore from "./modules/dataStore.js";
-import AssociatedRecords from "./modules/components/associatedRecords.js";
 import { validarFormData, handleFileInputsInfo } from "/static/js/modules/forms/utils.js";
 import Alert from "/static/js/modules/classes/Alert.js";
 
@@ -21,13 +20,13 @@ const validationRules = {
 const mainForm = document.getElementById("main-form");
 const fileInputs = document.querySelectorAll('input.input-file');
 
-//* Steps buttons
-const nextStepButtons = document.querySelectorAll(".step__button--next")
+//* Step sections
+const nextStepBtns = document.querySelectorAll(".step__button--next[data-skip]")
 
 //* Event Listeners
 document.addEventListener("DOMContentLoaded", () => {
     //* Init step form
-    goStep(1);
+    goStep(3);
 
     //* Init modals
     Modal.initModals();
@@ -41,20 +40,15 @@ document.addEventListener("DOMContentLoaded", () => {
             endpoint: c.endpoint,
             valueField: c.valueField,
             displayCallback: (container, items) => {
-                Modal.displayCards(container, items, c.icon, c.fields, c.stepLabel, c.onClickCallback);
+                Modal.displayCards(container, items, c.icon, c.fields, c.stepLabel, c.onClickCallback.bind(c));
             }
         });
     });
 
     //* Others event listeners
-    nextStepButtons.forEach(button => button.addEventListener("click", () => goStep("next")))
     mainForm.addEventListener("submit", handleMainFormSubmit);
+    nextStepBtns.forEach(btn => btn.addEventListener("click", skipHandler))
     fileInputs.forEach(input => handleFileInputsInfo(input))
-
-    //* Events listeners to associate records to the DB
-    const associatePhysicalInstallationsBtn = nextStepButtons[0];
-    
-    if (!associatePhysicalInstallationsBtn.dataset.skip) associatePhysicalInstallationsBtn.addEventListener("click", () => AssociatedRecords.saveDBRecords("/eventos/api/asignar-instalaciones/", "instalaciones"))
 });
 
 //* Functions

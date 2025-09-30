@@ -1,11 +1,9 @@
 import API from "./API.js";
 import Alert from "./Alert.js";
 import Loader from "./Loader.js"
-
-const modalOpeners = [
-    { buttonId: 'asignar-instalacion-btn', modalId: 'modal-instalaciones' },
-    { buttonId: 'asignar-organizador-btn', modalId: 'modal-organizadores' }
-];
+import { validarFormData } from "../forms/utils.js";
+import { modalOpeners, modalsConfig } from "../components/modalsConfig.js";
+import AssociatedRecords from "/static/events/js/modules/components/associatedRecords.js";
 
 export default class Modal{
     //* Initialize all modals and their steps/progress
@@ -49,13 +47,15 @@ export default class Modal{
         let idx = radios.findIndex(r => r.checked);
         if (idx < 0) idx = 0;
 
-        let target = direction === 'prev' ? idx - 1 : idx + 1;
+        const target = typeof direction === 'number' 
+            ? (direction >= 0 ? direction : idx + direction)
+            : (direction === 'prev' ? idx - 1 : idx + 1);
 
-        target = Math.max(0, Math.min(target, radios.length - 1));
-        if (!radios[target]) return;
+        const clampedTarget = Math.max(0, Math.min(target, radios.length - 1));
+        if (!radios[clampedTarget]) return;
 
-        radios[target].checked = true;
-        radios[target].dispatchEvent(new Event('change', { bubbles: true }));
+        radios[clampedTarget].checked = true;
+        radios[clampedTarget].dispatchEvent(new Event('change', { bubbles: true }));
     }
     
     //* Init close modal buttons
@@ -67,6 +67,20 @@ export default class Modal{
 
     static closeModal(modal){
         modal.close()
+    }
+
+    static resetModal(modal, associationForm){
+        // Reset form association
+        associationForm.reset();
+        associationForm.removeAttribute("data-id");
+        associationForm.querySelectorAll('.file-info').forEach(div => div.textContent = '');
+
+        // Reset record details
+        const list = modal.querySelector('.modal__list');
+        list.innerHTML = '';
+
+        Modal.goStep(modal, 0) // Go to the first modal step
+        Modal.closeModal(modal)
     }
 
     //* Toggle loader and results
@@ -142,7 +156,7 @@ export default class Modal{
 
             const iconDiv = document.createElement("DIV");
             iconDiv.classList.add("entity__icon");
-            iconDiv.innerHTML = `<i class="${icon}"></i>`; // Podrías recibir icono como argumento si quieres
+            iconDiv.innerHTML = `<i class="${icon}"></i>`;
 
             const descriptionDiv = document.createElement("DIV");
             descriptionDiv.classList.add("entity__description");
@@ -172,7 +186,7 @@ export default class Modal{
         });
     }
 
-    static renderDetailStep(modal, item){
+    static renderDetailStep(modal, item, type){
         const list = modal.querySelector('.modal__list');
 
         // Clear any previous content
@@ -197,6 +211,44 @@ export default class Modal{
 
         //* Add Event Listener to associate button
         const stepDetailButton = modal.querySelector(".modal__step[data-step='2'] .modal__btn--primary");
-        stepDetailButton.addEventListener("click", () => Modal.goStep(modal, "next"))
+        const associateForm = modal.querySelector(".modal__step[data-step='3'] .modal__form");
+        const idKey = Object.keys(item).find(k => k.toLowerCase().startsWith("id"));
+        const id = item[idKey];
+
+        stepDetailButton.addEventListener("click", () => {
+            associateForm.dataset.id = id;
+            Modal.goStep(modal, "next")
+        })
+
+        associateForm.onsubmit = (e) => Modal.handleAssociateForm(e, id, item, type);
+    }
+
+    static handleAssociateForm(e, itemID, item, type){
+        e.preventDefault();
+
+        const form = e.currentTarget;
+        const formData = new FormData(form);
+        const modalConfigIndex = type === "organizadores" ? 1 : 2;
+
+        // Add the id field
+        formData.append('id', itemID);
+
+        // Add extra form data fields
+        modalsConfig[modalConfigIndex].extraFormDataFields.forEach(field => formData.append(field, item[field]))
+
+        // Validate FormData
+        if (!validarFormData(formData, modalsConfig[modalConfigIndex].associateValidationRules)) return;
+
+        // Add record        
+        const recordUI = {};
+        modalsConfig[modalConfigIndex].fieldsRecordUI.forEach(field => recordUI[field] = item[field]);
+        if (item.nombres && item.apellidos) recordUI.nombreCompleto = `${item.nombres} ${item.apellidos}`;
+
+        const containerSelector = modalsConfig[modalConfigIndex].assignedRecordsContainerSelector;
+        AssociatedRecords.addRecord(formData, type, containerSelector, recordUI);
+
+        //Reset the modal
+        const modal = document.getElementById(modalsConfig[modalConfigIndex].modalId);
+        Modal.resetModal(modal, form)
     }
 }
