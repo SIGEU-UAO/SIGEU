@@ -129,7 +129,6 @@ class UserService:
         return True
     
 
-
     @staticmethod
     def listar_organizadores():
         return Usuario.objects.filter(Q(docente__isnull=False) | Q(estudiante__isnull=False))
@@ -160,6 +159,16 @@ class UserService:
 
         return list(qs.values("idUsuario", "nombre_completo", "numeroIdentificacion", "rol"))
     
+    # * This method allows you to obtain a user as an instance of the model.
+    @staticmethod
+    def obtener_instance_por_id(id_usuario):
+        try:
+            usuario = Usuario.objects.get(idUsuario=id_usuario)
+            return usuario
+        except Usuario.DoesNotExist:
+            return False
+
+    # * This method allows you to obtain a user as an object because it includes the role
     @staticmethod
     def obtener_por_id(id_usuario):
         try:

@@ -9,6 +9,15 @@ const notyf = new Notyf({
           tagName: 'i',                    
           color: 'white'                     
         }
+      },
+      {
+        type: 'warning',
+        background: '#ff8921',
+        icon: {
+          className: 'ri-alert-fill',
+          tagName: 'i',
+          color: 'white'
+        }
       }
     ]
 });
@@ -25,6 +34,13 @@ export default class Alert {
     static info(message) {
         notyf.open({
             type: 'info',
+            message: message
+        });
+    }
+
+    static warning(message) {
+        notyf.open({
+            type: 'warning',
             message: message
         });
     }

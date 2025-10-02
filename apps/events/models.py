@@ -1,7 +1,7 @@
 from django.db import models
 from apps.users.models import Usuario
 from apps.core.models import InstalacionFisica
-
+from .utils import path_coordinador_aval
 class Evento(models.Model):
     # Enumerations
     ESTADOS = [ 
@@ -48,5 +48,23 @@ class InstalacionesAsignadas(models.Model):
             models.UniqueConstraint(
                 fields=['evento', 'instalacion'],
                 name='unique_evento_instalacion'
+            )
+        ]
+
+class OrganizadoresEventos(models.Model):
+    evento = models.ForeignKey(Evento, on_delete=models.CASCADE)
+    organizador = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    aval = models.FileField(upload_to=path_coordinador_aval) 
+    tipo = models.CharField(max_length=50)
+    
+    # Simular PK Compuesta
+    class Meta:
+        db_table = "organizadores_eventos"
+        verbose_name = "organizador_evento"
+        verbose_name_plural = "organizadores_eventos"
+        constraints = [
+            models.UniqueConstraint(
+                fields=['evento', 'organizador'],
+                name='unique_evento_organizador'
             )
         ]

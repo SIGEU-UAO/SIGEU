@@ -17,6 +17,10 @@ class InstalacionesAsignadasAPI:
                 return JsonResponse({"error": "Formato JSON inválido."}, status=400)
                 
             evento_id = data.get("evento")
+
+            if not evento_id:
+                return JsonResponse({ "error": "No se suministró el id del evento" }, status=400)
+            
             instalaciones = data.get("records")
 
             if not validate_collection(instalaciones, SCHEMAS["instalaciones_asignadas"]):
@@ -24,8 +28,6 @@ class InstalacionesAsignadasAPI:
 
             errores = []
             guardadas = []
-
-            print(instalaciones)
 
             # * Try to assign all facilities
             for item in instalaciones:
@@ -40,7 +42,7 @@ class InstalacionesAsignadasAPI:
                         })
                         continue
 
-                    creada = InstalacionesAsignadasService.crearInstalacionAsignada({ "evento_id": evento_id, "instalacion_id": instalacion.idInstalacion })
+                    creada = InstalacionesAsignadasService.crearInstalacionAsignada({ "evento_id": evento_id, "instalacion": instalacion })
                     if creada:
                         guardadas.append(instalacion.idInstalacion)
 

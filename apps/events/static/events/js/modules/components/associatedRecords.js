@@ -1,7 +1,6 @@
 import dataStore from "../dataStore.js";
 import { validateCollection } from "../utils/validations.js";
 import { mergeFormDataArray, handleFileInputsInfo } from "/static/js/modules/forms/utils.js";
-import { modalsConfig } from "/static/js/modules/components/modalsConfig.js";
 import Modal from "/static/js/modules/classes/Modal.js";
 import API from "/static/js/modules/classes/API.js";
 import Alert from "/static/js/modules/classes/Alert.js";
@@ -115,13 +114,14 @@ export default class AssociatedRecords{
         let result;
         if (isFormData) {
             const bigForm = mergeFormDataArray(records, type);
+            bigForm.append("evento", dataStore.eventoId);
             result = await API.postFormData(endpoint, bigForm);
         } else {
             result = await API.post(endpoint, JSON.stringify({ evento: dataStore.eventoId, records }));
         }
 
         if (result.error) {
-            dataStore.excludeRecords(type, result.errores, container);
+            if (result.data.errores) dataStore.excludeRecords(type, result.data.errores, container);
             return;    
         }
 

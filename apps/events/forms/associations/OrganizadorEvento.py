@@ -1,7 +1,7 @@
 from django import forms
 from ...validations.data_validators import validate_pdf
 
-class CoordinadorEventoForm(forms.Form):
+class OrganizadorEventoForm(forms.Form):
     aval = forms.FileField(
         label="Aval del Organizador:",
         validators=[validate_pdf],

@@ -307,6 +307,7 @@ export default class Modal{
 
         const form = e.currentTarget;
         const formData = new FormData(form);
+        formData.delete("csrfmiddlewaretoken"); // Delete the CSRF token
         const modalConfig = modalsConfig.find(config => config.type === type);
 
         // Add the id field
@@ -366,6 +367,7 @@ export default class Modal{
     
         // Overwrite with form fields
         new FormData(form).forEach((value, key) => {
+            if (key === "csrfmiddlewaretoken") return; // Ignore the CSRF token
             if (form.querySelector(`[name="${key}"]`)?.type === "file" && !value.name) return;
             updatedRecord.set(key, value);
         });

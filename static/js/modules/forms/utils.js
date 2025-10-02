@@ -53,7 +53,7 @@ export function mergeFormDataArray(records, type) {
   records.forEach((form, i) => {
       for (const [key, value] of form.entries()) {
           // Each field is stored as records[0][key], records[1][key]...
-          bigForm.append(`${type}[${i}][${key}]`, value);
+          bigForm.append(`${type}_${key}[]`, value);
       }
   });
 
