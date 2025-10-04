@@ -52,10 +52,16 @@ class InstalacionesAsignadas(models.Model):
         ]
 
 class OrganizadoresEventos(models.Model):
+    # Enumerations
+    TIPOS = [ 
+        ("director_programa", "Director del Programa"),
+        ("director_docencia", "Director de Docencia")
+    ]
+    
     evento = models.ForeignKey(Evento, on_delete=models.CASCADE)
     organizador = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     aval = models.FileField(upload_to=path_coordinador_aval) 
-    tipo = models.CharField(max_length=50)
+    tipo = models.CharField(max_length=50, choices=TIPOS)
     
     # Simular PK Compuesta
     class Meta:
