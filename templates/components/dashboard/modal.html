@@ -27,7 +27,7 @@
                     </div>
                     <span class="loader hide"></span>
                     <div class="form__results hide" id="{{ modal_plural_name|lower }}-container"></div>
-                    {% if modal_type == "Organizaciones Externas" %}
+                    {% if modal_type == "Organizacion" %}
                         <div class="form__suggest hide">
                             <h4 class="suggest__title">¿No encuentras la organización que buscas?</h4>
                             <a href="{% url 'registrar_org' %}" class="suggest__cta" target="_blank">Crear Organización Externa</a>
@@ -63,7 +63,7 @@
     
                         {% for field in modal_associate_form %}
                             <div class="form__row">
-                                {% include "components/form/input.html" with field=field type="file" %}
+                                {% include "components/form/input.html" with field=field %}
                             </div>
                         {% endfor %}
 

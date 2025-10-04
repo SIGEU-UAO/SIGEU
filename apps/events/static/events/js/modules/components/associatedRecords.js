@@ -19,6 +19,12 @@ const stepDataKeys = {
         icon: "ri-map-pin-user-fill",
         saveHandler: (container) => () => AssociatedRecords.saveDBRecords("/eventos/api/asignar-organizadores/", "organizadores", container)
     },
+    organizaciones: {
+        annotation: "nit",
+        title: "nombre",
+        icon: "ri-building-2-fill",
+        saveHandler: (container) => () => AssociatedRecords.saveDBRecords("/eventos/api/asignar-organizaciones/", "organizaciones", container)
+    },
 }
 
 export default class AssociatedRecords{
@@ -42,7 +48,12 @@ export default class AssociatedRecords{
         //* Append to the UI
         const container = document.querySelector(containerSelector);
         const dataUI = isFormData ? recordUI : data;
-        this.addRecordToUI(id, dataUI, type, isFormData, container)
+        if (isFormData && type === "organizaciones") {
+            recordUI["associate_fields"] = [data.get("representante_asiste") === "on" ? "El representante legal ASISTE" : "El representante legal NO ASISTE"]
+            if (data.get("representante_alterno")) recordUI["associate_fields"].push(`Representante alterno: ${data.get("representante_alterno")}`)
+        }
+
+        this.addRecordToUI(id, dataUI, type, container)
     }
 
     static editRecord(record, type, form, modal, modalConfig, isCurrentUser = false) {
@@ -76,7 +87,7 @@ export default class AssociatedRecords{
         }
     
         // Update the UI
-        if (type !== "organizadores") this.updateRecordUI(type, record, container);
+        if (type !== "organizadores") this.updateRecordUI(record, container);
     
         // Update file input info
         form.querySelectorAll('input[type="file"]').forEach(input => {
@@ -135,8 +146,7 @@ export default class AssociatedRecords{
         goStep("next")
     }
 
-    //TODO: DECIDIR SI ELIMINAR PARAMETRO ISFORMDATA
-    static addRecordToUI(id, data, type, isFormData, container, isCurrentUser = false){
+    static addRecordToUI(id, data, type, container, isCurrentUser = false){
         const buttonStep = container.nextElementSibling.lastElementChild;
 
         const stepCard = document.createElement("DIV");
@@ -159,6 +169,20 @@ export default class AssociatedRecords{
 
         cardHeader.appendChild(cardAnnotation);
         cardHeader.appendChild(cardTitle);
+
+        if (type === "organizaciones") {
+            const cardList = document.createElement("UL");
+            cardList.classList.add("card__list")
+
+            data["associate_fields"].forEach((field, index) => {
+                const cardListItem = document.createElement("LI");
+                cardListItem.textContent = field;
+                cardListItem.classList.add('card__item')
+                cardList.appendChild(cardListItem)
+            })
+
+            cardHeader.appendChild(cardList)
+        }
 
         const cardButtons = document.createElement("DIV");
         cardButtons.classList.add("card__buttons");
@@ -200,24 +224,40 @@ export default class AssociatedRecords{
         this.updateStepBtn(type, buttonStep, container)
     }
 
-    // TODO: ESTA FUNCION HAY QUE IMPLEMENTARLA CORRECTAMENTE PARA ORGANIZACIONES EXTERNAS
-    static updateRecordUI(type, record, container){
-        const id = record instanceof FormData ? record.get('id') : record.id;
+    // * Function to update the record in UI (Applies only to external organizations...)
+    static updateRecordUI(record, container){
+        const id = record.get('id');
         const card = container.querySelector(`.step__card[data-id="${id}"]`);
         if (!card) return;
     
         // Update visible fields
-        const annotationKey = stepDataKeys[type].annotation;
-        const titleKey = stepDataKeys[type].title;
-    
-        const annotation = record instanceof FormData ? record.get(annotationKey) : record[annotationKey];
-        const title = record instanceof FormData ? record.get(titleKey) : record[titleKey];
-    
-        const cardAnnotation = card.querySelector('.card__annotation');
-        const cardTitle = card.querySelector('.card__title');
-    
-        if (cardAnnotation) cardAnnotation.textContent = annotation;
-        if (cardTitle) cardTitle.textContent = title;
+        const cardList = card.querySelector(".card__list")
+        let cardListItems = card.querySelectorAll(".card__item");
+
+        if (record.has("representante_asiste") || record.has("representante_alterno")) {
+            const representanteAsiste = record.get("representante_asiste");
+            const representanteAlterno = record.get("representante_alterno");
+
+            const texts = [representanteAsiste === "on" ? "El representante legal ASISTE" : "El representante legal NO ASISTE"];
+            if (representanteAlterno) texts.push(`Representante alterno: ${representanteAlterno}`)
+
+            while (cardListItems.length < texts.length) {
+                const newItem = document.createElement("li");
+                newItem.classList.add("card__item");
+                cardList.appendChild(newItem);
+                cardListItems = card.querySelectorAll(".card__item");
+            }
+
+            while (cardListItems.length > texts.length) {
+                cardListItems[cardListItems.length - 1].remove();
+                cardListItems = cardList.querySelectorAll(".card__item");
+            }
+
+            // Replace the content of visible items
+            cardListItems.forEach((item, index) => {
+                item.textContent = texts[index] || "";
+            });
+        }
     }    
 
     static updateStepBtn(type, buttonStep, container){

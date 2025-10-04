@@ -17,7 +17,6 @@
 .step__button{
     height: 48px;
     padding: 0 24px;
-    font-size: 22px;
     font-size: 20px;
     font-weight: 500;
     outline: none;
@@ -69,6 +68,11 @@
     font-size: 18px;
 }
 
+.card__list{
+    padding-left: 16px;
+    font-size: 13px;
+}
+
 .card__buttons{
     display: flex;
     gap: 8px;
@@ -111,7 +115,7 @@
     align-items: center;
 }
 
-.step__actions .step__button--next{
+.step__actions .step__button--next, .step__actions .step__button--finish{
     background-color: var(--primary);
     color: #fff;
     border: none;

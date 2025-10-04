@@ -5,7 +5,8 @@ import API from "../classes/API.js";
 // Configuration of all modes
 export const modalOpeners = [
     { buttonId: 'asignar-instalacion-btn', modalId: 'modal-instalaciones' },
-    { buttonId: 'asignar-organizador-btn', modalId: 'modal-organizadores' }
+    { buttonId: 'asignar-organizador-btn', modalId: 'modal-organizadores' },
+    { buttonId: 'asignar-organizacion-btn', modalId: 'modal-organizaciones' }
 ];
 
 export const modalsConfig = [
@@ -58,27 +59,42 @@ export const modalsConfig = [
         },
         associateFormSelector: "#asociar-organizador-form",
         associateValidationRules: {
-            aval: [{ check: (val) => val instanceof File && val.name.endsWith('.pdf'), msg: "Debes subir un archivo PDF"}],
-            id: [{ check: (val) => !isNaN(Number(val)) && Number(val) > 0, msg: "El ID debe ser un número válido mayor que 0"}]
+            id: [{ check: (val) => !isNaN(Number(val)) && Number(val) > 0, msg: "El ID debe ser un número válido mayor que 0"}],
+            aval: [{ check: (val) => val instanceof File && val.name.endsWith('.pdf'), msg: "Debes subir un archivo PDF"}]
         },
         fieldsRecordUI: ["rol"]
     },
     {
-        buttonId: 'asignar-usuario-btn',
-        modalId: 'modal-usuarios',
-        formSelector: '#search-users-form',
-        loaderSelector: '#search-users-form .loader',
-        resultSelector: '#search-users-form .form__results',
-        suggestSelector: '#search-users-form .form__suggest',
-        endpoint: '/usuarios/api/',
-        valueField: 'username',
+        buttonId: 'asignar-organizacion-btn',
+        modalId: 'modal-organizaciones',
+        type: "organizaciones",
+        editable: true,
+        formSelector: '#search-organizaciones-form',
+        loaderSelector: '#search-organizaciones-form .loader',
+        resultSelector: '#search-organizaciones-form .form__results',
+        suggestSelector: '#search-organizaciones-form .form__suggest',
+        endpoint: '/orgs/api/',
+        valueField: 'nit',
         fields: [
-            { key: 'username', label: 'Usuario', tag: 'H5' },
-            { key: 'email', label: 'Email' },
-            { key: 'rol', label: 'Rol' }
+            { key: 'nit', label: 'NIT', tag: 'H5' },
+            { key: 'nombre', label: 'Nombre' },
+            { key: 'representanteLegal', label: 'Representante Legal' }
         ],
-        icon: 'ri-user-fill',
-        stepLabel: 'Seleccionar usuario',
-        //onClickCallback: item => selectUser(item)
+        icon: 'ri-map-pin-user-fill',
+        modalStepLabel: 'Visualizar datos',
+        assignedRecordsContainerSelector: ".main__step--4 .step__cards",
+        onClickCallback: async function(resultContainer, item) {
+            const modal = resultContainer.closest("dialog")
+            const result = await API.fetchGet(`/orgs/api/${item.idOrganizacion}`)
+            if (result.error) return; 
+            Modal.renderDetailStep(modal, result.data.organizacion, this.type)
+            Modal.goStep(modal, "next");
+        },
+        associateFormSelector: "#asociar-organizacion-form",
+        associateValidationRules: {
+            id: [{ check: (val) => !isNaN(Number(val)) && Number(val) > 0, msg: "El ID debe ser un número válido mayor que 0"}],
+            certificado_participacion: [{ check: (val) => val instanceof File && val.name.endsWith('.pdf'), msg: "Debes subir un archivo PDF"}]
+        },
+        fieldsRecordUI: ["nit", "nombre"]
     }
 ];

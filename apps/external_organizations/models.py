@@ -9,7 +9,7 @@ class OrganizacionExterna(models.Model):
     telefono = models.CharField(max_length=10)
     ubicacion = models.CharField(max_length=100)
     sectorEconomico = models.CharField(max_length=100)
-    actividadPrincipal = models.CharField(max_length=100)
+    actividadPrincipal = models.CharField(max_length=200)
     creador = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="organizaciones_creadas")
 
     def __str__(self):

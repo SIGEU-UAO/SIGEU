@@ -140,15 +140,6 @@ class InicioSesionForm(forms.Form):
         for field in self.fields.values():
             field.widget.attrs["autocomplete"] = "off"
 
-class ModalBuscarOrganizadorForm(forms.Form):
-    nombre_completo = forms.CharField(label="Nombre Completo", required=True)
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Force autocomplete=off on all fields
-        for field in self.fields.values():
-            field.widget.attrs["autocomplete"] = "off"
-
 class EditarPerfilForm(forms.Form):
     numeroIdentificacion = forms.CharField(
         label="Documento de Identidad",
@@ -192,9 +183,6 @@ class EditarPerfilForm(forms.Form):
             "disabled": "true"
         })
     )
-  
-    
-
     contraseña = forms.CharField(
         label="Contraseña",
         required=False,
@@ -213,8 +201,6 @@ class EditarPerfilForm(forms.Form):
         for field in self.fields.values():
             field.widget.attrs["autocomplete"] = "off"
 
-
-
     def clean_contraseña(self):
         value = self.cleaned_data.get("contraseña", "")
         if value is None:
@@ -226,3 +212,12 @@ class EditarPerfilForm(forms.Form):
         # Enforce complexity only when provided
         password_validator(value)
         return value
+    
+class ModalBuscarOrganizadorForm(forms.Form):
+    nombre_completo = forms.CharField(label="Nombre Completo", required=True)
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Force autocomplete=off on all fields
+        for field in self.fields.values():
+            field.widget.attrs["autocomplete"] = "off"

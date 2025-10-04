@@ -71,6 +71,11 @@
         <section class="main__step main__step--3">
             {% include "events/layouts/step-section.html" with type="Organizadores" title="Asignar organizadores" subtitle="Organizadores asignados" row_btn="Asignar un nuevo organizador" id_btn="asignar-organizador-btn" %}
         </section>
+
+        {% comment "Step 4" %}-------------- STEP 4 --------------{% endcomment %}
+        <section class="main__step main__step--4">
+            {% include "events/layouts/step-section.html" with type="Organizaciones" title="Asignar organizaciones externas" subtitle="Organizaciones externas asignadas" row_btn="Asignar una nueva organización" id_btn="asignar-organizacion-btn" %}
+        </section>
     </div>
 
 {% endblock content %}

@@ -68,5 +68,5 @@
 #stepper-step--4:checked ~ .stepper .step--2 .step__circle,
 #stepper-step--4:checked ~ .stepper .step--2::after,
 #stepper-step--4:checked ~ .stepper .step--3 .step__circle,
-#stepper-step--4:checked ~ .stepper .step--3::after
+#stepper-step--4:checked ~ .stepper .step--3::after,
 #stepper-step--4:checked ~ .stepper .step--4 .step__circle { background-color: var(--blue); color: #fff; }

@@ -38,14 +38,15 @@ class OrganizacionExternaService:
             .values(
                 "idOrganizacion",   
                 "nit",
-                "nombre"
+                "nombre",
+                "representanteLegal"
             )
         )
         
     @staticmethod
     def obtener_por_id(id_organizacion):
         try:
-            return OrganizacionExterna.objects.get(idUsuario=id_organizacion)
+            return OrganizacionExterna.objects.get(idOrganizacion=id_organizacion)
         except OrganizacionExterna.DoesNotExist:
             return False
     

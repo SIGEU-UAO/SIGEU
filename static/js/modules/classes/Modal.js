@@ -18,6 +18,7 @@ export default class Modal{
             btn.addEventListener('click', () => { modal.show(); update(); });
             modal.querySelectorAll('input[name="steps"]').forEach(r => r.addEventListener('change', update));
             modal.querySelectorAll('.modal__btn--prev').forEach(btn => btn.addEventListener('click', () => Modal.goStep(modal, "prev")));
+            modal.querySelectorAll('.form__group .input-checkbox').forEach(input => input.addEventListener('click', Modal.toggleRelatedCheckboxField));
             Modal.initCloseButtons(modal);
         });
     }
@@ -106,6 +107,7 @@ export default class Modal{
                 handleFileInputsInfo(input, fileObj);
             } else if (input.type === "checkbox" || input.type === "radio") {
                 input.checked = input.value == value;
+                input.classList.add(input.checked ? "form__input--disabled" : "")
             } else {
                 input.value = value;
             }
@@ -132,7 +134,6 @@ export default class Modal{
         Modal.closeModal(modal)
     }
 
-    // todo: ressetear required aqui
     static resetEditModal(modal, currentStep = 3) {
         setTimeout(() => {
             // Go to first step
@@ -166,6 +167,21 @@ export default class Modal{
         result.classList.toggle("hide");
     }
 
+    //* Toggle related checkbox field
+    static toggleRelatedCheckboxField(e){
+        const checkbox = e.target;
+        const relatedField = document.querySelector(`#${checkbox.dataset.related}`)
+        
+        if (checkbox.checked) {
+            relatedField.setAttribute("disabled", "true")
+            relatedField.classList.add("form__input--disabled")
+            relatedField.value = "";
+        }else{
+            relatedField.removeAttribute("disabled")
+            relatedField.classList.remove("form__input--disabled")
+        }
+    }
+
      //* Handles any search form in a generic way
      static handleSearchFormSubmit({ formSelector, loaderSelector, resultSelector, suggestSelector, endpoint, valueField, displayCallback }) {
         const form = document.querySelector(formSelector);
@@ -191,7 +207,9 @@ export default class Modal{
             try {
                 const response = await API.fetchGet(`${endpoint}?q=${encodeURIComponent(searchInputValue)}`);
                 if (response.error) {
-                    setTimeout(() => Modal.toggleSearchState(loader, result), 1500);
+                    setTimeout(() => {
+                        Modal.toggleSearchState(loader, result)
+                    }, 1000);
                     return;
                 }
 
@@ -202,7 +220,7 @@ export default class Modal{
                     setTimeout(() => {
                         Loader.toggleLoader(loader);
                         if (suggest) suggest.classList.remove('hide');
-                    }, 1500);
+                    }, 1000);
                     return;
                 }
 
@@ -318,7 +336,7 @@ export default class Modal{
 
         // Add record        
         const recordUI = {};
-        modalConfig.fieldsRecordUI.forEach(field => recordUI[field] = item[field]);
+        if (modalConfig.fieldsRecordUI) modalConfig.fieldsRecordUI.forEach(field => recordUI[field] = item[field]);
         if (item.nombres && item.apellidos) recordUI.nombreCompleto = `${item.nombres} ${item.apellidos}`;
 
         const containerSelector = modalConfig.assignedRecordsContainerSelector;
@@ -368,6 +386,12 @@ export default class Modal{
             if (form.querySelector(`[name="${key}"]`)?.type === "file" && !value.name) return;
             updatedRecord.set(key, value);
         });
+
+        // For external organizations...
+        if (type === "organizaciones") {
+            const checkbox = form.querySelector('[name="representante_asiste"]');
+            updatedRecord.delete(checkbox.checked ? "representante_alterno" : "representante_asiste")
+        }
 
         const modal = document.getElementById(modalConfig.modalId);
         

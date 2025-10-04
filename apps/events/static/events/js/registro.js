@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const currentUser = window.currentUser;
 
     //* Init step form
-    goStep(1);
+    goStep(4);
 
     //* Init modals
     Modal.initModals();
@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
         rol: currentUser.rol
     };
 
-    AssociatedRecords.addRecordToUI(currentUser.id, recordUI, "organizadores", false, assignedOrganizatorsContainer, true)
+    AssociatedRecords.addRecordToUI(currentUser.id, recordUI, "organizadores", assignedOrganizatorsContainer, true)
 });
 
 //* Functions
