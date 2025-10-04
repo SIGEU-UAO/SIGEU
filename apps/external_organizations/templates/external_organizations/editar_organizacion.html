@@ -1,0 +1,41 @@
+{% extends 'layouts/dashboard.html' %}
+{% load static %}
+
+{% block page_title %} SIGEU | Registro Organizacion {% endblock page_title %}
+
+{% block css_files %}
+    <link rel="stylesheet" href="{% static 'external_organizations/css/registro.css' %}">
+{% endblock css_files %}
+
+{% block js_files %}
+    <script defer type="module" src="{% static 'external_organizations/js/editar.js' %}" ></script>
+{% endblock js_files %}
+
+{% block content %}
+    <form class="form" method="POST" >
+        {% csrf_token %}
+
+        <div class="form__row">
+            {% include "components/form/input.html" with field=form.nit %}
+            {% include "components/form/input.html" with field=form.nombre %}
+        </div>
+
+        <div class="form__row">
+            {% include "components/form/input.html" with field=form.representante_legal %}
+            {% include "components/form/input.html" with field=form.telefono %}
+        </div>
+
+        <div class="form__row">
+            {% include "components/form/input.html" with field=form.ubicacion %}
+            {% include "components/form/input.html" with field=form.sector_economico %}
+        </div>
+
+        <div class="form__group">
+            {% include "components/form/input.html" with field=form.actividad_principal %}
+        </div>
+
+        <div class="form__actions">
+            <button type="submit" class="form__button form__button--norounded">Guardar cambios</button>
+        </div>
+    </form>
+{% endblock content %}

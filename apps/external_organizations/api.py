@@ -41,6 +41,7 @@ class OrganizacionesExternasAPI:
                      # No results found
                     if not organizaciones:
                         return JsonResponse({
+                            "organizaciones": organizaciones,
                             "message": "No se encontraron organizaciones externas",
                             "messageType": "info"
                         }, status=200)
@@ -124,4 +125,25 @@ class OrganizacionesExternasAPI:
                 }
             }
             return JsonResponse(data, status=200)
+        return JsonResponse({"error": "Método no permitido"}, status=405)
+    
+    @login_required()
+    @organizador_required
+    def actualizar(request, id):
+        if request.method == "PUT":
+            try:
+                data = json.loads(request.body)
+            except json.JSONDecodeError:
+                return JsonResponse({"error": "Formato JSON inválido."}, status=400)
+
+            form = RegistroForm(data)
+            if form.is_valid():
+                try:
+                    OrganizacionExternaService.actualizar(id, form.cleaned_data)
+                    return JsonResponse({"message": "Organización actualizada"}, status=200)
+                except ValueError as e:
+                    return JsonResponse({"error": str(e)}, status=400)
+            else:
+                return JsonResponse({"error": form.errors}, status=400)
+
         return JsonResponse({"error": "Método no permitido"}, status=405)

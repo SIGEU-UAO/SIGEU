@@ -1,0 +1,19 @@
+{% extends 'layouts/dashboard.html' %}
+{% load static %}
+
+{% block page_title %} SIGEU | Organización no encontrada {% endblock page_title %}
+
+{% block css_files %}
+    <link rel="stylesheet" href="{% static 'css/components/forms/form.css' %}">
+{% endblock css_files %}
+
+{% block content %}
+<div class="error-page" style="text-align:left; margin-top: 2rem;">
+
+    <form action="{% url 'listado_orgs' %}" method="get">
+        <button type="submit" class="form__button form__button--norounded">
+            Volver al listado
+        </button>
+    </form>
+</div>
+{% endblock content %}

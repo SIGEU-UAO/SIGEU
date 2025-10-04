@@ -31,7 +31,7 @@ class OrganizacionExternaService:
     @staticmethod
     def filtrar_por_nit(nit):
         if not nit:
-         return []
+            return []
         return list(
             OrganizacionExterna.objects
             .filter(nit__icontains=nit)  
@@ -49,4 +49,16 @@ class OrganizacionExternaService:
             return OrganizacionExterna.objects.get(idOrganizacion=id_organizacion)
         except OrganizacionExterna.DoesNotExist:
             return False
+    
+    def actualizar(id, data):
+        org = OrganizacionExterna.objects.get(pk=id)
+        org.nit = data["nit"]
+        org.nombre = data["nombre"]
+        org.representanteLegal = data["representante_legal"]
+        org.telefono = data["telefono"]
+        org.ubicacion = data["ubicacion"]
+        org.sectorEconomico = data["sector_economico"]
+        org.actividadPrincipal = data["actividad_principal"]
+        org.save()
+        return org
     
