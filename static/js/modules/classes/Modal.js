@@ -313,9 +313,6 @@ export default class Modal{
         // Add the id field
         formData.append('id', itemID);
 
-        // Add extra form data fields
-        if (modalConfig.extraFormDataFields) modalConfig.extraFormDataFields.forEach(field => formData.append(field, item[field]))
-
         // Validate FormData
         if (!validarFormData(formData, modalConfig.associateValidationRules)) return;
 
@@ -371,13 +368,13 @@ export default class Modal{
             if (form.querySelector(`[name="${key}"]`)?.type === "file" && !value.name) return;
             updatedRecord.set(key, value);
         });
-    
-        // Call the method that updates dataStore and UI
-        const containerSelector = modalConfig.assignedRecordsContainerSelector;
-        AssociatedRecords.editRecord(updatedRecord, type, containerSelector, form, isCurrentUser);
 
-        //Reset the modal
         const modal = document.getElementById(modalConfig.modalId);
+        
+        // Call the method that updates dataStore and UI
+        AssociatedRecords.editRecord(updatedRecord, type, form, modal, modalConfig, isCurrentUser);
+        
+        //Reset the modal
         Modal.resetModal(modal, form)
     }    
 }

@@ -14,7 +14,7 @@ export function validateCollection(type, arr) {
     const schema = validationSchemas[type];
     if (!schema) throw new Error(`No hay esquema para el tipo: ${type}`);
     if (!Array.isArray(arr) || arr.length === 0) return false;
-
+    
     return arr.every(item => {
         let getValue, keys;
 
@@ -37,7 +37,13 @@ export function validateCollection(type, arr) {
             const expectedType = schema.types[k];
             const value = getValue(k);
 
-            if (expectedType === "file") return value instanceof File && value.type === "application/pdf";
+            if (expectedType === "file") {
+                if (!(value instanceof File)) return false;
+                const isPDFType = value.type === "application/pdf";
+                const isPDFExtension = value.name?.toLowerCase().endsWith(".pdf");
+                return isPDFType || isPDFExtension;
+            }
+
             return typeof value === expectedType;
         });
     });

@@ -1,6 +1,6 @@
 import dataStore from "../dataStore.js";
 import { validateCollection } from "../utils/validations.js";
-import { mergeFormDataArray, handleFileInputsInfo } from "/static/js/modules/forms/utils.js";
+import { validarFormData, mergeFormDataArray, handleFileInputsInfo } from "/static/js/modules/forms/utils.js";
 import Modal from "/static/js/modules/classes/Modal.js";
 import API from "/static/js/modules/classes/API.js";
 import Alert from "/static/js/modules/classes/Alert.js";
@@ -45,10 +45,16 @@ export default class AssociatedRecords{
         this.addRecordToUI(id, dataUI, type, isFormData, container)
     }
 
-    static editRecord(record, type, containerSelector, form, isCurrentUser = false) {
+    static editRecord(record, type, form, modal, modalConfig, isCurrentUser = false) {
         const id = record instanceof FormData ? record.get('id') : record.id;
-        const container = document.querySelector(containerSelector);
+        const container = document.querySelector(modalConfig.assignedRecordsContainerSelector);
         const buttonStep = container.nextElementSibling.lastElementChild;
+
+        // Validate formData
+        if (!validarFormData(record, modalConfig.associateValidationRules)) {
+            Modal.resetEditModal(modal);
+            return;
+        };
     
         // Update or add as appropriate and capture the result
         let result;
