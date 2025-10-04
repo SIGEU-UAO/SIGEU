@@ -61,35 +61,39 @@ Esto creará `env/`, instalará dependencias y activará el entorno virtual.
 - Copiar `.env.template` como `.env`.
 - Agregar la contraseña de la base de datos, la configuracion del correo electrónico y otros valores sensibles.
 
-4. Crear la base de datos y usuario:
+4. Iniciar XAMPP (Preferiblemente / Puede ser cualquier otro servidor local):
+- Iniciar Apache
+- Iniciar MySQL
+
+5. Crear la base de datos únicamente y su usuario (desde **phpMyAdmin**, por ejemplo):
 - Nombre: definido en `.env` (ej: `sigeu`)
 - Usuario: `django-user`
 - Conceder todos los permisos
 
-5. Crear migraciones:
+6. Crear migraciones:
 ```bash
 python manage.py makemigrations
 ```
 
-6. Ejecutar migraciones:
+7. Ejecutar migraciones (Crear tablas de la BD):
 ```bash
 python manage.py migrate
 ```
 
-7. Crear superusuario (administrador):
+8. Crear superusuario (administrador):
 ```bash
 python manage.py createsuperuser
 ```
 
-8. Iniciar servidor:
+9. Iniciar servidor:
 ```bash
 python manage.py runserver
 ```
 
-9. Acceder a http://127.0.0.1:8000/admin/ e iniciar como administrador
+10. Acceder a http://127.0.0.1:8000/admin/ e iniciar como administrador
    - Poblar tablas Facultades, Programas, Unidades Academicas e Instalaciones Físicas
 
-10. Iniciar el recorrido por el software a través de http://127.0.0.1:8000/registro
+11.  Iniciar el recorrido por el software a través de http://127.0.0.1:8000/registro
 
 ---
 
