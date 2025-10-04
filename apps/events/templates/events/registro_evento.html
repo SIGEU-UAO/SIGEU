@@ -9,8 +9,73 @@
 
 {% block js_files %}
     <script defer type="module" src="{% static 'events/js/registro.js' %}" ></script>
+    <script> window.currentUser = {{ current_user_data|safe }}; </script>
 {% endblock js_files %}
 
 {% block content %}
-    {% include 'external_organizations/components/modal.html' %}
+    <div class="main__steps">
+        <input type="radio" name="stepper" id="stepper-step--1" hidden>
+        <input type="radio" name="stepper" id="stepper-step--2" hidden>
+        <input type="radio" name="stepper" id="stepper-step--3" hidden>
+        <input type="radio" name="stepper" id="stepper-step--4" hidden>
+
+        <div class="stepper">
+            <div class="step step--1">
+                <div class="step__circle">1</div>
+                <div class="step__label">Datos básicos</div>
+            </div>
+            <div class="step step--2">
+                <div class="step__circle">2</div>
+                <div class="step__label">Instalaciones Físicas</div>
+            </div>
+            <div class="step step--3">
+                <div class="step__circle">3</div>
+                <div class="step__label">Organizadores</div>
+            </div>
+            <div class="step step--4">
+                <div class="step__circle">4</div>
+                <div class="step__label">Organizaciones Externas</div>
+            </div>
+        </div>          
+
+        {% comment "Step 1" %}-------------- STEP 1 --------------{% endcomment %}
+        <form class="form main__step main__step--1" id="main-form" method="POST" >
+            {% csrf_token %}
+    
+            <div class="form__row">
+                {% include "components/form/input.html" with field=form.nombre %}
+                {% include "components/form/input.html" with field=form.tipo %}
+            </div>
+    
+            <div class="form__row">
+                {% include "components/form/input.html" with field=form.descripcion %}
+                {% include "components/form/input.html" with field=form.fecha %}
+            </div>
+    
+            <div class="form__row">
+                {% include "components/form/input.html" with field=form.horaInicio %}
+                {% include "components/form/input.html" with field=form.horaFin %}
+            </div>
+    
+            <div class="form__actions">
+                <button type="submit" class="form__button form__button--norounded">Registrar evento</button>
+            </div>
+        </form>
+    
+        {% comment "Step 2" %}-------------- STEP 2 --------------{% endcomment %}
+        <section class="main__step main__step--2">
+            {% include "events/layouts/step-section.html" with type="Instalaciones Físicas" title="Asignar instalaciones físicas" subtitle="Espacios físicos asignados" row_btn="Asignar una nueva instalación física" id_btn="asignar-instalacion-btn" %}
+        </section>
+
+        {% comment "Step 3" %}-------------- STEP 3 --------------{% endcomment %}
+        <section class="main__step main__step--3">
+            {% include "events/layouts/step-section.html" with type="Organizadores" title="Asignar organizadores" subtitle="Organizadores asignados" row_btn="Asignar un nuevo organizador" id_btn="asignar-organizador-btn" %}
+        </section>
+
+        {% comment "Step 4" %}-------------- STEP 4 --------------{% endcomment %}
+        <section class="main__step main__step--4">
+            {% include "events/layouts/step-section.html" with type="Organizaciones" title="Asignar organizaciones externas" subtitle="Organizaciones externas asignadas" row_btn="Asignar una nueva organización" id_btn="asignar-organizacion-btn" %}
+        </section>
+    </div>
+
 {% endblock content %}

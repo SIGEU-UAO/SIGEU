@@ -1,6 +1,8 @@
 from django.db import IntegrityError
 from django.contrib.auth.models import Group
 from django.contrib.auth.hashers import check_password
+from django.db.models import Q, Value, Case, When, CharField
+from django.db.models.functions import Concat
 from .models import *
 
 # Password history limit
@@ -50,7 +52,6 @@ def save_password_history(user):
 class UserService:
     @staticmethod
     def registrar(data):
-     
         rol = data.get("rol")
 
         try:
@@ -127,3 +128,63 @@ class UserService:
         save_password_history(user)
         return True
     
+
+    @staticmethod
+    def listar_organizadores():
+        return Usuario.objects.filter(Q(docente__isnull=False) | Q(estudiante__isnull=False))
+
+    @staticmethod
+    def filtrar_organizadores_por_nombre_completo(nombre_completo, usuario_actual_id=None):
+        if not nombre_completo:
+         return []
+        
+        qs = (
+            Usuario.objects
+            .filter(Q(docente__isnull=False) | Q(estudiante__isnull=False))  # Solo organizadores
+            .annotate(
+                nombre_completo=Concat('nombres', Value(' '), 'apellidos'), # Añadir propiedad nombre completo
+                rol=Case(                                                   # Añadir propiedad rol
+                    When(estudiante__isnull=False, then=Value('Estudiante')),
+                    When(docente__isnull=False, then=Value('Docente')),
+                    default=Value('Usuario'),
+                    output_field=CharField()
+                )
+            )
+            .filter(nombre_completo__icontains=nombre_completo)
+            .values("idUsuario", "nombre_completo", "numeroIdentificacion", "rol")
+        )
+
+        if usuario_actual_id:
+            qs = qs.exclude(idUsuario=usuario_actual_id)
+
+        return list(qs.values("idUsuario", "nombre_completo", "numeroIdentificacion", "rol"))
+    
+    # * This method allows you to obtain a user as an instance of the model.
+    @staticmethod
+    def obtener_instance_por_id(id_usuario):
+        try:
+            usuario = Usuario.objects.get(idUsuario=id_usuario)
+            return usuario
+        except Usuario.DoesNotExist:
+            return False
+
+    # * This method allows you to obtain a user as an object because it includes the role
+    @staticmethod
+    def obtener_por_id(id_usuario):
+        try:
+            usuario = (
+                Usuario.objects
+                .annotate(
+                    rol=Case(
+                        When(estudiante__isnull=False, then=Value('Estudiante')),
+                        When(docente__isnull=False, then=Value('Docente')),
+                        default=Value('Usuario'),
+                        output_field=CharField()
+                    )
+                )
+                .values("idUsuario", "numeroIdentificacion", "nombres", "apellidos", "email", "telefono", "rol")
+                .get(idUsuario=id_usuario)
+            )
+            return usuario
+        except Usuario.DoesNotExist:
+            return False

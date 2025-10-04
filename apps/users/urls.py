@@ -14,4 +14,8 @@ urlpatterns = [
     path("users/api/inicio-sesion/", UsersAPI.login, name="inicio_sesion_api"),
     path("users/api/logout/", UsersAPI.logout, name="logout"),
     path("users/api/editar-perfil/", UsersAPI.editar_perfil, name="perfil"),
+
+    # --- API ORGANIZADORES ---
+    path("organizadores/api/", UsersAPI.listar_organizadores, name="organizadores_api_list"),
+    path("organizadores/api/<int:id>/", UsersAPI.obtener_por_id, name="organizadores_api_obtener_por_id"),
 ]

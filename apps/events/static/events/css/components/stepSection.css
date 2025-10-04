@@ -1,0 +1,122 @@
+.step__title{
+    font-size: 32px;
+    margin-bottom: 12px;
+}
+
+.step__row{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.step__subtitle{
+    font-size: 24px;
+}
+
+.step__button{
+    height: 48px;
+    padding: 0 24px;
+    font-size: 20px;
+    font-weight: 500;
+    outline: none;
+    cursor: pointer;
+    background-color: #fff;
+    border: 1px solid var(--light-gray);
+    border-radius: 12px;
+    transition: .3s ease-in-out scale;
+}
+
+.step__button:hover, .step__button:focus{
+    scale: 1.05;
+}
+
+.step__cards{
+    display: grid;
+    grid-template-columns: 350px 350px 350px;
+    gap: 24px;
+}
+
+.step__card{
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    border-radius: 12px;
+    box-shadow: 0 0 1px rgba(12, 26, 75, 0.2),
+                0 1px 3px rgba(50, 50, 71, 0.1);
+}
+
+.step__card .card__content{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.step__card .card__header{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.step__card .card__annotation{
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--light-gray);
+}
+
+.step__card .card__title{
+    font-size: 18px;
+}
+
+.card__list{
+    padding-left: 16px;
+    font-size: 13px;
+}
+
+.card__buttons{
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.card__button{
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 6px;
+    outline: none;
+    border: none;
+    background-color: var(--blue);
+    color: #fff;
+    cursor: pointer;
+}
+
+.card__button--danger{
+    background-color: transparent;
+    border: 1px solid var(--red);
+    color: var(--red);
+}
+
+.card__icon{
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: var(--blue);
+    color: #fff;
+    font-size: 18px;
+    display: grid;
+    place-items: center;
+}
+
+.step__actions{
+    margin-top: 32px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.step__actions .step__button--next, .step__actions .step__button--finish{
+    background-color: var(--primary);
+    color: #fff;
+    border: none;
+}

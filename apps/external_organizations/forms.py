@@ -16,7 +16,7 @@ class RegistroForm(forms.Form):
         widget=forms.TextInput(attrs={
             "class": "numeric-field",
             "pattern": r'^[0-9]{9}-[0-9]$',
-            "title": "El documento debe contener entre 8 y 10 números"
+            "title": "El NIT debe contener entre 8 y 10 números"
         })
     )
     nombre = forms.CharField(label="Nombre", required=True, max_length=100)
@@ -36,7 +36,21 @@ class RegistroForm(forms.Form):
     )
     ubicacion = forms.CharField(label="Ubicacion", required=True, max_length=100)
     sector_economico = forms.CharField(label="Sector economico", required=True, max_length=100)
-    actividad_principal = forms.CharField(label="Actividad principal", required=True, max_length=100)
+    actividad_principal = forms.CharField(label="Actividad principal", required=True, max_length=200)
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Force autocomplete=off on all fields
+        for field in self.fields.values():
+            field.widget.attrs["autocomplete"] = "off"
+
+class ModalBuscarOrganizacionForm(forms.Form):
+    nit = forms.CharField(
+        label="NIT",
+        required=True,
+        max_length=11,
+        widget=forms.TextInput(attrs={"class": "numeric-field"})
+    )
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

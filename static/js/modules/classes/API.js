@@ -2,16 +2,17 @@ import { formDataToJSON, getCookie } from "../forms/utils.js";
 import Alert from "./Alert.js";
 
 export default class API {
-    /**
-     * Realiza una petición POST a la URL dada con el formData o JSON proporcionado.
-     * Retorna un objeto { error, data }.
-     */
-    static async post(url, formData) {
+    static async post(url, requestBody) {
         // Get csrf token
         const csrf = getCookie("csrftoken")
 
+        // Detect whether the body is FormData or an object/JSON
+        const isFormData = requestBody instanceof FormData;
+
+        let jsonBody = requestBody; 
+        
         //Convert the formData to JSON
-        const jsonBody = formDataToJSON(formData);
+        if (isFormData) jsonBody = formDataToJSON(jsonBody);
 
         try {
             // Fetch the endpoint
@@ -28,22 +29,27 @@ export default class API {
             const json = await res.json();
 
             if (!res.ok) {
-                // Normalize error messages from backend (can be string or object of arrays)
-                let msg = (json && json.error) || null;
-                if (msg && typeof msg === 'object') {
-                    try {
-                        // Flatten values (strings or arrays) and join
-                        const parts = Object.values(msg).flatMap(v => Array.isArray(v) ? v : [String(v)]);
-                        msg = parts.join(' ');
-                    } catch (_) {
-                        msg = "¡Error en la operación!";
-                    }
+                let msg = json.error || "¡Error en la operación!";
+                Alert.error(msg);
+                return { error: true, data: json };
+            }
+
+            if (res.status === 207) {
+                let msg = json.error || "Hubo errores parciales";
+    
+                if (json.errores && Array.isArray(json.errores) && json.errores.length > 0) {
+                    const detalles = json.errores
+                        .map(e => {
+                            if (typeof e === "string") return e;
+                            if (e && e.error) return `ID ${e.id || "?"}: ${e.error}`;
+                            return JSON.stringify(e);
+                        })
+                        .join(" | ");
+                    msg = `${msg} - ${detalles}`;
                 }
-                if (!msg || typeof msg !== 'string') {
-                    msg = "¡Error en la operación!";
-                }
-                Alert.error(msg)
-                return { error: true, data: json }
+    
+                Alert.warning(msg);
+                return { error: true, data: json };
             }
 
             return { error: false, data: json };
@@ -53,6 +59,49 @@ export default class API {
             return { error: true };
         }
     }
+
+    static async postFormData(url, formData) {
+        const csrf = getCookie("csrftoken");
+    
+        try {
+            const res = await fetch(url, {
+                method: "POST",
+                headers: { "X-CSRFToken": csrf },
+                body: formData
+            });
+    
+            const json = await res.json();
+            
+            if (!res.ok) {
+                let msg = json.error || "¡Error en la operación!";
+                Alert.error(msg);
+                return { error: true, data: json };
+            }
+
+            if (res.status === 207) {
+                let msg = json.error || "Hubo errores parciales";
+    
+                if (json.errores && Array.isArray(json.errores) && json.errores.length > 0) {
+                    const detalles = json.errores
+                        .map(e => {
+                            if (typeof e === "string") return e;
+                            if (e && e.error) return `ID ${e.id || "?"}: ${e.error}`;
+                            return JSON.stringify(e);
+                        })
+                        .join(" | ");
+                    msg = `${msg} - ${detalles}`;
+                }
+    
+                Alert.warning(msg);
+                return { error: true, data: json };
+            }
+
+            return { error: false, data: json };
+        } catch (err) {
+            Alert.error(err.message || "¡Error de Red!");
+            return { error: true };
+        }
+    }    
 
     static async fetchGet(url) {
         try {

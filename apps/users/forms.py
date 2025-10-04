@@ -131,16 +131,7 @@ class InicioSesionForm(forms.Form):
     password = forms.CharField(
         label="Contraseña",
         required=True,
-        validators=[RegexValidator(
-            regex=password_validator.regex,
-            message=("La contraseña debe tener al menos 8 caracteres, "
-                     "incluyendo una mayúscula, una minúscula y un número.")
-        )],
-        widget=forms.PasswordInput(attrs={
-            "class": "password-field",
-            "pattern": r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$",
-            "title": "La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula, una minúscula y un número"
-        }),
+        widget=forms.PasswordInput(attrs={ "class": "password-field" }),
     )
 
     def __init__(self, *args, **kwargs):
@@ -192,9 +183,6 @@ class EditarPerfilForm(forms.Form):
             "disabled": "true"
         })
     )
-  
-    
-
     contraseña = forms.CharField(
         label="Contraseña",
         required=False,
@@ -213,8 +201,6 @@ class EditarPerfilForm(forms.Form):
         for field in self.fields.values():
             field.widget.attrs["autocomplete"] = "off"
 
-
-
     def clean_contraseña(self):
         value = self.cleaned_data.get("contraseña", "")
         if value is None:
@@ -226,3 +212,12 @@ class EditarPerfilForm(forms.Form):
         # Enforce complexity only when provided
         password_validator(value)
         return value
+    
+class ModalBuscarOrganizadorForm(forms.Form):
+    nombre_completo = forms.CharField(label="Nombre Completo", required=True)
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Force autocomplete=off on all fields
+        for field in self.fields.values():
+            field.widget.attrs["autocomplete"] = "off"

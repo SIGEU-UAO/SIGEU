@@ -1,12 +1,12 @@
 import Alert from "../classes/Alert.js"
 
-//* Valida campos de un FormData (Reutilizable para todos los forms)
+//* Validate fields in FormData (Reusable for all forms)
 export function validarFormData(formData, rules = {}) {
   for (let [campo, valor] of formData.entries()) {
-    let val = valor.trim();
+    let val = valor instanceof File ? valor : valor.trim();
 
     // Default validation: empty
-    if (!val) {
+    if (!val || (val instanceof File && !val.name)) {
       Alert.error(`El campo ${campo} es obligatorio`);
       return false;
     }
@@ -24,7 +24,7 @@ export function validarFormData(formData, rules = {}) {
   return true;
 }
 
-//* Retorna un JSON a partir de un formData
+//* Returns a JSON from a formData
 export function formDataToJSON(formData) {
   let obj = {};
   formData.forEach((val, key) => obj[key] = val.trim());
@@ -44,6 +44,61 @@ export function getCookie(name) {
         }
     }
     return cookieValue;
+}
+
+// * Convert an array of FormData into a single FormData container
+export function mergeFormDataFieldsArray(records, type) {
+  const bigForm = new FormData();
+
+  records.forEach((form, i) => {
+      for (const [key, value] of form.entries()) {
+          // Each field is stored as records[0][key], records[1][key]...
+          bigForm.append(`${type}_${key}[]`, value);
+      }
+  });
+
+  return bigForm;
+}
+
+export function mergeFormDataIndexed(records, type) {
+  const bigForm = new FormData();
+
+  records.forEach((form, i) => {
+    for (const [key, value] of form.entries()) {
+      // Use indexes to maintain an exact relationship between fields.
+      bigForm.append(`${type}[${i}][${key}]`, value);
+    }
+  });
+
+  return bigForm;
+}
+
+
+export function handleFileInputsInfo(input, existingFile = null) {
+  const fileLabel = input.closest('.form__group').querySelector('.add-file-btn');
+
+  // Check if infoDiv already exists to avoid duplication
+  let infoDiv = fileLabel.nextElementSibling;
+  if (!infoDiv || !infoDiv.classList.contains('file-info')) {
+    infoDiv = document.createElement('div');
+    infoDiv.classList.add('file-info');
+    fileLabel.insertAdjacentElement('afterend', infoDiv);
+  }
+
+  // Function to update infoDiv
+  const updateInfo = (file) => {
+    if (file) {
+      infoDiv.innerHTML = `<i class="ri-file-check-fill"></i> ${file.name}`;
+    } else {
+      infoDiv.textContent = '';
+    }
+  };
+
+  // Display existing file if passed
+  if (existingFile) updateInfo(existingFile);
+
+  // Listener for future changes
+  input.addEventListener('change', () => updateInfo(input.files[0]));
 }
 
 export function cleanContainer(container){

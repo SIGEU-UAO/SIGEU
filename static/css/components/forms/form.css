@@ -29,6 +29,146 @@
     font-size: 18px;
 }
 
+.form__group .form__input--disabled{
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Hide the default checkbox */
+.form__group .input-checkbox {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  --clr: #0B6E4F;
+  position: relative;
+  top: 0;
+  left: 0;
+  height: 1.3em;
+  width: 1.3em;
+  background-color: #ccc;
+  border-radius: 50%;
+  transition: 300ms;
+  cursor: pointer;
+}
+
+/* When the checkbox is checked, add a blue background */
+.form__group .input-checkbox:checked ~ .checkmark {
+  background-color: var(--clr);
+  border-radius: .5rem;
+  animation: pulse 500ms ease-in-out;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.form__group .input-checkbox:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.form__group .checkmark:after {
+  left: 0.45em;
+  top: 0.25em;
+  width: 0.25em;
+  height: 0.5em;
+  border: solid #E0E0E2;
+  border-width: 0 0.15em 0.15em 0;
+  transform: rotate(45deg);
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 #0B6E4F90;
+    rotate: 20deg;
+  }
+
+  50% {
+    rotate: -20deg;
+  }
+
+  75% {
+    box-shadow: 0 0 0 10px #0B6E4F60;
+  }
+
+  100% {
+    box-shadow: 0 0 0 13px #0B6E4F30;
+    rotate: 0;
+  }
+}
+
+/* File Input Styles */
+
+input.input-file {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    z-index: -1;
+}
+
+.add-file-btn {
+    max-width: 60%;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--primary);
+    color: #fff !important;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 0.5rem;
+    user-select: none;
+    box-shadow:
+        0 4px 6px -1px #488aec31,
+        0 2px 4px -1px #488aec17;
+    transition: all 0.3s ease;
+}
+
+.add-file-btn:hover {
+    box-shadow:
+        0 10px 15px -3px #488aec4f,
+        0 4px 6px -2px #488aec17;
+}
+
+.add-file-btn:focus,
+.add-file-btn:active {
+    opacity: 0.85;
+    box-shadow: none;
+}
+
+.add-file-btn svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    stroke: white;
+}
+
+.file-info {
+    max-width: 100%;
+    margin-top: 6px;
+    font-size: 14px;
+    color: var(--light-gray);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-info i {
+    font-size: 16px;
+    color: rgb(15, 175, 15);
+}
+
+/* End File Input Styles */
+
 .form__group .numeric-field {
     font-family: Arial, Helvetica, sans-serif;
 }
