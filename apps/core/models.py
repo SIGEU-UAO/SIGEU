@@ -2,7 +2,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 
 class Facultad(models.Model):
-    idUsuario = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    idFacultad = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     nombre = models.CharField(max_length=100)
 
     def __str__(self):
