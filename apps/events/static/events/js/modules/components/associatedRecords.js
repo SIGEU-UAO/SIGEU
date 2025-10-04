@@ -1,10 +1,10 @@
 import dataStore from "../dataStore.js";
 import { validateCollection } from "../utils/validations.js";
-import { validarFormData, mergeFormDataArray, handleFileInputsInfo } from "/static/js/modules/forms/utils.js";
+import { validarFormData, mergeFormDataFieldsArray, mergeFormDataIndexed, handleFileInputsInfo } from "/static/js/modules/forms/utils.js";
 import Modal from "/static/js/modules/classes/Modal.js";
 import API from "/static/js/modules/classes/API.js";
 import Alert from "/static/js/modules/classes/Alert.js";
-import { goStep, toggleSkip } from "./stepper.js";
+import { finishStepHandler, goStep, toggleSkip } from "./stepper.js";
 
 const stepDataKeys = {
     instalaciones: {
@@ -23,7 +23,7 @@ const stepDataKeys = {
         annotation: "nit",
         title: "nombre",
         icon: "ri-building-2-fill",
-        saveHandler: (container) => () => AssociatedRecords.saveDBRecords("/eventos/api/asignar-organizaciones/", "organizaciones", container)
+        saveHandler: (container) => () => AssociatedRecords.saveDBRecords("/eventos/api/asignar-organizaciones/", "organizaciones", container, true, "/dashboard/")
     },
 }
 
@@ -113,12 +113,13 @@ export default class AssociatedRecords{
             stepCard.remove();
         } else {
             Alert.error(message);
+            return;
         }
 
         this.updateStepBtn(type, buttonStep, container)
     }
 
-    static async saveDBRecords(endpoint, type, container){
+    static async saveDBRecords(endpoint, type, container, isFinishStep = false, finishURL = ""){
         const records = dataStore[type];
 
         if (!validateCollection(type, records)) {
@@ -130,7 +131,9 @@ export default class AssociatedRecords{
 
         let result;
         if (isFormData) {
-            const bigForm = mergeFormDataArray(records, type);
+            const bigForm = (type === "organizaciones")
+                ? mergeFormDataIndexed(records, type)
+                : mergeFormDataFieldsArray(records, type);
             bigForm.append("evento", dataStore.eventoId);
             result = await API.postFormData(endpoint, bigForm);
         } else {
@@ -143,7 +146,12 @@ export default class AssociatedRecords{
         }
 
         Alert.success(`Datos de ${type} guardados correctamente.`);
-        goStep("next")
+        
+        if (isFinishStep) {
+            setTimeout(() => window.location.href = finishURL, 1500);
+        }else{
+            goStep("next")
+        }
     }
 
     static addRecordToUI(id, data, type, container, isCurrentUser = false){
@@ -263,12 +271,10 @@ export default class AssociatedRecords{
     static updateStepBtn(type, buttonStep, container){
         const recordsLength = dataStore[type]?.length || 0;
 
-        if (recordsLength > 0) {
-            if (buttonStep.hasAttribute('data-skip')) {
-                toggleSkip(buttonStep, false, stepDataKeys[type].saveHandler(container));
-            }
+        if (buttonStep.classList.contains("step__button--finish")) {
+            finishStepHandler(buttonStep, recordsLength, stepDataKeys[type].saveHandler(container), "/dashboard/");
         } else {
-            toggleSkip(buttonStep, true, stepDataKeys[type].saveHandler(container));
+            toggleSkip(buttonStep, recordsLength === 0, stepDataKeys[type].saveHandler(container));
         }
     }
 }

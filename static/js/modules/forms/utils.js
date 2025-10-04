@@ -47,7 +47,7 @@ export function getCookie(name) {
 }
 
 // * Convert an array of FormData into a single FormData container
-export function mergeFormDataArray(records, type) {
+export function mergeFormDataFieldsArray(records, type) {
   const bigForm = new FormData();
 
   records.forEach((form, i) => {
@@ -59,6 +59,20 @@ export function mergeFormDataArray(records, type) {
 
   return bigForm;
 }
+
+export function mergeFormDataIndexed(records, type) {
+  const bigForm = new FormData();
+
+  records.forEach((form, i) => {
+    for (const [key, value] of form.entries()) {
+      // Use indexes to maintain an exact relationship between fields.
+      bigForm.append(`${type}[${i}][${key}]`, value);
+    }
+  });
+
+  return bigForm;
+}
+
 
 export function handleFileInputsInfo(input, existingFile = null) {
   const fileLabel = input.closest('.form__group').querySelector('.add-file-btn');

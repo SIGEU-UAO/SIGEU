@@ -2,6 +2,7 @@
 
 [![Python](https://img.shields.io/badge/python-3.13.7-blue)](https://www.python.org/)
 [![Django](https://img.shields.io/badge/django-5.2.6-green)](https://www.djangoproject.com/)
+[![MariaDB](https://img.shields.io/badge/MariaDB-12.02-brightgreen)]()
 [![License](https://img.shields.io/badge/license-internal-orange)]()
 
 ---
@@ -34,10 +35,13 @@ SIGEU es un **sistema web** desarrollado en Django para la gestión integral de 
 
 - Python 3.13.7
 - XAMPP / MySQL instalado
+- MariaDB versión 12.02
 - Git
 - Navegador moderno (Chrome, Firefox, Edge)
 
 ---
+
+> 💡 **Nota:** Para garantizar compatibilidad con SIGEU, se recomienda usar **XAMPP** con MariaDB versión **12.02** o superior. Algunas instalaciones de XAMPP incluyen versiones antiguas de MariaDB que podrían no funcionar correctamente; en ese caso, se recomienda **actualizar manualmente MariaDB reemplazando los archivos en la carpeta de XAMPP**.
 
 ## 🚀 Instalación
 
@@ -55,22 +59,37 @@ Esto creará `env/`, instalará dependencias y activará el entorno virtual.
 
 3. Configurar variables de entorno:
 - Copiar `.env.template` como `.env`.
-- Agregar la contraseña de la base de datos y otros valores sensibles.
+- Agregar la contraseña de la base de datos, la configuracion del correo electrónico y otros valores sensibles.
 
 4. Crear la base de datos y usuario:
 - Nombre: definido en `.env` (ej: `sigeu`)
 - Usuario: `django-user`
 - Conceder todos los permisos
 
-5. Ejecutar migraciones:
+5. Crear migraciones:
+```bash
+python manage.py makemigrations
+```
+
+6. Ejecutar migraciones:
 ```bash
 python manage.py migrate
 ```
 
-6. Iniciar servidor:
+7. Crear superusuario (administrador):
+```bash
+python manage.py createsuperuser
+```
+
+8. Iniciar servidor:
 ```bash
 python manage.py runserver
 ```
+
+9. Acceder a http://127.0.0.1:8000/admin/ e iniciar como administrador
+   - Poblar tablas Facultades, Programas, Unidades Academicas e Instalaciones Físicas
+
+10. Iniciar el recorrido por el software a través de http://127.0.0.1:8000/registro
 
 ---
 
@@ -106,7 +125,7 @@ sigeu/
 │       ├── models.py
 │       ├── urls.py
 │       ├── services/
-│       │   └── <archivo por modelo>.py
+│       │   └── 
 │       ├── views/
 │       │   └── <archivo por grupo de funciones>.py  # cuando aplique
 │       ├── forms/
@@ -149,7 +168,7 @@ Además del esquema clásico MVT, SIGEU implementa una **capa de servicios por a
 
 Ejemplos:
 - `apps/users/service.py`: validación de credenciales, recuperación de contraseñas, asignación de roles.
-- `apps/events/service.py`: gestión de estados (borrador → enviado → aprobado/rechazado), validación de avales PDF, publicación automática de eventos.
+- `apps/events/services/event.py`: gestión de estados (borrador → enviado → aprobado/rechazado), validación de avales PDF, publicación automática de eventos.
 - `apps/external_organizations/service.py`: creación, edición y asociación de organizaciones externas
 
 ---

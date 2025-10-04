@@ -1,5 +1,5 @@
 import { modalsConfig } from "/static/js/modules/components/modalsConfig.js";
-import { goStep, skipHandler } from "./modules/components/stepper.js";
+import { goStep, goToListHandler, skipHandler } from "./modules/components/stepper.js";
 import Modal from "/static/js/modules/classes/Modal.js";
 import API from "/static/js/modules/classes/API.js";
 import { validarFormData, handleFileInputsInfo } from "/static/js/modules/forms/utils.js";
@@ -23,6 +23,7 @@ const fileInputs = document.querySelectorAll('input.input-file');
 
 //* Step sections
 const nextStepBtns = document.querySelectorAll(".step__button--next[data-skip]")
+const finishStepBtn = document.querySelector(".step__button--finish");
 
 //* Event Listeners
 document.addEventListener("DOMContentLoaded", () => {
@@ -30,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const currentUser = window.currentUser;
 
     //* Init step form
-    goStep(4);
+    goStep(1);
 
     //* Init modals
     Modal.initModals();
@@ -51,7 +52,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     //* Others event listeners
     mainForm.addEventListener("submit", handleMainFormSubmit);
-    nextStepBtns.forEach(btn => btn.addEventListener("click", skipHandler))
+    nextStepBtns.forEach(btn => btn.onclick = skipHandler)
+    finishStepBtn.onclick = () => goToListHandler("/dashboard/");
     fileInputs.forEach(input => handleFileInputsInfo(input))
 
     //* Load the current user as the default/main organizer

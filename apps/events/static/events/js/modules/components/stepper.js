@@ -28,19 +28,21 @@ export function goStep(direction) {
 }
 
 export const skipHandler = () => goStep("next");
+export const goToListHandler = url => window.location.href = url
 
 export function toggleSkip(button, enable, saveHandler) {
     if (enable) {
-      button.setAttribute("data-skip", "");
-      button.textContent = "Omitir";
-  
-      if (saveHandler) button.removeEventListener("click", saveHandler);
-      button.addEventListener("click", skipHandler);
+        button.setAttribute("data-skip", "");
+        button.textContent = "Omitir";
+        button.onclick = skipHandler
     } else {
-      button.removeAttribute("data-skip");
-      button.textContent = "Guardar";
-  
-      button.removeEventListener("click", skipHandler);
-      if (saveHandler) button.addEventListener("click", saveHandler);
+        button.removeAttribute("data-skip");
+        button.textContent = "Guardar";
+        button.onclick = saveHandler || null;
     }
+}
+
+export function finishStepHandler(button, recordsLength, callback, url) {
+    button.onclick = null;
+    button.onclick = recordsLength > 0 ? callback : goToListHandler.bind(null, url);
 }

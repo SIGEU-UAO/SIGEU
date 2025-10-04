@@ -1,7 +1,8 @@
 from django.db import models
-from apps.users.models import Usuario
 from apps.core.models import InstalacionFisica
-from .utils import path_coordinador_aval
+from apps.users.models import Usuario
+from apps.external_organizations.models import OrganizacionExterna
+from .utils import path_coordinador_aval, path_organizacion_certificado
 class Evento(models.Model):
     # Enumerations
     ESTADOS = [ 
@@ -36,8 +37,8 @@ class Evento(models.Model):
         verbose_name_plural = "eventos"
 
 class InstalacionesAsignadas(models.Model):
-    evento = models.ForeignKey(Evento, on_delete=models.CASCADE)
-    instalacion = models.ForeignKey(InstalacionFisica, on_delete=models.CASCADE)
+    evento = models.ForeignKey(Evento, on_delete=models.CASCADE, related_name="instalaciones_asignadas")
+    instalacion = models.ForeignKey(InstalacionFisica, on_delete=models.CASCADE, related_name="eventos_asignados")
     
     # Simular PK Compuesta
     class Meta:
@@ -58,8 +59,8 @@ class OrganizadoresEventos(models.Model):
         ("director_docencia", "Director de Docencia")
     ]
     
-    evento = models.ForeignKey(Evento, on_delete=models.CASCADE)
-    organizador = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    evento = models.ForeignKey(Evento, on_delete=models.CASCADE, related_name="organizadores_asignados")
+    organizador = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="eventos_organizados")
     aval = models.FileField(upload_to=path_coordinador_aval) 
     tipo = models.CharField(max_length=50, choices=TIPOS)
     
@@ -72,5 +73,24 @@ class OrganizadoresEventos(models.Model):
             models.UniqueConstraint(
                 fields=['evento', 'organizador'],
                 name='unique_evento_organizador'
+            )
+        ]
+
+class OrganizacionesInvitadas(models.Model):    
+    evento = models.ForeignKey(Evento, on_delete=models.CASCADE, related_name="organizaciones_invitadas")
+    organizacion = models.ForeignKey(OrganizacionExterna, on_delete=models.CASCADE, related_name="eventos_invitados")
+    representante_asiste = models.BooleanField(default=False, verbose_name="¿Representante legal asiste?")
+    representante_alterno = models.CharField(max_length=100, null=True, blank=True)
+    certificado_participacion = models.FileField(upload_to=path_organizacion_certificado) 
+    
+    # Simular PK Compuesta
+    class Meta:
+        db_table = "organizaciones_invitadas"
+        verbose_name = "organizacion_invitada"
+        verbose_name_plural = "organizaciones_invitadas"
+        constraints = [
+            models.UniqueConstraint(
+                fields=['evento', 'organizacion'],
+                name='unique_evento_organizacion'
             )
         ]

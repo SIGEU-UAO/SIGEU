@@ -1,5 +1,4 @@
 from django import forms
-from ...validations.data_validators import validate_pdf
 
 class OrganizacionInvitadaForm(forms.Form):
     representante_asiste = forms.BooleanField(
@@ -15,7 +14,6 @@ class OrganizacionInvitadaForm(forms.Form):
     
     certificado_participacion = forms.FileField(
         label="Certificado de Participación:",
-        validators=[validate_pdf],
         widget=forms.ClearableFileInput(attrs={
             'accept': '.pdf',
             'class': 'input-file'

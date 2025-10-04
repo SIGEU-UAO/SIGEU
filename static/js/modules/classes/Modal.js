@@ -18,7 +18,7 @@ export default class Modal{
             btn.addEventListener('click', () => { modal.show(); update(); });
             modal.querySelectorAll('input[name="steps"]').forEach(r => r.addEventListener('change', update));
             modal.querySelectorAll('.modal__btn--prev').forEach(btn => btn.addEventListener('click', () => Modal.goStep(modal, "prev")));
-            modal.querySelectorAll('.form__group .input-checkbox').forEach(input => input.addEventListener('click', Modal.toggleRelatedCheckboxField));
+            modal.querySelectorAll('.form__group .input-checkbox').forEach(input => input.addEventListener('change', Modal.toggleRelatedCheckboxField));
             Modal.initCloseButtons(modal);
         });
     }
@@ -107,7 +107,7 @@ export default class Modal{
                 handleFileInputsInfo(input, fileObj);
             } else if (input.type === "checkbox" || input.type === "radio") {
                 input.checked = input.value == value;
-                input.classList.add(input.checked ? "form__input--disabled" : "")
+                input.dispatchEvent(new Event('change', { bubbles: true }));
             } else {
                 input.value = value;
             }
@@ -125,6 +125,9 @@ export default class Modal{
         associationForm.reset();
         associationForm.removeAttribute("data-id");
         associationForm.querySelectorAll('.file-info').forEach(div => div.textContent = '');
+
+        // Rehabilitate all related fields
+        Modal.enableRelatedFields(associationForm);
 
         // Reset record details
         const list = modal.querySelector('.modal__list');
@@ -156,6 +159,7 @@ export default class Modal{
             if (form) form.reset();
             form.querySelectorAll('input[type="file"]').forEach(input => input.setAttribute('required', ''));
             form.querySelectorAll('.file-info').forEach(div => div.textContent = '');
+            Modal.enableRelatedFields(form);
 
             modal.close();
         }, 500);
@@ -180,6 +184,16 @@ export default class Modal{
             relatedField.removeAttribute("disabled")
             relatedField.classList.remove("form__input--disabled")
         }
+    }
+
+    static enableRelatedFields(form){
+        form.querySelectorAll('[data-related]').forEach(cb => {
+            const relatedField = document.getElementById(cb.dataset.related);
+            if (relatedField) {
+                relatedField.disabled = false;
+                relatedField.classList.remove('form__input--disabled');
+            }
+        });
     }
 
      //* Handles any search form in a generic way
