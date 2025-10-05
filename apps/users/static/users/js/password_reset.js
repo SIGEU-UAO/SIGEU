@@ -1,10 +1,10 @@
 import Alert from "/static/js/modules/classes/Alert.js";
 
 //* Variables
-// Regex para validar email institucional @uao.edu.co
+// Regex to validate institutional email @uao.edu.co
 const emailRegex = /^[a-zA-Z0-9._%+-]+@uao\.edu\.co$/;
 
-// Validación manual en handleSubmit
+// Manual validation in handleSubmit
 
 //* Selectors
 const form = document.querySelector("form.form--reset");
@@ -15,12 +15,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // Mostrar mensajes de Django usando Notyf
     showDjangoMessages();
     
-    // Configurar validación del formulario
+    // Configure form validation
     if (form) {
         form.addEventListener("submit", handleSubmit);
     }
     
-    // Configurar validación en tiempo real
+    // Configure real-time validation
     setupRealTimeValidation();
 });
 
@@ -45,8 +45,7 @@ function showDjangoMessages() {
 function handleSubmit(e) {
     e.preventDefault();
     
-    // Solo validar formato básico en frontend
-    // La validación de existencia la hará el backend
+    // Only validate basic format in frontend. Existence validation will be done by the backend.
     const formData = new FormData(form);
     const email = formData.get('email');
     
@@ -60,14 +59,14 @@ function handleSubmit(e) {
         return;
     }
     
-    // Si la validación básica pasa, enviar al servidor
+    // If basic validation passes, send to server
     form.submit();
 }
 
 function setupRealTimeValidation() {
     if (emailField) {
         emailField.addEventListener("input", (e) => {
-            // Limpiar errores del servidor cuando el usuario empiece a escribir
+            // Clear server errors when the user starts typing
             const parent = emailField.closest(".form__group");
             if (parent) {
                 const serverError = parent.querySelector(".form__error:not(.js-error)");
@@ -90,10 +89,10 @@ function validateEmailField(email) {
     const parent = emailField.closest(".form__group");
     if (!parent) return;
     
-    // Remover clases anteriores
+    // Remove previous classes
     parent.classList.remove("form__group--valid", "form__group--invalid");
     
-    // Solo remover errores de validación en tiempo real (no los del servidor)
+    // Only remove real-time validation errors (not server errors)
     const existingError = parent.querySelector(".form__error.js-error");
     if (existingError) {
         existingError.remove();
@@ -113,7 +112,7 @@ function showFieldError(field, message) {
     const parent = field.closest(".form__group");
     if (!parent) return;
     
-    // Crear y mostrar mensaje de error (marcado como error JS)
+    // Create and display error message (marked as JS error)
     const errorDiv = document.createElement('div');
     errorDiv.className = 'form__error js-error';
     errorDiv.innerHTML = `<p>${message}</p>`;

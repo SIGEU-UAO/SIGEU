@@ -102,14 +102,10 @@ async function handleSubmit(e) {
         formData.delete('contraseña');
     }
     // Use API.post method which handles CSRF automatically
-    const result = await API.post("/users/api/editar-perfil/", formData);
+    const result = await API.put("/users/api/editar-perfil/", formData);
 
-    
-    if (result.error) {
+    if (result.error) return;
         
-        return;
-    }
-    
     // Success case
     Alert.success("Perfil actualizado correctamente!");
 
@@ -138,6 +134,8 @@ async function handleSubmit(e) {
             Alert.error("Error de red al cerrar sesión. Intenta de nuevo o cierra sesión manualmente.");
             console.error(err);
         }
+    }else{
+        setTimeout(() => window.location.reload(), 1500);
     }
     
     // Clean the password field

@@ -70,8 +70,8 @@ class UsersAPI():
     
     @login_required()
     def editar_perfil(request):
-        # Profile update via API (POST JSON)
-        if request.method == "POST":
+        # Profile update via API (PUT JSON)
+        if request.method == "PUT":
             if not request.user.is_authenticated:
                 return JsonResponse({"error": "No autenticado"}, status=401)
             try:
@@ -80,15 +80,14 @@ class UsersAPI():
                 return JsonResponse({"error": "formato JSON inválido."}, status=400)
 
             # Ensure that disabled/required fields are included
-            post_data = dict(data) if isinstance(data, dict) else {}
+            put_data = dict(data) if isinstance(data, dict) else {}
             for fld in ["numeroIdentificacion", "nombres", "apellidos", "email", "telefono"]:
-                if not post_data.get(fld):
-                    post_data[fld] = getattr(request.user, fld, "")
-        
+                if not put_data.get(fld):
+                    put_data[fld] = getattr(request.user, fld, "")
         
             # Validate with the same form used in the view
             
-            form = EditarPerfilForm(post_data, user=request.user)
+            form = EditarPerfilForm(put_data, user=request.user)
             if not form.is_valid():
                 return JsonResponse({"error": form.errors}, status=400)
 
@@ -106,7 +105,7 @@ class UsersAPI():
                 try:
                     UserService.cambiar_password(request.user, cd["contraseña"])
                 except ValueError as e:
-                    return JsonResponse({"error": {"contraseña": [str(e)]}}, status=400)
+                    return JsonResponse({"error": "La nueva contraseña no puede ser igual a las anteriores. Intenta con una diferente."}, status=400)
                 except IntegrityError:
                     return JsonResponse({"error": "Violación de unicidad al actualizar el perfil."}, status=400)
             else:
