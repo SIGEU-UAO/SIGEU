@@ -26,6 +26,10 @@ class OrganizacionExternaService:
         return org.idOrganizacion
 
     @staticmethod
+    def contar():
+        return OrganizacionExterna.objects.count()
+    
+    @staticmethod
     def listar():
         return OrganizacionExterna.objects.all()
     

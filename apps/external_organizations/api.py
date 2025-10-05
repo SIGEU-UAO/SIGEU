@@ -1,6 +1,5 @@
 from django.http import JsonResponse
 
-from apps.external_organizations.models import OrganizacionExterna
 from .forms import RegistroForm
 from .service import OrganizacionExternaService
 from django.core.paginator import Paginator
@@ -79,7 +78,7 @@ class OrganizacionesExternasAPI:
                 else OrganizacionExternaService.listar()
             )
 
-            total_records = OrganizacionExterna.objects.count()
+            total_records = OrganizacionExternaService.contar()
             filtered_records = qs.count()
 
 
@@ -139,14 +138,7 @@ class OrganizacionesExternasAPI:
     @organizador_required
     def actualizar(request, id):
         if request.method == "PUT":
-            try:
-                if request.content_type == "application/json":
-                    data = json.loads(request.body)
-                else:
-                    data = request.POST
-            except json.JSONDecodeError:
-                return JsonResponse({"error": "Formato JSON inválido."}, status=400)
-
+            data = json.loads(request.body)
             form = RegistroForm(data)
             if form.is_valid():
                 try:
