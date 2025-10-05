@@ -8,7 +8,22 @@ export default class Datatable{
             ajax: async (data, callback) => {
                 try {
                     const urlFetch = new URL(url, window.location.origin);
-                    Object.keys(data).forEach(k => urlFetch.searchParams.append(k, data[k]));
+
+                    // Añadir parámetros que el servidor espera
+                    urlFetch.searchParams.append('draw', data.draw);
+                    urlFetch.searchParams.append('start', data.start);
+                    urlFetch.searchParams.append('length', data.length);
+
+                    // search puede venir como objeto { value: '...'}
+                    const globalSearch = (data.search && data.search.value) ? data.search.value : '';
+                    urlFetch.searchParams.append('search[value]', globalSearch);
+
+                    // Si quieres enviar order/columns mínimos, puedes añadirlos así:
+                    // (ejemplo: primer order)
+                    if (Array.isArray(data.order) && data.order.length) {
+                        urlFetch.searchParams.append('order[0][column]', data.order[0].column);
+                        urlFetch.searchParams.append('order[0][dir]', data.order[0].dir);
+                    }
 
                     const response = await fetch(urlFetch);
                     const json = await response.json();

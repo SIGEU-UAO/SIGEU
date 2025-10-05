@@ -1,4 +1,6 @@
 from django.http import JsonResponse
+
+from apps.external_organizations.models import OrganizacionExterna
 from .forms import RegistroForm
 from .service import OrganizacionExternaService
 from django.core.paginator import Paginator
@@ -71,13 +73,15 @@ class OrganizacionesExternasAPI:
             search_value = request.GET.get("search[value]", "")
 
             # Query base
-            qs = OrganizacionExternaService.listar()
+            qs = (
+                OrganizacionExternaService.buscar(search_value)
+                if search_value
+                else OrganizacionExternaService.listar()
+            )
 
-            # Filtro búsqueda
-            if search_value:
-                qs = qs.filter(nombre__icontains=search_value)
+            total_records = OrganizacionExterna.objects.count()
+            filtered_records = qs.count()
 
-            total = qs.count()
 
             # Paginación
             paginator = Paginator(qs, length)
@@ -87,21 +91,23 @@ class OrganizacionesExternasAPI:
             data = []
             for org in page.object_list:
                 data.append({
-                    "id": org["idOrganizacion"],
-                    "nit": org["nit"],
-                    "nombre": org["nombre"],
-                    "representanteLegal": org["representanteLegal"],
-                    "telefono": org["telefono"],
-                    "ubicacion": org["ubicacion"],
-                    "sectorEconomico": org["sectorEconomico"],
-                    "actividadPrincipal": org["actividadPrincipal"],
-                    "esCreador": request.user.idUsuario == org["creador_id"]
+                    "id": org.idOrganizacion,
+                    "nit": org.nit,
+                    "nombre": org.nombre,
+                    "representanteLegal": org.representanteLegal,
+                    "telefono": org.telefono,
+                    "ubicacion": org.ubicacion,
+                    "sectorEconomico": org.sectorEconomico,
+                    "actividadPrincipal": org.actividadPrincipal,
+                    "esCreador": request.user.idUsuario == org.creador_id
                 })
+            
+            
 
             return JsonResponse({
                 "draw": draw,
-                "recordsTotal": total,
-                "recordsFiltered": total,
+                "recordsTotal": total_records,
+                "recordsFiltered": filtered_records,
                 "data": data
             })
 

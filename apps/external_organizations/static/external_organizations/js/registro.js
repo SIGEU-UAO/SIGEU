@@ -34,5 +34,5 @@ async function handleSubmit(e) {
     if (result.error) return;
 
     Alert.success("Organización registrada exitosamente");
-    form.reset();
+    setTimeout(() => { window.location.href = "/orgs/listado/"; }, 1500);
 }

@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.db import IntegrityError
 from .models import OrganizacionExterna
 from django.shortcuts import get_object_or_404
@@ -26,7 +27,19 @@ class OrganizacionExternaService:
 
     @staticmethod
     def listar():
-        return OrganizacionExterna.objects.values()
+        return OrganizacionExterna.objects.all()
+    
+    @staticmethod
+    def buscar(termino):
+        qs = OrganizacionExterna.objects.all()
+        if termino:
+            qs = qs.filter(
+                Q(nombre__icontains=termino)
+                | Q(nit__icontains=termino)
+                | Q(representanteLegal__icontains=termino)
+                | Q(sectorEconomico__icontains=termino)
+            )
+        return qs
 
     @staticmethod
     def filtrar_por_nit(nit):
