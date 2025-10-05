@@ -1,6 +1,45 @@
 from django import forms
 from django.core.validators import RegexValidator
 from .models import *
+from django.contrib.auth.forms import PasswordResetForm
+from django.template.loader import render_to_string
+from django.core.mail import EmailMultiAlternatives
+from django.conf import settings
+from email.mime.image import MIMEImage
+from email.utils import make_msgid
+from pathlib import Path
+import re
+from html import unescape
+
+# Utilidad simple para convertir HTML -> texto con saltos de línea legibles
+# sin depender de una plantilla .txt aparte.
+def _html_to_text(html):
+    text = html
+    # Reemplazos básicos para conservar estructura
+    patterns = [
+        (r'<br\s*/?>', '\n'),
+        (r'</p>', '\n\n'),
+        (r'<h[1-6][^>]*>', '\n'),
+        (r'</h[1-6]>', '\n\n'),
+        (r'<li[^>]*>', '• '),
+        (r'</li>', '\n'),
+        (r'<ul[^>]*>', '\n'),
+        (r'</ul>', '\n'),
+        (r'<ol[^>]*>', '\n'),
+        (r'</ol>', '\n'),
+        (r'<div[^>]*>', '\n'),
+        (r'</div>', '\n'),
+        (r'<[^>]+>', ''),  # Remover todas las demás etiquetas HTML
+    ]
+    
+    for pattern, replacement in patterns:
+        text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
+    
+    # Limpiar espacios en blanco excesivos
+    text = re.sub(r'\n\s*\n\s*\n', '\n\n', text)
+    text = re.sub(r'[ \t]+', ' ', text)
+    
+    return unescape(text.strip())
 
 # * Validators
 numero_identificacion_validator = RegexValidator(regex=r'^[0-9]{8,10}$', message="El documento debe contener entre 8 y 10 números.")
@@ -221,3 +260,48 @@ class ModalBuscarOrganizadorForm(forms.Form):
         # Force autocomplete=off on all fields
         for field in self.fields.values():
             field.widget.attrs["autocomplete"] = "off"
+
+class CustomPasswordResetForm(PasswordResetForm):
+    """
+    Formulario de reset de contraseña que define el asunto en código,
+    evitando el uso de subject_template_name.
+    """
+    def send_mail(
+        self,
+        subject_template_name,
+        email_template_name,
+        context,
+        from_email,
+        to_email,
+        html_email_template_name=None,
+    ):
+        subject = "SIGEU - Recuperación de Contraseña"
+
+        # Preparar contexto (posible copia) y CID del banner
+        ctx = dict(context or {})
+        banner_cid = make_msgid(domain=None)[1:-1]  # quitar <>
+        ctx['banner_cid'] = banner_cid
+
+        # Renderizar el HTML del correo (incluye cid en la plantilla)
+        html_template = html_email_template_name or email_template_name
+        html_body = render_to_string(html_template, ctx)
+
+        # Cuerpo de texto plano derivado del HTML (sin plantilla .txt)
+        text_body = _html_to_text(html_body)
+
+        email_message = EmailMultiAlternatives(subject, text_body, from_email, [to_email])
+        email_message.attach_alternative(html_body, "text/html")
+
+        # Adjuntar banner como imagen inline usando el path del proyecto
+        try:
+            banner_path = Path(settings.BASE_DIR) / 'static' / 'assets' / 'img' / 'banner.png'
+            with open(banner_path, 'rb') as f:
+                img = MIMEImage(f.read())
+                img.add_header('Content-ID', f'<{banner_cid}>')
+                img.add_header('Content-Disposition', 'inline', filename='banner.png')
+                email_message.attach(img)
+        except Exception:
+            # Si falla, el HTML seguirá usando el fallback por URL absoluta
+            pass
+
+        email_message.send()

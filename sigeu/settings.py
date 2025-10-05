@@ -147,4 +147,16 @@ LOGIN_URL = "/users/inicio-sesion/"
 # Modelo de usuario personalizado
 AUTH_USER_MODEL = "users.Usuario"
 
+# Email configuration for password reset
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'your-email@gmail.com'  # Cambiar por el email real
+EMAIL_HOST_PASSWORD = 'your-app-password'  # Cambiar por la contraseña de aplicación
+DEFAULT_FROM_EMAIL = 'SIGEU <noreply@sigeu.com>'
+
+# Password reset settings
+PASSWORD_RESET_TIMEOUT = 86400  # 24 hours in seconds
+
 SESSION_COOKIE_AGE = 60 * 60 * 24   # 24 horas
