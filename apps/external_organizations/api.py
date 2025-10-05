@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+
 from .forms import RegistroForm
 from .service import OrganizacionExternaService
 from django.core.paginator import Paginator
@@ -41,6 +42,7 @@ class OrganizacionesExternasAPI:
                      # No results found
                     if not organizaciones:
                         return JsonResponse({
+                            "organizaciones": organizaciones,
                             "message": "No se encontraron organizaciones externas",
                             "messageType": "info"
                         }, status=200)
@@ -70,13 +72,15 @@ class OrganizacionesExternasAPI:
             search_value = request.GET.get("search[value]", "")
 
             # Query base
-            qs = OrganizacionExternaService.listar()
+            qs = (
+                OrganizacionExternaService.buscar(search_value)
+                if search_value
+                else OrganizacionExternaService.listar()
+            )
 
-            # Filtro búsqueda
-            if search_value:
-                qs = qs.filter(nombre__icontains=search_value)
+            total_records = OrganizacionExternaService.contar()
+            filtered_records = qs.count()
 
-            total = qs.count()
 
             # Paginación
             paginator = Paginator(qs, length)
@@ -86,21 +90,23 @@ class OrganizacionesExternasAPI:
             data = []
             for org in page.object_list:
                 data.append({
-                    "id": org["idOrganizacion"],
-                    "nit": org["nit"],
-                    "nombre": org["nombre"],
-                    "representanteLegal": org["representanteLegal"],
-                    "telefono": org["telefono"],
-                    "ubicacion": org["ubicacion"],
-                    "sectorEconomico": org["sectorEconomico"],
-                    "actividadPrincipal": org["actividadPrincipal"],
-                    "esCreador": request.user.idUsuario == org["creador_id"]
+                    "id": org.idOrganizacion,
+                    "nit": org.nit,
+                    "nombre": org.nombre,
+                    "representanteLegal": org.representanteLegal,
+                    "telefono": org.telefono,
+                    "ubicacion": org.ubicacion,
+                    "sectorEconomico": org.sectorEconomico,
+                    "actividadPrincipal": org.actividadPrincipal,
+                    "esCreador": request.user.idUsuario == org.creador_id
                 })
+            
+            
 
             return JsonResponse({
                 "draw": draw,
-                "recordsTotal": total,
-                "recordsFiltered": total,
+                "recordsTotal": total_records,
+                "recordsFiltered": filtered_records,
                 "data": data
             })
 
@@ -111,17 +117,53 @@ class OrganizacionesExternasAPI:
     def obtener_por_id(request, id):
         if request.method == "GET":
             org = OrganizacionExternaService.obtener_por_id(id)
+            if not org:
+                return JsonResponse({"error": "Organización no encontrada."}, status=404)
+            
             data = {
-                "organizacion": {  
-                    "idOrganizacion": org.idOrganizacion,
-                    "nit": org.nit,
-                    "nombre": org.nombre,
-                    "representanteLegal": org.representanteLegal,
-                    "telefono": org.telefono,
-                    "ubicacion": org.ubicacion,
-                    "sectorEconomico": org.sectorEconomico,
-                    "actividadPrincipal": org.actividadPrincipal,
-                }
+                "idOrganizacion": org.idOrganizacion,
+                "nit": org.nit,
+                "nombre": org.nombre,
+                "representanteLegal": org.representanteLegal,
+                "telefono": org.telefono,
+                "ubicacion": org.ubicacion,
+                "sectorEconomico": org.sectorEconomico,
+                "actividadPrincipal": org.actividadPrincipal,
             }
-            return JsonResponse(data, status=200)
+            return JsonResponse({"organizacion": data}, status=200)
+
+        return JsonResponse({"error": "Método no permitido"}, status=405)
+    
+    @login_required()
+    @organizador_required
+    def actualizar(request, id):
+        if request.method == "PUT":
+            data = json.loads(request.body)
+            form = RegistroForm(data)
+            if form.is_valid():
+                try:
+                    OrganizacionExternaService.actualizar(id, form.cleaned_data)
+                    return JsonResponse({"message": "Organización actualizada correctamente."}, status=200)
+                except ValueError as e:
+                    return JsonResponse({"error": str(e)}, status=400)
+            else:
+                return JsonResponse({"error": form.errors}, status=400)
+
+        return JsonResponse({"error": "Método no permitido"}, status=405)
+    
+
+
+    @login_required()
+    @organizador_required
+    def verificarCreador(request, id):
+        if request.method == "GET":
+            es_creador = OrganizacionExternaService.es_creador(request.user, id)
+            if es_creador is None:
+                return JsonResponse({"error": "Organización no encontrada."}, status=404)
+            if not es_creador:
+                return JsonResponse(
+                    {"isCreator": False, "message": "No eres el creador de esta organización."},
+                    status=403
+                )
+            return JsonResponse({"isCreator": True}, status=200)
         return JsonResponse({"error": "Método no permitido"}, status=405)

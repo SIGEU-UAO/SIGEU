@@ -25,14 +25,20 @@ form.addEventListener("submit", handleSubmit);
 async function handleSubmit(e) {
     e.preventDefault();
 
-    // Validate form
-    let formData = new FormData(form);
+    // Validar formulario
+    const formData = new FormData(form);
     if (!validarFormData(formData, validationRules)) return;
 
-    //Fetch the endpoint
-    const result = await API.post("/orgs/api/registro/", formData);
+    // Obtener el ID desde la URL actual (ej. /orgs/listado/orgs/editar/7/)
+    const parts = window.location.pathname.split("/").filter(Boolean);
+    const pk = parts[parts.length - 1]; // Toma el último número
+
+    const apiUrl = `/orgs/api/${pk}/update/`;
+
+    // Enviar al endpoint correcto
+    const result = await API.put(apiUrl, formData);
     if (result.error) return;
 
-    Alert.success("Organización registrada exitosamente");
+    Alert.success("Organización actualizada exitosamente");
     setTimeout(() => { window.location.href = "/orgs/listado/"; }, 1500);
 }

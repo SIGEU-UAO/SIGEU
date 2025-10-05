@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.db import IntegrityError
 from .models import OrganizacionExterna
 from django.shortcuts import get_object_or_404
@@ -25,13 +26,36 @@ class OrganizacionExternaService:
         return org.idOrganizacion
 
     @staticmethod
+    def contar():
+        return OrganizacionExterna.objects.count()
+    
+    @staticmethod
     def listar():
-        return OrganizacionExterna.objects.values()
+        return OrganizacionExterna.objects.all()
+    
+    @staticmethod
+    def buscar(termino):
+        qs = OrganizacionExterna.objects.all()
+        if termino:
+            qs = qs.filter(
+                Q(nombre__icontains=termino)
+                | Q(nit__icontains=termino)
+                | Q(representanteLegal__icontains=termino)
+                | Q(sectorEconomico__icontains=termino)
+            )
+        return qs
 
+    @staticmethod
+    def es_creador(usuario, id_org):
+        org = OrganizacionExternaService.obtener_por_id(id_org)
+        if not org:
+            return None 
+        return usuario.idUsuario == org.creador_id
+    
     @staticmethod
     def filtrar_por_nit(nit):
         if not nit:
-         return []
+            return []
         return list(
             OrganizacionExterna.objects
             .filter(nit__icontains=nit)  
@@ -49,4 +73,16 @@ class OrganizacionExternaService:
             return OrganizacionExterna.objects.get(idOrganizacion=id_organizacion)
         except OrganizacionExterna.DoesNotExist:
             return False
+    
+    def actualizar(id, data):
+        org = OrganizacionExterna.objects.get(pk=id)
+        org.nit = data["nit"]
+        org.nombre = data["nombre"]
+        org.representanteLegal = data["representante_legal"]
+        org.telefono = data["telefono"]
+        org.ubicacion = data["ubicacion"]
+        org.sectorEconomico = data["sector_economico"]
+        org.actividadPrincipal = data["actividad_principal"]
+        org.save()
+        return org
     
