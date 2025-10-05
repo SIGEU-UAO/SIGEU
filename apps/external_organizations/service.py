@@ -46,6 +46,13 @@ class OrganizacionExternaService:
         return qs
 
     @staticmethod
+    def es_creador(usuario, id_org):
+        org = OrganizacionExternaService.obtener_por_id(id_org)
+        if not org:
+            return None 
+        return usuario.idUsuario == org.creador_id
+    
+    @staticmethod
     def filtrar_por_nit(nit):
         if not nit:
             return []
