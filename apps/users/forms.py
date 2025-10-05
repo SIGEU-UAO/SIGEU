@@ -1,6 +1,43 @@
 from django import forms
 from django.core.validators import RegexValidator
 from .models import *
+from django.contrib.auth.forms import PasswordResetForm
+from django.template.loader import render_to_string
+from django.core.mail import EmailMultiAlternatives
+from django.conf import settings
+from email.mime.image import MIMEImage
+from email.utils import make_msgid
+from pathlib import Path
+import re
+from html import unescape
+
+# translate Html to plain text
+def _html_to_text(html):
+    text = html
+    patterns = [
+        (r'<br\s*/?>', '\n'),
+        (r'</p>', '\n\n'),
+        (r'<h[1-6][^>]*>', '\n'),
+        (r'</h[1-6]>', '\n\n'),
+        (r'<li[^>]*>', '• '),
+        (r'</li>', '\n'),
+        (r'<ul[^>]*>', '\n'),
+        (r'</ul>', '\n'),
+        (r'<ol[^>]*>', '\n'),
+        (r'</ol>', '\n'),
+        (r'<div[^>]*>', '\n'),
+        (r'</div>', '\n'),
+        (r'<[^>]+>', ''),  # Rremakke all the remaining tags
+    ]
+    
+    for pattern, replacement in patterns:
+        text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
+    
+    # clean up multiple newlines and spaces
+    text = re.sub(r'\n\s*\n\s*\n', '\n\n', text)
+    text = re.sub(r'[ \t]+', ' ', text)
+    
+    return unescape(text.strip())
 
 # * Validators
 numero_identificacion_validator = RegexValidator(regex=r'^[0-9]{8,10}$', message="El documento debe contener entre 8 y 10 números.")
@@ -65,7 +102,7 @@ class RegistroForm(forms.Form):
         }),
     )
 
-    # Selección de rol
+    # select role
     ROLE_CHOICES = [
         ('estudiante', 'Estudiante'),
         ('docente', 'Docente'),
@@ -73,7 +110,7 @@ class RegistroForm(forms.Form):
     ]
     rol = forms.ChoiceField(label="Rol", choices=ROLE_CHOICES, required=True)
 
-    # Campos específicos por rol (opcionales, se validan en clean())
+    # specific filesd for roll
 
     #* Estudiante
     codigo_estudiante = forms.CharField(
@@ -221,3 +258,53 @@ class ModalBuscarOrganizadorForm(forms.Form):
         # Force autocomplete=off on all fields
         for field in self.fields.values():
             field.widget.attrs["autocomplete"] = "off"
+
+class CustomPasswordResetForm(PasswordResetForm):
+    """
+    form resret password defines subject in code,
+    """
+    
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email and not email.endswith('@uao.edu.co'):
+            raise forms.ValidationError('Correo inválido')
+        return email
+    def send_mail(
+        self,
+        subject_template_name,
+        email_template_name,
+        context,
+        from_email,
+        to_email,
+        html_email_template_name=None,
+    ):
+        subject = "SIGEU - Recuperación de Contraseña"
+
+        # contect foto banner inline
+        ctx = dict(context or {})
+        banner_cid = make_msgid(domain=None)[1:-1]  
+        ctx['banner_cid'] = banner_cid
+
+        # reder the html off the email 
+        html_template = html_email_template_name or email_template_name
+        html_body = render_to_string(html_template, ctx)
+
+        # body off plain text 
+        text_body = _html_to_text(html_body)
+
+        email_message = EmailMultiAlternatives(subject, text_body, from_email, [to_email])
+        email_message.attach_alternative(html_body, "text/html")
+
+        # add banner image as inline image using project path
+        try:
+            banner_path = Path(settings.BASE_DIR) / 'static' / 'assets' / 'img' / 'banner.png'
+            with open(banner_path, 'rb') as f:
+                img = MIMEImage(f.read())
+                img.add_header('Content-ID', f'<{banner_cid}>')
+                img.add_header('Content-Disposition', 'inline', filename='banner.png')
+                email_message.attach(img)
+        except Exception:
+            # If the image is not found or any error occurs, we simply skip attaching the image
+            pass
+
+        email_message.send()

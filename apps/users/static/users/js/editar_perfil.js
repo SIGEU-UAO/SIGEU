@@ -71,6 +71,7 @@ function handleCancel(e) {
 async function handleSubmit(e) {
     e.preventDefault();
     
+    
     // Password confirmation if changed
     if (passwordFieldEl && passwordFieldEl.value.trim().length > 0) {
         const result = await Alert.confirmationAlert({
