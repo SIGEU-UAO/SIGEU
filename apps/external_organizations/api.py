@@ -150,20 +150,3 @@ class OrganizacionesExternasAPI:
                 return JsonResponse({"error": form.errors}, status=400)
 
         return JsonResponse({"error": "Método no permitido"}, status=405)
-    
-
-
-    @login_required()
-    @organizador_required
-    def verificarCreador(request, id):
-        if request.method == "GET":
-            es_creador = OrganizacionExternaService.es_creador(request.user, id)
-            if es_creador is None:
-                return JsonResponse({"error": "Organización no encontrada."}, status=404)
-            if not es_creador:
-                return JsonResponse(
-                    {"isCreator": False, "message": "No eres el creador de esta organización."},
-                    status=403
-                )
-            return JsonResponse({"isCreator": True}, status=200)
-        return JsonResponse({"error": "Método no permitido"}, status=405)
