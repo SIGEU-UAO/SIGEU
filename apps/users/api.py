@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import EditarPerfilForm
 from django.db import IntegrityError
 import json
+import re
 
 class UsersAPI():
     def registro(request):
@@ -14,15 +15,34 @@ class UsersAPI():
             except json.JSONDecodeError:
                 return JsonResponse({"error": "Formato JSON inválido"}, status=400)
 
+            # Validate if the email ends with @uao.edu.co
+            email = data.get("email", "")
+            if not email.endswith("@uao.edu.co"):
+                return JsonResponse({"error": "El correo electrónico debe pertenecer al dominio @uao.edu.co"}, status=400)
+            
+            # Validate that the identification number has between 8 and 10 characters and the phone number has 10 characters.
+            identificacion = data.get("documento", "")
+            telefono = data.get("telefono", "")
+            if not (8 <= len(identificacion) <= 10):
+                return JsonResponse({"error": "El número de identificación debe tener entre 8 y 10 caracteres"}, status=400)
+            if len(telefono) != 10:
+                return JsonResponse({"error": "El número de teléfono debe tener exactamente 10 caracteres"}, status=400)
+            
+            # Validate the password with the regex
+            setting_password = data.get("password1", "")
+            password_pattern = re.compile(r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$')
+            if not password_pattern.match(setting_password):
+                return JsonResponse({"error": "La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, una letra minúscula, un número y opcionalmente un carácter especial."}, status=400)
+
             rol = data.get("rol")
 
             registro = {
-                "email": data.get("email"),
-                "password": data.get("password1"),
+                "email": email,
+                "password": setting_password,
                 "nombres": data.get("nombre"),
                 "apellidos": data.get("apellido"),
-                "telefono": data.get("telefono"),
-                "numeroIdentificacion": data.get("documento"),
+                "telefono": telefono,
+                "numeroIdentificacion": identificacion,
                 "rol": rol,
             }
 
@@ -36,7 +56,7 @@ class UsersAPI():
 
             try:
                 usuario_id = UserService.registrar(registro)
-                return JsonResponse({"id": usuario_id, "message": "registro creado"}, status=201)
+                return JsonResponse({"id": usuario_id, "message": f"{rol.capitalize()} creado/a correctamente"}, status=201)
             except ValueError as e:
                 return JsonResponse({"error": str(e)}, status=400)
         
@@ -158,10 +178,10 @@ class UsersAPI():
         return JsonResponse({"error": "Método no permitido"}, status=405)
 
     @login_required()
-    def obtener_por_id(request, id):
+    def obtener_organizador_por_id(request, id):
         if request.method == "GET":
-            user = UserService.obtener_por_id(id)
-            if not user: return JsonResponse({"error": "No se encontró ningun usuario"}, status=404)
+            user = UserService.obtener_organizador_por_id(id)
+            if not user: return JsonResponse({"error": "No se encontró ningun organizador con dicha ID"}, status=404)
             
             data = {
                 "organizador": {  

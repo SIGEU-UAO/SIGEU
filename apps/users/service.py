@@ -130,7 +130,17 @@ class UserService:
 
     @staticmethod
     def listar_organizadores():
-        return Usuario.objects.filter(Q(docente__isnull=False) | Q(estudiante__isnull=False))
+        return Usuario.objects.filter(
+            Q(docente__isnull=False) | Q(estudiante__isnull=False)
+        ).annotate(
+            nombre_completo=Concat('nombres', Value(' '), 'apellidos'),
+            rol=Case(
+                When(estudiante__isnull=False, then=Value('Estudiante')),
+                When(docente__isnull=False, then=Value('Docente')),
+                default=Value('Usuario'),
+                output_field=CharField()
+            )
+        ).values("idUsuario", "nombre_completo", "numeroIdentificacion", "rol")
 
     @staticmethod
     def filtrar_organizadores_por_nombre_completo(nombre_completo, usuario_actual_id=None):
@@ -169,10 +179,11 @@ class UserService:
 
     # * This method allows you to obtain a user as an object because it includes the role
     @staticmethod
-    def obtener_por_id(id_usuario):
+    def obtener_organizador_por_id(id_usuario):
         try:
             usuario = (
                 Usuario.objects
+                .filter(Q(estudiante__isnull=False) | Q(docente__isnull=False))  # solo organizadores
                 .annotate(
                     rol=Case(
                         When(estudiante__isnull=False, then=Value('Estudiante')),
@@ -184,6 +195,7 @@ class UserService:
                 .values("idUsuario", "numeroIdentificacion", "nombres", "apellidos", "email", "telefono", "rol")
                 .get(idUsuario=id_usuario)
             )
+
             return usuario
         except Usuario.DoesNotExist:
             return False

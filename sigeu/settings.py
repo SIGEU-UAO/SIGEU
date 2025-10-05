@@ -14,10 +14,12 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()  # Load variables from .env file
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load variables from the project .env file and let them override system env vars if present
+# This avoids picking up stale machine-wide variables like DB_USER that don't match the project
+load_dotenv(dotenv_path=BASE_DIR / ".env", override=True)
 
 
 # Quick-start development settings - unsuitable for production
@@ -86,7 +88,7 @@ DATABASES = {
         'NAME': os.getenv('DB_NAME'),
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
+        'HOST': os.getenv('DB_HOST', '127.0.0.1'),
         'PORT': os.getenv('DB_PORT', '3306'),
     }
 }
