@@ -1,7 +1,7 @@
 from django.db import IntegrityError
 from django.db.models import ObjectDoesNotExist
 from apps.events.services.event import EventoService
-from ...models import Evento, InstalacionesAsignadas
+from ...models import InstalacionAsignada
 
 class InstalacionesAsignadasService:
     @staticmethod
@@ -11,7 +11,7 @@ class InstalacionesAsignadasService:
             evento = EventoService.obtener_por_id(data["evento_id"])
 
             # 2. Create intermediate table record
-            asignacion = InstalacionesAsignadas.objects.create(evento=evento, instalacion=data["instalacion"])
+            asignacion = InstalacionAsignada.objects.create(evento=evento, instalacion=data["instalacion"])
             return True
 
         except ObjectDoesNotExist as e:

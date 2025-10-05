@@ -8,7 +8,6 @@ from .models import *
 # Password history limit
 PASSWORD_HISTORY_LIMIT = 3
 
-
 def validate_new_password(user, new_password):
     """
     Validates that the new password is not the same as the current one or the last N used by the user.

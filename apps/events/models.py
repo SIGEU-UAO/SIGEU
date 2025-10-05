@@ -36,7 +36,7 @@ class Evento(models.Model):
         verbose_name = "evento"
         verbose_name_plural = "eventos"
 
-class InstalacionesAsignadas(models.Model):
+class InstalacionAsignada(models.Model):
     evento = models.ForeignKey(Evento, on_delete=models.CASCADE, related_name="instalaciones_asignadas")
     instalacion = models.ForeignKey(InstalacionFisica, on_delete=models.CASCADE, related_name="eventos_asignados")
     
@@ -52,7 +52,7 @@ class InstalacionesAsignadas(models.Model):
             )
         ]
 
-class OrganizadoresEventos(models.Model):
+class OrganizadorEvento(models.Model):
     # Enumerations
     TIPOS = [ 
         ("director_programa", "Director del Programa"),
@@ -76,7 +76,7 @@ class OrganizadoresEventos(models.Model):
             )
         ]
 
-class OrganizacionesInvitadas(models.Model):    
+class OrganizacionInvitada(models.Model):    
     evento = models.ForeignKey(Evento, on_delete=models.CASCADE, related_name="organizaciones_invitadas")
     organizacion = models.ForeignKey(OrganizacionExterna, on_delete=models.CASCADE, related_name="eventos_invitados")
     representante_asiste = models.BooleanField(default=False, verbose_name="¿Representante legal asiste?")
