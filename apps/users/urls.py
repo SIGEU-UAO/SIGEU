@@ -1,7 +1,6 @@
-from django.urls import path, re_path
+from django.urls import path
 from . import views
 from .api import UsersAPI
-from django.contrib.auth.views import PasswordResetConfirmView
 
 urlpatterns = [
     # --- Views ---
@@ -23,8 +22,6 @@ urlpatterns = [
     # Password Reset URLs
     path('reset/password_reset/', views.CustomPasswordResetView.as_view(), name='password_reset'),
     path('reset/password_reset_done/', views.CustomPasswordResetDoneView.as_view(), name='password_reset_done'),
-    re_path(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,32})/$', 
-        PasswordResetConfirmView.as_view(template_name='users/reset_password/password_reset_confirm.html'),
-        name='password_reset_confirm'),
+    path('reset/<uidb64>/<token>/', views.CustomPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('reset/done/', views.CustomPasswordResetCompleteView.as_view(), name='password_reset_complete'),
 ]
