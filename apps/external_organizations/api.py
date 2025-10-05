@@ -112,19 +112,21 @@ class OrganizacionesExternasAPI:
     def obtener_por_id(request, id):
         if request.method == "GET":
             org = OrganizacionExternaService.obtener_por_id(id)
+            if not org:
+                return JsonResponse({"error": "Organización no encontrada."}, status=404)
+            
             data = {
-                "organizacion": {  
-                    "idOrganizacion": org.idOrganizacion,
-                    "nit": org.nit,
-                    "nombre": org.nombre,
-                    "representanteLegal": org.representanteLegal,
-                    "telefono": org.telefono,
-                    "ubicacion": org.ubicacion,
-                    "sectorEconomico": org.sectorEconomico,
-                    "actividadPrincipal": org.actividadPrincipal,
-                }
+                "idOrganizacion": org.idOrganizacion,
+                "nit": org.nit,
+                "nombre": org.nombre,
+                "representanteLegal": org.representanteLegal,
+                "telefono": org.telefono,
+                "ubicacion": org.ubicacion,
+                "sectorEconomico": org.sectorEconomico,
+                "actividadPrincipal": org.actividadPrincipal,
             }
-            return JsonResponse(data, status=200)
+            return JsonResponse({"organizacion": data}, status=200)
+
         return JsonResponse({"error": "Método no permitido"}, status=405)
     
     @login_required()
@@ -132,7 +134,10 @@ class OrganizacionesExternasAPI:
     def actualizar(request, id):
         if request.method == "PUT":
             try:
-                data = json.loads(request.body)
+                if request.content_type == "application/json":
+                    data = json.loads(request.body)
+                else:
+                    data = request.POST
             except json.JSONDecodeError:
                 return JsonResponse({"error": "Formato JSON inválido."}, status=400)
 
@@ -140,7 +145,7 @@ class OrganizacionesExternasAPI:
             if form.is_valid():
                 try:
                     OrganizacionExternaService.actualizar(id, form.cleaned_data)
-                    return JsonResponse({"message": "Organización actualizada"}, status=200)
+                    return JsonResponse({"message": "Organización actualizada correctamente."}, status=200)
                 except ValueError as e:
                     return JsonResponse({"error": str(e)}, status=400)
             else:

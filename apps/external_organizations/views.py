@@ -32,32 +32,9 @@ def listado(request):
 @login_required()
 @organizador_required
 def editar(request, pk):
-    try:
-        org = OrganizacionExterna.objects.get(idOrganizacion=pk)
-    except OrganizacionExterna.DoesNotExist:
+    org = OrganizacionExternaService.obtener_por_id(pk)
+    if not org:
         return redirect("org_no_encontrada")
-
-    if request.method == "POST":
-        form = RegistroForm(request.POST)
-        if form.is_valid():
-            try:
-                OrganizacionExternaService.actualizar(pk, form.cleaned_data)
-                return JsonResponse({
-                    "status": "success",
-                    "message": "Organización actualizada correctamente."
-                }, status=200)
-            except ValueError as e:
-                return JsonResponse({
-                    "status": "error",
-                    "message": str(e)
-                }, status=400)
-        else:
-            return JsonResponse({
-                "status": "error",
-                "message": "Hay errores en el formulario.",
-                "errors": form.errors
-            }, status=400)
-
     # GET → renderizar el form con datos iniciales
     initial_data = {
         "nit": org.nit,

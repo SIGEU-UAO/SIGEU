@@ -1,41 +1,44 @@
+import { telefonoRegex, nitRegex } from "/static/js/base.js";
+import { validarFormData } from "/static/js/modules/forms/utils.js";
+
 import Alert from "/static/js/modules/classes/Alert.js";
+import API from "/static/js/modules/classes/API.js";
 
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.querySelector(".form");
-  if (!form) return;
+//* Variables
+const validationRules = {
+    nit: [
+        { check: value => nitRegex.test(value), msg: "El NIT no cumple el formato válido (ej. 12345678-9)" }
+        
+    ],
+    telefono: [
+        { check: value => telefonoRegex.test(value), msg: "Teléfono inválido" }
+    ]
+};
 
-  form.addEventListener("submit", async (e) => {
+//* Selectors
+const form = document.querySelector("form.form");
+
+//* Events Listeners
+form.addEventListener("submit", handleSubmit);
+
+//* Functions
+async function handleSubmit(e) {
     e.preventDefault();
 
+    // Validar formulario
     const formData = new FormData(form);
+    if (!validarFormData(formData, validationRules)) return;
 
-    try {
-      const response = await fetch(window.location.href, {
-        method: "POST",
-        headers: {
-          "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
-        },
-        body: formData,
-      });
+    // Obtener el ID desde la URL actual (ej. /orgs/listado/orgs/editar/7/)
+    const parts = window.location.pathname.split("/").filter(Boolean);
+    const pk = parts[parts.length - 1]; // Toma el último número
 
-      const result = await response.json();
+    const apiUrl = `/orgs/api/${pk}/update/`;
 
-      if (result.status === "success") {
-        Alert.success(result.message);
-      } else {
-        Alert.error(result.message);
+    // Enviar al endpoint correcto
+    const result = await API.put(apiUrl, formData);
+    if (result.error) return;
 
-        if (result.errors) {
-          for (const [field, messages] of Object.entries(result.errors)) {
-            messages.forEach((msg) => {
-              Alert.error(`${field}: ${msg}`);
-            });
-          }
-        }
-      }
-    } catch (err) {
-      Alert.error("Error de conexión con el servidor.");
-      console.error("Error en fetch editar:", err);
-    }
-  });
-});
+    Alert.success("Organización actualizada exitosamente");
+    setTimeout(() => { window.location.href = "/orgs/listado/"; }, 1500);
+}
