@@ -34,7 +34,7 @@ class OrganizadorEventoAPI:
             # * Try to assign all facilities
             for item in organizadores:
                 try:
-                    organizador = UserService.obtener_por_id(item["id"])
+                    organizador = UserService.obtener_organizador_por_id(item["id"])
                     
                     # If the user was not found, add an error.
                     if not organizador:

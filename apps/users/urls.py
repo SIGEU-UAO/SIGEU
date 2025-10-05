@@ -14,11 +14,11 @@ urlpatterns = [
     path("users/api/registro/", UsersAPI.registro, name="registro_api"),
     path("users/api/inicio-sesion/", UsersAPI.login, name="inicio_sesion_api"),
     path("users/api/logout/", UsersAPI.logout, name="logout"),
-    path("users/api/editar-perfil/", UsersAPI.editar_perfil, name="perfil_api"),
+    path("users/api/editar-perfil/", UsersAPI.editar_perfil, name="perfil   _api"),
 
     # --- API ORGANIZADORES ---
     path("organizadores/api/", UsersAPI.listar_organizadores, name="organizadores_api_list"),
-    path("organizadores/api/<int:id>/", UsersAPI.obtener_por_id, name="organizadores_api_obtener_por_id"),
+    path("organizadores/api/<int:id>/", UsersAPI.obtener_organizador_por_id, name="organizadores_api_obtener_por_id"),
 
     # Password Reset URLs
     path('reset/password_reset/', views.CustomPasswordResetView.as_view(), name='password_reset'),
