@@ -56,7 +56,7 @@ class OrganizacionesExternasAPI:
                 else:
                     return JsonResponse({"error": "No se envió el query param adecuado"}, status=400)
             else:
-                organizaciones = list(OrganizacionExternaService.listar())
+                organizaciones = list(OrganizacionExternaService.listar_json())
                 return JsonResponse({"items": organizaciones}, status=200)
 
         return JsonResponse({"error": "Método no permitido"}, status=405)
@@ -137,16 +137,40 @@ class OrganizacionesExternasAPI:
     @login_required()
     @organizador_required
     def actualizar(request, id):
+        print("LLEGUE A ACTUALIZAR")
         if request.method == "PUT":
+            print("ENTRE AL METODO PUT")
+            #Validates if the user is the creator of the organization
+            try:
+                response = OrganizacionesExternasAPI.verificarCreador(request, id)
+                if response.status_code != 200:
+                    return response
+            except Exception as e:
+                return JsonResponse({"error": str(e)}, status=400)
+            print("VERIFICACION DE CREADOR EXITOSA")
+
             data = json.loads(request.body)
             form = RegistroForm(data)
             if form.is_valid():
                 try:
+                    print("FORM ES VALIDO")
                     OrganizacionExternaService.actualizar(id, form.cleaned_data)
                     return JsonResponse({"message": "Organización actualizada correctamente."}, status=200)
                 except ValueError as e:
                     return JsonResponse({"error": str(e)}, status=400)
             else:
                 return JsonResponse({"error": form.errors}, status=400)
-
         return JsonResponse({"error": "Método no permitido"}, status=405)
+    
+    @login_required()
+    @organizador_required
+    def verificarCreador(request, id):
+        es_creador = OrganizacionExternaService.es_creador(request.user, id)
+        if es_creador is None:
+            return JsonResponse({"error": "Organización no encontrada."}, status=404)
+        if not es_creador:
+            return JsonResponse(
+                {"isCreator": False, "message": "No eres el creador de esta organización."},
+                status=403
+            )
+        return JsonResponse({"isCreator": True}, status=200)

@@ -6,7 +6,7 @@ class OrganizacionExterna(models.Model):
     nit = models.CharField(max_length=12, unique=True) 
     nombre = models.CharField(max_length=100)
     representanteLegal = models.CharField(max_length=100)
-    telefono = models.CharField(max_length=10)
+    telefono = models.CharField(max_length=10, unique=True)
     ubicacion = models.CharField(max_length=100)
     sectorEconomico = models.CharField(max_length=100)
     actividadPrincipal = models.CharField(max_length=200)

@@ -34,6 +34,21 @@ class OrganizacionExternaService:
         return OrganizacionExterna.objects.all()
     
     @staticmethod
+    @staticmethod
+    def listar_json():
+        return list(OrganizacionExterna.objects.values(
+            "idOrganizacion",
+            "nit",
+            "nombre",
+            "representanteLegal",
+            "telefono",
+            "ubicacion",
+            "sectorEconomico",
+            "actividadPrincipal",
+            "creador_id"
+        ))
+    
+    @staticmethod
     def buscar(termino):
         qs = OrganizacionExterna.objects.all()
         if termino:
@@ -75,14 +90,26 @@ class OrganizacionExternaService:
             return False
     
     def actualizar(id, data):
-        org = OrganizacionExterna.objects.get(pk=id)
-        org.nit = data["nit"]
-        org.nombre = data["nombre"]
-        org.representanteLegal = data["representante_legal"]
-        org.telefono = data["telefono"]
-        org.ubicacion = data["ubicacion"]
-        org.sectorEconomico = data["sector_economico"]
-        org.actividadPrincipal = data["actividad_principal"]
-        org.save()
+        #Validate integrity errors for unique fields
+        try:
+            org = OrganizacionExterna.objects.get(pk=id)
+            org.nit = data["nit"]
+            org.nombre = data["nombre"]
+            org.representanteLegal = data["representante_legal"]
+            org.telefono = data["telefono"]
+            org.ubicacion = data["ubicacion"]
+            org.sectorEconomico = data["sector_economico"]
+            org.actividadPrincipal = data["actividad_principal"]
+            org.save()
+        except OrganizacionExterna.DoesNotExist:
+            raise ValueError("No se encontró la organización especificada.")
+        except IntegrityError as e:
+            s = str(e).lower()
+            if "nit" in s:
+                raise ValueError("Ya existe una organización con este NIT.") from e
+            if "telefono" in s:
+                raise ValueError("Ya existe una organización con este teléfono.") from e
+            raise ValueError("Error de integridad al actualizar la organización.") from e
         return org
+    
     
