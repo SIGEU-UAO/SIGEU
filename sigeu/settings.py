@@ -14,7 +14,7 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv() # carga las variables del archivo .env
+load_dotenv()  # Load variables from .env file
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -137,23 +137,23 @@ MEDIA_URL = "/media/"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Redirección después de login/logout
-LOGIN_REDIRECT_URL = "/dashboard/" # A dónde ir tras login
-LOGOUT_REDIRECT_URL = "/users/inicio-sesion/" # A dónde ir tras logout
+# Redirect after login/logout
+LOGIN_REDIRECT_URL = "/dashboard/"  # Where to go after login
+LOGOUT_REDIRECT_URL = "/users/inicio-sesion/"  # Where to go after logout
 
-# Vista que Django usará si se intenta acceder a @login_required
+# View that Django will use if attempting to access @login_required
 LOGIN_URL = "/users/inicio-sesion/"
 
-# Modelo de usuario personalizado
+# Custom user model
 AUTH_USER_MODEL = "users.Usuario"
 
-# Backend SMTP personalizado para manejar problemas de SSL con Gmail
+# Custom SMTP backend to handle SSL issues with Gmail
 import ssl
 from django.core.mail.backends.smtp import EmailBackend
 
 class CustomSMTPBackend(EmailBackend):
     """
-    Backend SMTP personalizado que maneja problemas de verificación SSL en Windows
+    Custom SMTP backend that handles SSL verification issues on Windows
     """
     
     def __init__(self, host=None, port=None, username=None, password=None,
@@ -224,43 +224,5 @@ SERVER_EMAIL = DEFAULT_FROM_EMAIL
 # Password reset settings
 PASSWORD_RESET_TIMEOUT = 86400  # 24 hours in seconds
 
-# Configuración de logging para emails
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'console': {
-            'level': 'DEBUG' if DEBUG else 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
-        },
-    },
-    'loggers': {
-        'django.core.mail': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-        'apps.users': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        '': {
-            'handlers': ['console'],
-            'level': 'INFO',
-        },
-    },
-}
 
-SESSION_COOKIE_AGE = 60 * 60 * 24   # 24 horas
+SESSION_COOKIE_AGE = 60 * 60 * 24   # 24 hours

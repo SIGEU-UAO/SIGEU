@@ -10,7 +10,6 @@ from django.contrib import messages
 from sigeu.decorators import no_superuser_required
 from .service import UserService
 import json
-import logging
 
 def formulario_registro(request):
     if request.method == "GET":
@@ -57,7 +56,6 @@ def editar_perfil(request):
     return JsonResponse({"error": "Método no permitido"}, status=405)
 
 # ----- Password Reset Views -----
-logger = logging.getLogger(__name__)
 
 class CustomPasswordResetView(PasswordResetView):
     form_class = CustomPasswordResetForm
@@ -66,30 +64,35 @@ class CustomPasswordResetView(PasswordResetView):
     success_url = reverse_lazy('password_reset_done')
 
     def form_valid(self, form):
-        """Valida existencia de email y guarda email en sesión"""
+        """Valida existencia de email y envía correo"""
         email = form.cleaned_data['email']
-        logger.info(f"Intentando enviar correo de reset a: {email}")
+        
+        # Verificar si el usuario existe
         User = get_user_model()
         try:
-            User.objects.get(email=email)
+            user = User.objects.get(email=email)
         except User.DoesNotExist:
-            logger.warning(f"Intento de reset con email no registrado: {email}")
-            messages.error(self.request, 'El correo electrónico no está registrado en SIGEU.')
+            messages.error(self.request, 'Correo no registrado')
             return self.render_to_response(self.get_context_data(form=form))
+        
         try:
             self.request.session['password_reset_email'] = email
             response = super().form_valid(form)
-            logger.info(f"Correo de reset enviado exitosamente a: {email}")
             return response
         except Exception as e:
-            logger.error(f"Error al enviar correo de reset a {email}: {str(e)}")
             messages.error(self.request, f'Error al enviar correo: {str(e)}')
             return self.render_to_response(self.get_context_data(form=form))
 
     def form_invalid(self, form):
-        logger.error(f"Formulario de password reset inválido: {form.errors}")
-        messages.error(self.request, 'Por favor corrige los errores en el formulario')
-        return super().form_invalid(form)
+        # Convertir errores del formulario en mensajes para mostrar con JS
+        if 'email' in form.errors:
+            for error in form.errors['email']:
+                messages.error(self.request, str(error))
+        
+        # Limpiar errores del formulario para evitar duplicados
+        form.errors.clear()
+        
+        return self.render_to_response(self.get_context_data(form=form))
 
 class CustomPasswordResetDoneView(PasswordResetDoneView):
     template_name = 'users/reset_password/password_reset_done.html'

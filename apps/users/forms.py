@@ -11,11 +11,9 @@ from pathlib import Path
 import re
 from html import unescape
 
-# Utilidad simple para convertir HTML -> texto con saltos de línea legibles
-# sin depender de una plantilla .txt aparte.
+# translate Html to plain text
 def _html_to_text(html):
     text = html
-    # Reemplazos básicos para conservar estructura
     patterns = [
         (r'<br\s*/?>', '\n'),
         (r'</p>', '\n\n'),
@@ -29,13 +27,13 @@ def _html_to_text(html):
         (r'</ol>', '\n'),
         (r'<div[^>]*>', '\n'),
         (r'</div>', '\n'),
-        (r'<[^>]+>', ''),  # Remover todas las demás etiquetas HTML
+        (r'<[^>]+>', ''),  # Rremakke all the remaining tags
     ]
     
     for pattern, replacement in patterns:
         text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
     
-    # Limpiar espacios en blanco excesivos
+    # clean up multiple newlines and spaces
     text = re.sub(r'\n\s*\n\s*\n', '\n\n', text)
     text = re.sub(r'[ \t]+', ' ', text)
     
@@ -104,7 +102,7 @@ class RegistroForm(forms.Form):
         }),
     )
 
-    # Selección de rol
+    # select role
     ROLE_CHOICES = [
         ('estudiante', 'Estudiante'),
         ('docente', 'Docente'),
@@ -112,7 +110,7 @@ class RegistroForm(forms.Form):
     ]
     rol = forms.ChoiceField(label="Rol", choices=ROLE_CHOICES, required=True)
 
-    # Campos específicos por rol (opcionales, se validan en clean())
+    # specific filesd for roll
 
     #* Estudiante
     codigo_estudiante = forms.CharField(
@@ -263,9 +261,14 @@ class ModalBuscarOrganizadorForm(forms.Form):
 
 class CustomPasswordResetForm(PasswordResetForm):
     """
-    Formulario de reset de contraseña que define el asunto en código,
-    evitando el uso de subject_template_name.
+    form resret password defines subject in code,
     """
+    
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email and not email.endswith('@uao.edu.co'):
+            raise forms.ValidationError('Correo inválido')
+        return email
     def send_mail(
         self,
         subject_template_name,
@@ -277,22 +280,22 @@ class CustomPasswordResetForm(PasswordResetForm):
     ):
         subject = "SIGEU - Recuperación de Contraseña"
 
-        # Preparar contexto (posible copia) y CID del banner
+        # contect foto banner inline
         ctx = dict(context or {})
-        banner_cid = make_msgid(domain=None)[1:-1]  # quitar <>
+        banner_cid = make_msgid(domain=None)[1:-1]  
         ctx['banner_cid'] = banner_cid
 
-        # Renderizar el HTML del correo (incluye cid en la plantilla)
+        # reder the html off the email 
         html_template = html_email_template_name or email_template_name
         html_body = render_to_string(html_template, ctx)
 
-        # Cuerpo de texto plano derivado del HTML (sin plantilla .txt)
+        # body off plain text 
         text_body = _html_to_text(html_body)
 
         email_message = EmailMultiAlternatives(subject, text_body, from_email, [to_email])
         email_message.attach_alternative(html_body, "text/html")
 
-        # Adjuntar banner como imagen inline usando el path del proyecto
+        # add banner image as inline image using project path
         try:
             banner_path = Path(settings.BASE_DIR) / 'static' / 'assets' / 'img' / 'banner.png'
             with open(banner_path, 'rb') as f:
@@ -301,7 +304,7 @@ class CustomPasswordResetForm(PasswordResetForm):
                 img.add_header('Content-Disposition', 'inline', filename='banner.png')
                 email_message.attach(img)
         except Exception:
-            # Si falla, el HTML seguirá usando el fallback por URL absoluta
+            # If the image is not found or any error occurs, we simply skip attaching the image
             pass
 
         email_message.send()

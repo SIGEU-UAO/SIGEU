@@ -18,6 +18,8 @@ const validationRules = {
 const form = document.querySelector("form.form");
 const passwordEyeBtns = document.querySelectorAll(".form__group:has(.password-field) .icon__btn:first-of-type, .form__group:has(input[type='password']) .icon__btn:first-of-type");
 const passwordInfoBtn = document.querySelector(".form__group:has(#id_new_password1) .icon__btn:last-of-type");
+const password1Field = document.getElementById("id_new_password1");
+const password2Field = document.getElementById("id_new_password2");
 
 //* Event Listeners
 document.addEventListener("DOMContentLoaded", () => {
@@ -61,9 +63,6 @@ function showDjangoMessages() {
 
 function setupPasswordFields() {
     // Agregar clase password-field a los campos de contraseña para compatibilidad
-    const password1Field = document.getElementById("id_new_password1");
-    const password2Field = document.getElementById("id_new_password2");
-    
     if (password1Field) {
         password1Field.classList.add("password-field");
         password1Field.setAttribute("type", "password");
@@ -89,56 +88,3 @@ function handleSubmit(e) {
     form.submit();
 }
 
-// Función para mostrar validación en tiempo real (opcional)
-function setupRealTimeValidation() {
-    const password1Field = document.getElementById("id_new_password1");
-    const password2Field = document.getElementById("id_new_password2");
-    
-    if (password1Field) {
-        password1Field.addEventListener("input", (e) => {
-            validatePasswordStrength(e.target.value);
-        });
-    }
-    
-    if (password2Field) {
-        password2Field.addEventListener("input", (e) => {
-            validatePasswordMatch(password1Field.value, e.target.value);
-        });
-    }
-}
-
-function validatePasswordStrength(password) {
-    const isValid = passwordRegex.test(password);
-    const field = document.getElementById("id_new_password1");
-    const parent = field.closest(".form__group");
-    
-    // Remover clases anteriores
-    parent.classList.remove("form__group--valid", "form__group--invalid");
-    
-    if (password.length > 0) {
-        if (isValid) {
-            parent.classList.add("form__group--valid");
-        } else {
-            parent.classList.add("form__group--invalid");
-        }
-    }
-}
-
-function validatePasswordMatch(password1, password2) {
-    const field = document.getElementById("id_new_password2");
-    const parent = field.closest(".form__group");
-    
-    // Remover clases anteriores
-    parent.classList.remove("form__group--valid", "form__group--invalid");
-    
-    if (password2.length > 0) {
-        if (password1 === password2 && passwordRegex.test(password2)) {
-            parent.classList.add("form__group--valid");
-        } else {
-            parent.classList.add("form__group--invalid");
-        }
-    }
-}
-
-// Inicializar validación en tiempo real si se desea
-// setupRealTimeValidation();

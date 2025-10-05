@@ -26,6 +26,29 @@
         <img src="{% static 'assets/icons/logo.svg' %}" alt="SIGEU Logo">
     </figure>
 
+    <!-- Django Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'error' %}
+                <div class="alert alert--error" style="display: none;">
+                    {{ message }}
+                </div>
+            {% elif message.tags == 'success' %}
+                <div class="alert alert--success" style="display: none;">
+                    {{ message }}
+                </div>
+            {% elif message.tags == 'info' %}
+                <div class="alert alert--info" style="display: none;">
+                    {{ message }}
+                </div>
+            {% else %}
+                <div class="alert alert--{{ message.tags }}" style="display: none;">
+                    {{ message }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
     {% block content %}
     {% endblock content %}
 </body>
