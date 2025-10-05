@@ -38,6 +38,13 @@ def validate_collection(data, schema):
                 value = item[k]
                 if not validate_type(value, expected_type):
                     return False
+
+        # For organizations...
+        if item.get("representante_asiste") and item.get("representante_alterno") and schema == SCHEMAS["organizaciones_invitadas"]:
+            return False    
+        
+        if not item.get("representante_asiste") and not item.get("representante_alterno") and schema == SCHEMAS["organizaciones_invitadas"]:
+            return False
     
     return True
 
