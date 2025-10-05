@@ -8,7 +8,7 @@ from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, 
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from sigeu.decorators import no_superuser_required
-from .service import UserService
+from .service import UserService, save_password_history, validate_new_password
 import json
 from django.contrib.auth.views import PasswordResetConfirmView
 
@@ -124,9 +124,6 @@ class CustomPasswordResetConfirmView(PasswordResetConfirmView):
     success_url = reverse_lazy('password_reset_complete')
 
     def _is_json_request(self, request):
-        print("📦 ¿Es JSON?")
-
-
         ct = request.META.get('CONTENT_TYPE', '') or request.headers.get('Content-Type', '')
         accept = request.META.get('HTTP_ACCEPT', '') or request.headers.get('Accept', '')
         return 'application/json' in ct.lower() or 'application/json' in accept.lower()
@@ -159,6 +156,19 @@ class CustomPasswordResetConfirmView(PasswordResetConfirmView):
 
     def form_valid(self, form):
         # Guarda la nueva contraseña
+        try:
+            validate_new_password(
+                form.user,
+                form.cleaned_data['new_password1']
+            )
+            save_password_history(form.user)
+        except ValueError as e:
+            if self._is_json_request(self.request):
+                return JsonResponse({"success": False, "message": str(e)}, status=400)
+            messages.error(self.request, str(e))
+            return self.form_invalid(form)
+
+
         form.save()
         if self._is_json_request(self.request):
             return JsonResponse({"success": True, "message": "Contraseña restablecida correctamente."}, status=200)

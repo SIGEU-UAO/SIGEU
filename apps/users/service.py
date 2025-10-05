@@ -3,6 +3,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.hashers import check_password
 from django.db.models import Q, Value, Case, When, CharField
 from django.db.models.functions import Concat
+import re
 from .models import *
 
 # Password history limit
@@ -12,10 +13,14 @@ def validate_new_password(user, new_password):
     """
     Validates that the new password is not the same as the current one or the last N used by the user.
     """
+
+    if not re.match(r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$', new_password):
+        raise ValueError("La nueva contraseña debe tener al menos 8 caracteres, incluyendo letras y números.")
+
     if not new_password:
         raise ValueError("La nueva contraseña es requerida.")
 
-     # Compare with the current one
+    # Compare with the current one
     if check_password(new_password, user.password):
         raise ValueError("No puede ser igual a la actual.")
 
@@ -27,7 +32,7 @@ def validate_new_password(user, new_password):
     )
     for h in historial:
         if check_password(new_password, h.clave):
-            raise ValueError("Ya la usaste antes.")
+            raise ValueError("Esta contraseña ya ha sido utilizada anteriormente.")
 
     return True
 
