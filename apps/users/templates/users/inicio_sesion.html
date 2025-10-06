@@ -1,0 +1,39 @@
+{% extends 'users/layouts/form.html' %}
+{% load static %}
+
+{% block page_title %} Iniciar Sesión {% endblock page_title %}
+
+{% block css_files %}
+  <link rel="stylesheet" href="{% static 'users/css/base-users.css' %}">
+  <link rel="stylesheet" href="{% static 'users/css/inicio_sesion.css' %}">
+{% endblock css_files %}
+
+{% block js_files %}
+  <script defer type="module" src="{% static 'users/js/inicio_sesion.js' %}"></script>  
+{% endblock js_files %}
+
+{% block content %}
+  <form class="form form--login" method="POST">
+    {% csrf_token %}
+
+    <h1 class="form__title">Inicia Sesión en SIGEU 👋</h1>
+    
+    {% include "components/form/input.html" with field=form.email %}
+    {% include "components/form/input.html" with field=form.password icon=password_icons %}
+
+    <div class="form__actions">
+      <button type="submit" class="form__button">Iniciar sesión</button>
+
+      <p class="form__secondary">
+        <a href="{% url 'password_reset' %}" class="form__link">¿Olvidaste tu contraseña?</a>
+      </p>
+
+      <p class="form__tertiary">
+        ¿No tienes cuenta?
+        <a href="{%  url 'registro'%}" class="form__link">Registrarse</a>
+      </p>
+    </div>
+
+  </form>
+
+{% endblock content %}

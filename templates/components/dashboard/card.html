@@ -1,0 +1,12 @@
+{% load static %}
+
+<article class="card">
+    <img src="{% static img %}" alt="{{ title }}" class="card__img">
+
+    <div class="card__content">
+        <h3 class="card__title">{{ title }}</h3>
+        <p class="card__paragraph">{{ paragraph }}</p>
+    </div>
+
+    <a href="{{ url }}" class="card__cta">Acceder</a>
+</article>

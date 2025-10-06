@@ -1,0 +1,51 @@
+@import url('/static/css/components/forms/form.css');
+
+.form{
+    max-width: 820px;
+    background-color: #fff;
+    padding: 48px;
+    border-radius: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form__title{
+    font-size: 48px;
+    font-weight: 800;
+    color: var(--black);
+}
+
+/* Form Icons */
+
+.icon__btn{
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    top: 40px;
+    right: 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+    border: none;
+    outline: none;
+}
+
+.icon__btn i{
+    font-size: 20px;
+    color: var(--light-gray);
+    opacity: .8;
+}
+
+.form__group:has(#id_password1) .icon__btn:last-of-type{
+    top: -5px;
+}
+
+.form__group:has(#id_password1) .icon__btn:last-of-type i{
+    color: var(--primary);
+    opacity: 1;
+}
+
+/* End Form Icons */

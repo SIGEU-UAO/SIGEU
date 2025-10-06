@@ -1,0 +1,87 @@
+.sidebar{
+    grid-area: sidebar;
+    border-right: 1px solid var(--pale-gray);
+    padding: 30px 0;
+}
+
+.sidebar__logo{
+    padding: 0 32px 30px 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 21px;
+    color: var(--black);
+}
+
+.sidebar__icon{
+    width: 25px;
+    height: 25px;
+}
+
+.sidebar__list{
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar__list a {
+    text-decoration: none;
+}
+
+.sidebar__item{
+    padding: 14px 24px 14px 20px;
+    cursor: pointer;
+}
+
+.item__group{
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar__item--active .item__group{
+    background-color: var(--pale-primary);
+    padding: 10px 5px;
+    border-radius: 12px;
+}
+
+.sidebar__item--active .item__group .item__info h4{
+    color: #fff;
+}
+
+.sidebar__item--active .item__group .item__info i{
+    color: #fff;
+}
+
+.item__summary{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.item__info{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.item__info h4{
+    color: var(--black);
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.item__sublist{
+    list-style: none;
+}
+
+.item__sublist a{
+    text-decoration: none;
+}
+
+.item__sublist .item__info h4{
+    font-size: 15px;
+}
+
+.item__info i{
+    color: var(--light-gray);
+    font-size: 20px;
+}

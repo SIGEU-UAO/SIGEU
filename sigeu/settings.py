@@ -14,10 +14,12 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv() # carga las variables del archivo .env
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load variables from the project .env file and let them override system env vars if present
+# This avoids picking up stale machine-wide variables like DB_USER that don't match the project
+load_dotenv(dotenv_path=BASE_DIR / ".env", override=True)
 
 
 # Quick-start development settings - unsuitable for production
@@ -29,12 +31,16 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'testserver']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'apps.users.apps.UsersConfig',
+    'apps.core',
+    'apps.events',
+    'apps.external_organizations',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -58,7 +64,7 @@ ROOT_URLCONF = 'sigeu.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -82,7 +88,7 @@ DATABASES = {
         'NAME': os.getenv('DB_NAME'),
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
+        'HOST': os.getenv('DB_HOST', '127.0.0.1'),
         'PORT': os.getenv('DB_PORT', '3306'),
     }
 }
@@ -123,8 +129,102 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / "static"]
+
+MEDIA_ROOT = BASE_DIR / "files"
+MEDIA_URL = "/media/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Redirect after login/logout
+LOGIN_REDIRECT_URL = "/dashboard/"  # Where to go after login
+LOGOUT_REDIRECT_URL = "/users/inicio-sesion/"  # Where to go after logout
+
+# View that Django will use if attempting to access @login_required
+LOGIN_URL = "/users/inicio-sesion/"
+
+# Custom user model
+AUTH_USER_MODEL = "users.Usuario"
+
+# Custom SMTP backend to handle SSL issues with Gmail
+import ssl
+from django.core.mail.backends.smtp import EmailBackend
+
+class CustomSMTPBackend(EmailBackend):
+    """
+    Custom SMTP backend that handles SSL verification issues on Windows
+    """
+    
+    def __init__(self, host=None, port=None, username=None, password=None,
+                 use_tls=None, fail_silently=False, use_ssl=None, timeout=None,
+                 ssl_keyfile=None, ssl_certfile=None, **kwargs):
+        super().__init__(host, port, username, password, use_tls, fail_silently, 
+                         use_ssl, timeout, ssl_keyfile, ssl_certfile, **kwargs)
+    
+    def open(self):
+        """
+        Establish connection with custom SSL context
+        """
+        if self.connection:
+            # Already opened
+            return False
+        
+        # Import smtplib here to avoid issues if it's not available
+        import smtplib
+        
+        connection_class = smtplib.SMTP_SSL if self.use_ssl else smtplib.SMTP
+        
+        try:
+            # Create SSL context that doesn't verify certificates
+            ssl_context = ssl.create_default_context()
+            ssl_context.check_hostname = False
+            ssl_context.verify_mode = ssl.CERT_NONE
+            
+            if self.use_ssl:
+                self.connection = connection_class(
+                    self.host, self.port, 
+                    local_hostname=getattr(globals().get('settings'), 'EMAIL_SSL_LOCALNAME', None),
+                    timeout=self.timeout,
+                    context=ssl_context
+                )
+            else:
+                self.connection = connection_class(
+                    self.host, self.port,
+                    local_hostname=getattr(globals().get('settings'), 'EMAIL_SSL_LOCALNAME', None),
+                    timeout=self.timeout
+                )
+                
+                if self.use_tls:
+                    self.connection.ehlo()
+                    self.connection.starttls(context=ssl_context)
+                    self.connection.ehlo()
+            
+            if self.username and self.password:
+                self.connection.login(self.username, self.password)
+                
+            return True
+            
+        except Exception as e:
+            if not self.fail_silently:
+                raise
+            return False
+
+# Email configuration for password reset
+EMAIL_BACKEND = 'sigeu.settings.CustomSMTPBackend'
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() == 'true'
+EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'False').lower() == 'true'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = f'SIGEU <{os.getenv("EMAIL_HOST_USER", "noreply@sigeu.com")}>'
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+# Password reset settings
+PASSWORD_RESET_TIMEOUT = 86400  # 24 hours in seconds
+
+
+SESSION_COOKIE_AGE = 60 * 60 * 24   # 24 hours

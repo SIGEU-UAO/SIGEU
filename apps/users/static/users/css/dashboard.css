@@ -1,0 +1,7 @@
+@import url("/static/css/components/dashboard/card.css");
+
+.cards{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+}

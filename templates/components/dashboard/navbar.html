@@ -1,0 +1,14 @@
+<nav class="nav">
+    <div class="nav__content">
+        <div class="nav__user">
+            <i class="ri-notification-fill"></i>
+            <div class="nav__info">
+                <h5>{{ request.user.nombres }} {{ request.user.apellidos }}</h5>
+                <p>{{ request.user.rol }}</p>
+            </div>
+        </div>
+        <button type="button" id="boton-cerrar-sesion" class="nav__logout">
+            <i class="ri-logout-circle-r-line"></i>
+        </button>
+    </div>
+</nav>

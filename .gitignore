@@ -2,6 +2,9 @@
 # Django + Python + Virtualenv
 # ================================
 
+# Files
+files/
+
 # Archivos de entorno
 **/.env
 
