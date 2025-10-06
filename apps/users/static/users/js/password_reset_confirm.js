@@ -84,7 +84,7 @@ function handleSubmit(e) {
     }
     
     // Si la validación pasa, enviar el formulario
-    Alert.success("Se ha enviado un correo de recuperación");
+    
     form.submit();
 }
 
