@@ -176,7 +176,7 @@ class OrganizacionesExternasAPI:
     
     @login_required()
     @organizador_required
-    def eliminar_organizacion(request, pk):
+    def eliminar(request, pk):
         if request.method != "DELETE":
             return JsonResponse({"error": "Método no permitido"}, status=405)
 
@@ -187,7 +187,7 @@ class OrganizacionesExternasAPI:
             if not es_creador:
                 return JsonResponse({"error": "No tienes permiso para eliminar esta organización."}, status=403)
 
-            resultado = OrganizacionExternaService.eliminar_organizacion_externa(pk)
+            resultado = OrganizacionExternaService.eliminar(pk)
             if resultado.get("error"):
                 return JsonResponse({"error": resultado.get("mensaje")}, status=400)
 

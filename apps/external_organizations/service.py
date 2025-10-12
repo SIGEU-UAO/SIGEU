@@ -114,7 +114,7 @@ class OrganizacionExternaService:
         return org
     
     @staticmethod
-    def eliminar_organizacion_externa(pk):
+    def eliminar(pk):
         try:
             organizacion = OrganizacionExterna.objects.get(pk=pk)
             organizacion.delete()
