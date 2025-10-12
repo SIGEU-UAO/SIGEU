@@ -171,36 +171,42 @@ export default class API {
         }
     }
 
-    static async delete(url) {
-        try {
-            const csrf = getCookie("csrftoken");
+    static async delete(url, AlertTitle, AlertText, successText, errorText, datatableId) {
+        const result = await Alert.confirmationAlert({
+            title: AlertTitle,
+            text: AlertText,
+            confirmButtonText: "Eliminar",
+            cancelButtonText: "Cancelar"
+        });
 
-            const res = await fetch(url, {
+        if (!result.isConfirmed) return;
+
+        try {
+            const response = await fetch(url, {
                 method: "DELETE",
                 headers: {
-                    "X-CSRFToken": csrf,
+                    "X-CSRFToken": getCookie("csrftoken"),
                     "Accept": "application/json",
-                    "Content-Type": "application/json" 
+                    "Content-Type": "application/json"
                 },
+                credentials: "same-origin"
             });
 
-            let json = {};
-            try {
-                json = await res.json();
-            } catch {
-                json = { message: "Eliminado correctamente." };
+            if (response.ok || response.status === 404) {
+                Alert.success(successText);
+
+                if (datatableId) {
+                    setTimeout(() => {
+                        $(`#${datatableId}`).DataTable().ajax.reload(null, false);
+                    }, 1500);
+                }
+            } else {
+                const data = await response.json().catch(() => ({}));
+                Alert.error(data.error || errorText);
             }
 
-            if (!res.ok) {
-                Alert.error(json.error || "¡Error en la operación!");
-                return { error: true, data: json };
-            }
-
-            Alert.success(json.message || "Eliminado correctamente.");
-            return { error: false, data: json };
         } catch (err) {
-            Alert.error(err.message || "¡Error de Red!");
-            return { error: true };
+            Alert.error("Error de red. Intenta de nuevo.");
         }
     }
 }
