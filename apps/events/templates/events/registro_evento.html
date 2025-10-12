@@ -78,4 +78,36 @@
         </section>
     </div>
 
+    <section class="slide__section">
+        <button class="slide__section--close" id="close-slide-section">&times;</button>
+        <h2>Registrar Organización Externa</h1>
+
+        <form class="form slide__form" id="crear-organizacion-form" method="POST">
+            {% csrf_token %}
+
+            <div class="form__row">
+                {% include "components/form/input.html" with field=registro_organizacion_form.nit %}
+                {% include "components/form/input.html" with field=registro_organizacion_form.nombre %}
+            </div>
+
+            <div class="form__row">
+                {% include "components/form/input.html" with field=registro_organizacion_form.representante_legal %}
+                {% include "components/form/input.html" with field=registro_organizacion_form.telefono %}
+            </div>
+
+            <div class="form__row">
+                {% include "components/form/input.html" with field=registro_organizacion_form.ubicacion %}
+                {% include "components/form/input.html" with field=registro_organizacion_form.sector_economico %}
+            </div>
+
+            <div class="form__group">
+                {% include "components/form/input.html" with field=registro_organizacion_form.actividad_principal %}
+            </div>
+
+            <div class="form__actions">
+                <button type="submit" class="form__button form__button--norounded">Registrar organizacion externa</button>
+            </div>
+        </form>
+    </section>
+
 {% endblock content %}

@@ -4,7 +4,6 @@ from .api import OrganizacionesExternasAPI
 
 urlpatterns = [
     # --- Views ---
-    path("orgs/registro/", views.formulario_registro, name="registrar_org"),
     path("orgs/listado/", views.listado, name="listado_orgs"),
     path("orgs/listado/orgs/editar/<int:pk>/", views.editar, name="editar_org"),
     path("orgs/listado/error/no-encontrada/", views.org_no_encontrada, name="org_no_encontrada"),

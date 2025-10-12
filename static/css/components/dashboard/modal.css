@@ -230,6 +230,19 @@
   gap: 8px;
 }
 
+.suggest__btn{
+  width: max-content;
+  padding: 12px 18px;
+  margin: 5px auto;
+  background-color: var(--primary);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+}
+
 /* Modal Details */
 
 .modal__details{

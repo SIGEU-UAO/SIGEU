@@ -6,7 +6,7 @@ from .forms.associations.OrganizadorEvento import OrganizadorEventoForm
 from .forms.associations.OrganizacionesInvitadas import OrganizacionInvitadaForm
 from apps.core.forms import ModalBuscarInstalacionForm
 from apps.users.forms import ModalBuscarOrganizadorForm
-from apps.external_organizations.forms import ModalBuscarOrganizacionForm
+from apps.external_organizations.forms import RegistroForm, ModalBuscarOrganizacionForm
 
 @no_superuser_required
 @login_required()
@@ -24,6 +24,9 @@ def formulario_registro(request):
     modalAsociarOrganizadorForm = OrganizadorEventoForm()
     modalAsociarOrganizacionForm = OrganizacionInvitadaForm()
 
+    # Formulario de creacion de organizacion externa
+    registroOrganizacionForm = RegistroForm()
+
     return render(request, "events/registro_evento.html", {
         "header_title": "Registrar Evento Universitario", 
         "header_paragraph": "Administra las entidades que participan en tus eventosOrganiza y lleva el control de todos tus eventos en un solo lugar",
@@ -33,6 +36,7 @@ def formulario_registro(request):
         "modal_buscar_organizaciones_form": modalBuscarOrganizacionesForm,
         "modal_asociar_organizador_form": modalAsociarOrganizadorForm,
         "modal_asociar_organizacion_form": modalAsociarOrganizacionForm,
+        "registro_organizacion_form": registroOrganizacionForm,
         "current_user_data": { "id": current_user.idUsuario, "nombreCompleto": f"{current_user.nombres} {current_user.apellidos}", "rol": current_user.rol },
         "active_page": "registrar-evento"
     })

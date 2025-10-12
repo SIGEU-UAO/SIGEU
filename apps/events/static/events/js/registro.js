@@ -1,3 +1,4 @@
+import { nitRegex, telefonoRegex } from "/static/js/base.js";
 import { modalsConfig } from "/static/js/modules/components/modalsConfig.js";
 import { goStep, goToListHandler, skipHandler } from "./modules/components/stepper.js";
 import Modal from "/static/js/modules/classes/Modal.js";
@@ -17,9 +18,25 @@ const validationRules = {
     ],
 };
 
+const organizationValidationRules = {
+    nit: [
+        { check: value => nitRegex.test(value), msg: "El NIT no cumple el formato válido (ej. 12345678-9)" }
+        
+    ],
+    telefono: [
+        { check: value => telefonoRegex.test(value), msg: "Teléfono inválido" }
+    ]
+};
+
 //* Selectors
 const mainForm = document.getElementById("main-form");
 const fileInputs = document.querySelectorAll('input.input-file');
+
+//* Slide section
+const slideSection = document.querySelector(".slide__section");
+const openSlideSectionBtn = document.getElementById("crear-organizacion-externa");
+const closeSlideSectionBtn = document.getElementById("close-slide-section");
+const createOrganizationForm = document.getElementById("crear-organizacion-form");
 
 //* Step sections
 const nextStepBtns = document.querySelectorAll(".step__button--next[data-skip]")
@@ -56,6 +73,11 @@ document.addEventListener("DOMContentLoaded", () => {
     finishStepBtn.onclick = () => goToListHandler("/dashboard/");
     fileInputs.forEach(input => handleFileInputsInfo(input))
 
+    //* Slide section event listeners
+    openSlideSectionBtn.addEventListener("click", openSlideSection)
+    closeSlideSectionBtn.addEventListener("click", closeSlideSection)
+    createOrganizationForm.addEventListener("submit", handleOrganizationFormSubmit)
+
     //* Load the current user as the default/main organizer
     const assignedOrganizatorsContainer = document.querySelector(".main__step--3 .step__cards");
 
@@ -83,4 +105,27 @@ async function handleMainFormSubmit(e) {
     dataStore.eventoId = result.data.evento; // Save the event ID
     goStep("next")
     mainForm.reset();
+}
+
+function openSlideSection() {
+    slideSection.classList.add("active")
+}
+
+function closeSlideSection() {
+    slideSection.classList.remove("active")
+}
+
+async function handleOrganizationFormSubmit(e) {
+    e.preventDefault();
+
+    // Validate form
+    let formData = new FormData(createOrganizationForm);
+    if (!validarFormData(formData, organizationValidationRules)) return;
+
+    //Fetch the endpoint
+    const result = await API.post("/orgs/api/registro/", formData);
+    if (result.error) return;
+
+    Alert.success("Organización registrada exitosamente");
+    setTimeout(closeSlideSection, 1500);
 }
