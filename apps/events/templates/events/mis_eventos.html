@@ -1,0 +1,28 @@
+{% extends 'layouts/dashboard.html' %}
+{% load static %}
+
+{% block page_title %} SIGEU | Mis Eventos {% endblock page_title %}
+
+{% block css_files %}
+    <link rel="stylesheet" href="{% static 'events/css/mis_eventos.css' %}">
+{% endblock css_files %}
+
+{% block js_files %}
+    <script defer type="module" src="{% static 'events/js/mis_eventos.js' %}" ></script>
+{% endblock js_files %}
+
+{% block content %}
+    {% include 'events/components/filters.html' %}
+
+    <section class="cards">
+        {% comment %} TODO: Aqui esta generacion de cards debera de hacerse con un for desde aqui, usando include {% endcomment %}
+
+        {% include 'events/components/card.html' with type="Borrador" %}
+        {% include 'events/components/card.html' with type="Enviado" %}
+        {% include 'events/components/card.html' with type="Aprobado" %}
+        {% include 'events/components/card.html' with type="Rechazado" %}
+    </section>
+
+    {% comment %} TODO: Aquí hay que validar si hay al menos 2 paginas para renderizar la paginación, sino, no tiene sentido {% endcomment %}
+    {% include 'events/components/pagination.html' %}
+{% endblock content %}

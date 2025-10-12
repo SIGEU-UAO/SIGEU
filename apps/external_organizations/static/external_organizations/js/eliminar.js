@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!btn) return;
 
         const id = btn.dataset.id;
-        const url = `/orgs/api/delete/${id}/`; 
+        const url = `/orgs/api/delete/${id}/`;
         await API.delete(url, title, text, successText, errorText, datatableId);
     });
 });

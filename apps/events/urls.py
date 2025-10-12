@@ -7,7 +7,8 @@ from .api.associations.organizaciones_invitadas import OrganizacionInvitadaAPI
 
 urlpatterns = [
     # --- Views ---
-    path("eventos/registro/", views.formulario_registro, name="registrar_evento"),           
+    path("eventos/registro/", views.formulario_registro, name="registrar_evento"),  
+    path("eventos/mis-eventos/", views.mis_eventos, name="mis_eventos"),     
 
     # --- API ---
     path("eventos/api/registro/", EventoAPI.registro, name="registro_evento_api"),

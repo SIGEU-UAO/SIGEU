@@ -1,0 +1,180 @@
+.cards{
+    width: 90%;
+    margin-top: 32px;
+    display: flex;
+    gap: 48px;
+    flex-wrap: wrap;
+}
+
+.card{
+    background-color: white;
+    width: 350px;
+    height: min-content;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 0 1px rgba(40, 41, 61, 0.04), 0 2px 4px rgba(96, 97, 112, 0.16);
+}
+
+.card__header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card__header--left{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card__icon{
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    color: #fff;
+}
+
+.borrador .card__icon{
+    background-color: var(--light-gray);
+}
+
+.enviado .card__icon{
+    background-color: var(--blue);
+}
+
+.aprobado .card__icon{
+    background-color: var(--green);
+}
+
+.rechazado .card__icon{
+    background-color: var(--red);
+}
+
+.card__info{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.card__info h4{
+    width: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--black);
+}
+
+.card__info span{
+    font-size: 14px;
+    color: var(--light-gray);
+}
+
+.card__btn{
+    padding: 8px 16px;
+    border: none;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.card__btn--send{
+    background-color: var(--blue);
+}
+
+.card__date{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--black);
+}
+
+.card__main{
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.card__description{
+    font-size: 14px;
+    color: var(--black);
+    opacity: .9;
+}
+
+.card hr{
+    border-top: 0px solid var(--light-gray);
+}
+
+.card__details .card__sub--label{
+    cursor: pointer;
+    color: var(--black);
+    font-size: 15px;
+}
+
+.card__sub--list{
+    margin: 8px 0 0 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: var(--black);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.card__organizators .card__sub--list{
+    margin: 8px 0 0 0;
+    list-style: none;
+}
+
+.card__sub--item--group{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card__sub--item--info{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.card__sub--item--info h6{
+    font-size: 14px;
+}
+
+.card__sub--item--info span{
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--light-gray);
+}
+
+.card__sub--item--file{
+    padding: 8px;
+    background-color: var(--red);
+    border-radius: 50%;
+    color: #fff;
+    text-decoration: none;
+}
+
+.card__actions{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.card__btn--edit{
+    background-color: var(--blue);
+}
+
+.card__btn--delete{
+    background-color: var(--red);
+}

@@ -30,7 +30,7 @@
                     {% if modal_type == "Organizacion" %}
                         <div class="form__suggest hide">
                             <h4 class="suggest__title">¿No encuentras la organización que buscas?</h4>
-                            <a href="{% url 'registrar_org' %}" class="suggest__cta" target="_blank">Crear Organización Externa</a>
+                            <button type="button" class="suggest__btn" id="crear-organizacion-externa">Crear Organización Externa</button>
                         </div>
                     {% endif %}
                 </form>

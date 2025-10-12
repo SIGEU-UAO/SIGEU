@@ -3,6 +3,7 @@
 @import url("/static/css/components/forms/form.css");
 @import url("/static/css/components/dashboard/modal.css");
 @import url("/static/css/components/dashboard/loader.css");
+@import url("/static/css/components/dashboard/slideSection.css");
 
 .main__step{
     display: flex;
