@@ -170,4 +170,37 @@ export default class API {
             return { error: true };
         }
     }
+
+    static async delete(url) {
+        try {
+            const csrf = getCookie("csrftoken");
+
+            const res = await fetch(url, {
+                method: "DELETE",
+                headers: {
+                    "X-CSRFToken": csrf,
+                    "Accept": "application/json",
+                    "Content-Type": "application/json" 
+                },
+            });
+
+            let json = {};
+            try {
+                json = await res.json();
+            } catch {
+                json = { message: "Eliminado correctamente." };
+            }
+
+            if (!res.ok) {
+                Alert.error(json.error || "¡Error en la operación!");
+                return { error: true, data: json };
+            }
+
+            Alert.success(json.message || "Eliminado correctamente.");
+            return { error: false, data: json };
+        } catch (err) {
+            Alert.error(err.message || "¡Error de Red!");
+            return { error: true };
+        }
+    }
 }

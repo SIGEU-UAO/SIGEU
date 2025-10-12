@@ -89,6 +89,7 @@ class OrganizacionExternaService:
         except OrganizacionExterna.DoesNotExist:
             return False
     
+    @staticmethod
     def actualizar(id, data):
         #Validate integrity errors for unique fields
         try:
@@ -112,4 +113,16 @@ class OrganizacionExternaService:
             raise ValueError("Error de integridad al actualizar la organización.") from e
         return org
     
+    @staticmethod
+    def eliminar_organizacion_externa(pk):
+        try:
+            organizacion = OrganizacionExterna.objects.get(pk=pk)
+            organizacion.delete()
+            return {"error": False, "mensaje": "Organización eliminada correctamente."}
+        except OrganizacionExterna.DoesNotExist:
+            return {"error": True, "mensaje": "La organización no existe."}
+        except IntegrityError as e:
+            return {"error": True, "mensaje": f"No se puede eliminar la organización: {str(e)}"}
+        except Exception as e:
+            return {"error": True, "mensaje": f"Error interno: {str(e)}"}
     
