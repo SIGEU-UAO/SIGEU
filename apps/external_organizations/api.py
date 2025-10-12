@@ -172,3 +172,26 @@ class OrganizacionesExternasAPI:
                 status=403
             )
         return JsonResponse({"isCreator": True}, status=200)
+    
+    
+    @login_required()
+    @organizador_required
+    def eliminar_organizacion(request, pk):
+        if request.method != "DELETE":
+            return JsonResponse({"error": "Método no permitido"}, status=405)
+
+        try:
+            es_creador = OrganizacionExternaService.es_creador(request.user, pk)
+            if es_creador is None:
+                return JsonResponse({"error": "Organización no encontrada."}, status=404)
+            if not es_creador:
+                return JsonResponse({"error": "No tienes permiso para eliminar esta organización."}, status=403)
+
+            resultado = OrganizacionExternaService.eliminar_organizacion_externa(pk)
+            if resultado.get("error"):
+                return JsonResponse({"error": resultado.get("mensaje")}, status=400)
+
+            return JsonResponse({"message": "Organización eliminada correctamente."}, status=200)
+
+        except Exception as e:
+            return JsonResponse({"error": f"Error interno: {str(e)}"}, status=500)

@@ -14,4 +14,5 @@ urlpatterns = [
     path("orgs/api/datatables/", OrganizacionesExternasAPI.datatables_rendering, name="orgs_api_datatables"),
     path("orgs/api/registro/", OrganizacionesExternasAPI.registro, name="orgs_registro_api"),
     path("orgs/api/<int:id>/update/", OrganizacionesExternasAPI.actualizar, name="orgs_api_update"),
+    path("orgs/api/delete/<int:pk>/", OrganizacionesExternasAPI.eliminar_organizacion, name="orgs_api_delete"),
 ]
