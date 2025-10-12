@@ -40,3 +40,16 @@ def formulario_registro(request):
         "current_user_data": { "id": current_user.idUsuario, "nombreCompleto": f"{current_user.nombres} {current_user.apellidos}", "rol": current_user.rol },
         "active_page": "registrar-evento"
     })
+
+@no_superuser_required
+@login_required()
+@organizador_required
+def mis_eventos(request):
+    # * Aqui deberias de cargar los eventos del usuario actual 
+
+    return render(request, "events/mis_eventos.html", {
+        "header_title": "Mis Eventos", 
+        "header_paragraph": "Administra y lleva el control de todos tus eventos en un solo lugar de manera fácil y eficiente.",
+        # Aquí deberias de pasar los eventos del usuario actual
+        "active_page": "registrar-evento"
+    })

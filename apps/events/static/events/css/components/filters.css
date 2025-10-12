@@ -1,0 +1,22 @@
+.filters{
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+}
+
+.filter__btn{
+    padding: 10px 20px;
+    background-color: #fff;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    border-radius: 4px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .3s ease-in-out background-color, .3s ease-in-out color;
+}
+
+.filter__btn--active, .filter__btn:hover{
+    background-color: var(--primary);
+    color: #fff;
+}

@@ -1,0 +1,15 @@
+{% comment %} TODO: SOLO SE PERMITIRAN 12 CARDS POR PAGINA {% endcomment %}
+<section class="pagination">
+    <button type="button" class="pagination__item pagination__item--prev"><i class="ri-arrow-left-s-line"></i></button>
+
+    <div class="pagination__pages">
+        {% comment %} TODO: AQUI MAXIMO SE MUESTRAN 5 PERO DEBEN IR ACTUALIZANDOSE SI SE VA A UNA PAGINA SIGUIENTE, EJEMPLO 6 {% endcomment %}
+        <button type="button" class="pagination__item pagination__item--active">1</button>
+        <button type="button" class="pagination__item">2</button>
+        <button type="button" class="pagination__item">3</button>
+        <button type="button" class="pagination__item">4</button>
+        <button type="button" class="pagination__item">5</button>
+    </div>
+
+    <button type="button" class="pagination__item pagination__item--prev"><i class="ri-arrow-right-s-line"></i></button>
+</section>

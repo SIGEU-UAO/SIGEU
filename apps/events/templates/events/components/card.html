@@ -1,0 +1,110 @@
+<div class="card {{ type|lower }}">
+    <div class="card__header">
+        <div class="card__header--left">
+            <div class="card__icon">
+                {% if type == "Borrador" %}
+                    <i class="ri-file-edit-fill"></i>
+                {% elif type == "Enviado" %}
+                    <i class="ri-send-plane-fill"></i>
+                {% elif type == "Aprobado" %}
+                    <i class="ri-file-check-fill"></i>
+                {% elif type == "Rechazado" %}
+                    <i class="ri-file-close-fill"></i>
+                {% endif %}
+            </div>
+            <div class="card__info">
+                <h4 class="card__title">NOMBRE DE EVENTO</h4>
+                <span class="card__type">TIPO DE EVENTO</span>
+            </div>
+        </div>
+        {% if type == "Borrador" or type == "Rechazado" %}
+            <div class="card__header--right">
+                <button class="card__btn card__btn--send">Enviar</button>
+            </div>
+        {% endif %}
+    </div>
+    <div class="card__date">
+        <div class="card__day">
+            <i class="ri-calendar-event-fill"></i>
+            <span>20/10/2025</span>
+        </div>
+        <div class="card__time">
+            <i class="ri-time-fill"></i>
+            <span>10:00 - 16:00</span>
+        </div>
+    </div>
+    <div class="card__main">
+        <p class="card__description">Descripción del evento. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+
+        <hr>
+
+        {% comment %} TODO: Aqui hay que validar si hay instalaciones fisicas asociadas para renderizar este details {% endcomment %}
+        <details class="card__details card__installations">
+            <summary class="card__sub--label">Instalaciones:</summary>
+            <ul class="card__sub--list">
+                {% comment %} TODO: Aqui hay que hacer un for para renderizar las instalaciones {% endcomment %}
+                <li class="card__sub--item">Instalación 1</li>
+                <li class="card__sub--item">Instalación 2</li>
+                <li class="card__sub--item">Instalación 3</li>
+            </ul>
+        </details>
+
+        <hr>
+
+        {% comment %} TODO: Aqui hay que validar si hay organizadores asociados para renderizar este details {% endcomment %}
+        <details class="card__details card__organizators">
+            <summary class="card__sub--label">Organizadores:</summary>
+            <ul class="card__sub--list">
+                {% comment %} TODO: Aqui hay que hacer un for para renderizar los organizadores {% endcomment %}
+                <li class="card__sub--item card__sub--item--group">
+                    <div class="card__sub--item--info">
+                        <h6>Organizador 1</h6>
+                        <span>ROL: </span>
+                    </div>
+                    <a href="" target="__blank" class="card__sub--item--file" title="Abrir Aval"><i class="ri-file-pdf-2-fill"></i></a>
+                </li>
+                <li class="card__sub--item card__sub--item--group">
+                    <div class="card__sub--item--info">
+                        <h6>Organizador 2</h6>
+                        <span>ROL: </span>
+                    </div>
+                    <a href="" target="__blank" class="card__sub--item--file" title="Abrir Aval"><i class="ri-file-pdf-2-fill"></i></a>
+                </li>
+            </ul>
+        </details>
+
+        <hr>
+
+        {% comment %} TODO: Aqui hay que validar si hay organizaciones externas asociadas para renderizar este details {% endcomment %}
+        <details class="card__details card__organizations">
+            <summary class="card__sub--label">Organizaciones Externas:</summary>
+            <ul class="card__sub--list">
+                <li class="card__sub--item card__sub--item--group">
+                    <div class="card__sub--item--info">
+                        <h6>Organizacion 1</h6>
+                        <span>NIT: </span>
+                    </div>
+                    <a href="" target="__blank" class="card__sub--item--file" title="Abrir Certificado"><i class="ri-file-pdf-2-fill"></i></a>
+                </li>
+                <li class="card__sub--item card__sub--item--group">
+                    <div class="card__sub--item--info">
+                        <h6>Organizacion 2</h6>
+                        <span>NIT: </span>
+                    </div>
+                    <a href="" target="__blank" class="card__sub--item--file" title="Abrir Certificado"><i class="ri-file-pdf-2-fill"></i></a>
+                </li>
+            </ul>
+        </details>
+
+        {% if type == "Borrador" or type == "Rechazado" %}
+            <hr>
+        
+            <div class="card__actions">
+                <button class="card__btn card__btn--edit">Editar</button>
+                <button class="card__btn card__btn--delete">Eliminar</button>
+            </div>    
+        {% endif %}
+
+        
+    </div>
+</div>
