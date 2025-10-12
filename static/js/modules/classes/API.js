@@ -170,4 +170,43 @@ export default class API {
             return { error: true };
         }
     }
+
+    static async delete(url, AlertTitle, AlertText, successText, errorText, datatableId) {
+        const result = await Alert.confirmationAlert({
+            title: AlertTitle,
+            text: AlertText,
+            confirmButtonText: "Eliminar",
+            cancelButtonText: "Cancelar"
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+            const response = await fetch(url, {
+                method: "DELETE",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Accept": "application/json",
+                    "Content-Type": "application/json"
+                },
+                credentials: "same-origin"
+            });
+
+            if (response.ok || response.status === 404) {
+                Alert.success(successText);
+
+                if (datatableId) {
+                    setTimeout(() => {
+                        $(`#${datatableId}`).DataTable().ajax.reload(null, false);
+                    }, 1500);
+                }
+            } else {
+                const data = await response.json().catch(() => ({}));
+                Alert.error(data.error || errorText);
+            }
+
+        } catch (err) {
+            Alert.error("Error de red. Intenta de nuevo.");
+        }
+    }
 }
