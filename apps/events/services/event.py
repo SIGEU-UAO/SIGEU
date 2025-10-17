@@ -1,4 +1,5 @@
 from django.db import IntegrityError
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from ..models import Evento
 
 
@@ -27,3 +28,19 @@ class EventoService:
             return evento
         except Evento.DoesNotExist:
             return False
+    
+    @staticmethod
+    def listar_por_organizador(usuario, status=None, page=1, per_page=12):
+        qs = Evento.objects.filter(organizadores_asignados__organizador=usuario).distinct().order_by('-fecha', '-horaInicio')
+        if status:
+            qs = qs.filter(estado__iexact=status)
+
+        paginator = Paginator(qs, per_page)
+        try:
+            page_obj = paginator.page(page)
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)
+
+        return page_obj

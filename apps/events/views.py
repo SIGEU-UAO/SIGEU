@@ -7,6 +7,8 @@ from .forms.associations.OrganizacionesInvitadas import OrganizacionInvitadaForm
 from apps.core.forms import ModalBuscarInstalacionForm
 from apps.users.forms import ModalBuscarOrganizadorForm
 from apps.external_organizations.forms import RegistroForm, ModalBuscarOrganizacionForm
+from .services.event import EventoService
+from math import floor
 
 @no_superuser_required
 @login_required()
@@ -45,11 +47,53 @@ def formulario_registro(request):
 @login_required()
 @organizador_required
 def mis_eventos(request):
-    # * Aqui deberias de cargar los eventos del usuario actual 
+    status = request.GET.get('status', None)   # e.g. "Aprobado"
+    page = request.GET.get('page', 1)
 
-    return render(request, "events/mis_eventos.html", {
-        "header_title": "Mis Eventos", 
-        "header_paragraph": "Administra y lleva el control de todos tus eventos en un solo lugar de manera fácil y eficiente.",
-        # Aquí deberias de pasar los eventos del usuario actual
-        "active_page": "registrar-evento"
-    })
+    page_obj = EventoService.listar_por_organizador(request.user, status=status, page=page, per_page=12) 
+
+    # --- cálculo de ventana de paginación ---
+    paginator = page_obj.paginator
+    current = page_obj.number
+    total = paginator.num_pages
+
+    # ventana de páginas: mostrar up to 5 páginas centradas en la actual
+    window_size = 5
+    half = window_size // 2
+
+    start = current - half
+    end = current + half
+
+    if start < 1:
+        start = 1
+        end = min(window_size, total)
+    if end > total:
+        end = total
+        start = max(1, total - window_size + 1)
+
+    page_numbers = list(range(start, end + 1))
+
+    # banderas para primeros/ultimos y puntos suspensivos
+    show_first = (1 not in page_numbers)
+    show_last = (total not in page_numbers)
+    first_page = 1
+    last_page = total
+    left_has_more = start > 2   # hay hueco entre 1 y start
+    right_has_more = end < total - 1
+
+    context = {
+        "header_title": "Mis Eventos",
+        "header_paragraph": "Administra y lleva el control de todos tus eventos en un solo lugar.",
+        "active_page": "mis-eventos",
+        "page_obj": page_obj,
+        "status": status or "",
+        # datos para paginación
+        "page_numbers": page_numbers,
+        "show_first": show_first,
+        "show_last": show_last,
+        "first_page": first_page,
+        "last_page": last_page,
+        "left_has_more": left_has_more,
+        "right_has_more": right_has_more,
+    }
+    return render(request, "events/mis_eventos.html", context)

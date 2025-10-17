@@ -15,14 +15,17 @@
     {% include 'events/components/filters.html' %}
 
     <section class="cards">
-        {% comment %} TODO: Aqui esta generacion de cards debera de hacerse con un for desde aqui, usando include {% endcomment %}
+        {% if page_obj.object_list %}
+            {% for event in page_obj.object_list %}
+                {% include 'events/components/card.html' with event=event type=event.estado %}
+            {% endfor %}
+        {% else %}
+            <p>No tienes eventos registrados.</p>
+        {% endif %}
 
-        {% include 'events/components/card.html' with type="Borrador" %}
-        {% include 'events/components/card.html' with type="Enviado" %}
-        {% include 'events/components/card.html' with type="Aprobado" %}
-        {% include 'events/components/card.html' with type="Rechazado" %}
     </section>
 
-    {% comment %} TODO: Aquí hay que validar si hay al menos 2 paginas para renderizar la paginación, sino, no tiene sentido {% endcomment %}
-    {% include 'events/components/pagination.html' %}
+    {% if page_obj.paginator.num_pages > 1 %}
+        {% include 'events/components/pagination.html' %}
+    {% endif %}
 {% endblock content %}

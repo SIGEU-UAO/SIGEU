@@ -13,8 +13,8 @@
                 {% endif %}
             </div>
             <div class="card__info">
-                <h4 class="card__title">NOMBRE DE EVENTO</h4>
-                <span class="card__type">TIPO DE EVENTO</span>
+                <h4 class="card__title">{{ event.nombre }}</h4>
+                <span class="card__type">{{ event.get_tipo_display }}</span>
             </div>
         </div>
         {% if type == "Borrador" or type == "Rechazado" %}
@@ -26,75 +26,66 @@
     <div class="card__date">
         <div class="card__day">
             <i class="ri-calendar-event-fill"></i>
-            <span>20/10/2025</span>
+            <span>{{ event.fecha|date:"d/m/Y" }}</span>
         </div>
         <div class="card__time">
             <i class="ri-time-fill"></i>
-            <span>10:00 - 16:00</span>
+            <span>{{ event.horaInicio|time:"H:i" }} - {{ event.horaFin|time:"H:i" }}</span>
         </div>
     </div>
     <div class="card__main">
-        <p class="card__description">Descripción del evento. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+        <p class="card__description">{{ event.descripcion|truncatechars:200 }}</p>
 
         <hr>
 
-        {% comment %} TODO: Aqui hay que validar si hay instalaciones fisicas asociadas para renderizar este details {% endcomment %}
+        {% if event.instalaciones_asignadas.exists %}
         <details class="card__details card__installations">
             <summary class="card__sub--label">Instalaciones:</summary>
             <ul class="card__sub--list">
-                {% comment %} TODO: Aqui hay que hacer un for para renderizar las instalaciones {% endcomment %}
-                <li class="card__sub--item">Instalación 1</li>
-                <li class="card__sub--item">Instalación 2</li>
-                <li class="card__sub--item">Instalación 3</li>
+                {% for asign in event.instalaciones_asignadas.all %}
+                    <li class="card__sub--item">{{ asign.instalacion }}</li>
+                {% endfor %}
             </ul>
         </details>
 
         <hr>
+        {% endif %}
 
-        {% comment %} TODO: Aqui hay que validar si hay organizadores asociados para renderizar este details {% endcomment %}
+        {% if event.organizadores_asignados.exists %}
         <details class="card__details card__organizators">
             <summary class="card__sub--label">Organizadores:</summary>
             <ul class="card__sub--list">
-                {% comment %} TODO: Aqui hay que hacer un for para renderizar los organizadores {% endcomment %}
+                {% for o in event.organizadores_asignados.all %}
                 <li class="card__sub--item card__sub--item--group">
                     <div class="card__sub--item--info">
-                        <h6>Organizador 1</h6>
-                        <span>ROL: </span>
+                        <h6>{{ o.organizador.nombres }} {{ o.organizador.apellidos }}</h6>
+                        <span>ROL: {{ o.get_tipo_display }}</span>
                     </div>
-                    <a href="" target="__blank" class="card__sub--item--file" title="Abrir Aval"><i class="ri-file-pdf-2-fill"></i></a>
+                    <a href="{{ o.aval.url }}" target="__blank" class="card__sub--item--file" title="Abrir Aval"><i class="ri-file-pdf-2-fill"></i></a>
                 </li>
-                <li class="card__sub--item card__sub--item--group">
-                    <div class="card__sub--item--info">
-                        <h6>Organizador 2</h6>
-                        <span>ROL: </span>
-                    </div>
-                    <a href="" target="__blank" class="card__sub--item--file" title="Abrir Aval"><i class="ri-file-pdf-2-fill"></i></a>
-                </li>
+                {% endfor %}
             </ul>
         </details>
 
         <hr>
+        {% endif %}
 
-        {% comment %} TODO: Aqui hay que validar si hay organizaciones externas asociadas para renderizar este details {% endcomment %}
+        {% if event.organizaciones_invitadas.exists %}
         <details class="card__details card__organizations">
             <summary class="card__sub--label">Organizaciones Externas:</summary>
             <ul class="card__sub--list">
+                {% for oi in event.organizaciones_invitadas.all %}
                 <li class="card__sub--item card__sub--item--group">
                     <div class="card__sub--item--info">
-                        <h6>Organizacion 1</h6>
-                        <span>NIT: </span>
+                        <h6>{{ oi.organizacion.nombre }}</h6>
+                        <span>NIT: {{ oi.organizacion.nit }}</span>
                     </div>
-                    <a href="" target="__blank" class="card__sub--item--file" title="Abrir Certificado"><i class="ri-file-pdf-2-fill"></i></a>
+                    <a href="{{ oi.certificado_participacion.url }}" target="__blank" class="card__sub--item--file" title="Abrir Certificado"><i class="ri-file-pdf-2-fill"></i></a>
                 </li>
-                <li class="card__sub--item card__sub--item--group">
-                    <div class="card__sub--item--info">
-                        <h6>Organizacion 2</h6>
-                        <span>NIT: </span>
-                    </div>
-                    <a href="" target="__blank" class="card__sub--item--file" title="Abrir Certificado"><i class="ri-file-pdf-2-fill"></i></a>
-                </li>
+                {% endfor %}
             </ul>
         </details>
+        {% endif %}
 
         {% if type == "Borrador" or type == "Rechazado" %}
             <hr>
