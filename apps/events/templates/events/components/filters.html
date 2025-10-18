@@ -1,7 +1,26 @@
+{% load static %}
 <section class="filters">
-    <button class="filter__btn filter__btn--active" type="button" data-filter-status="">Todos</button>
+  <div class="filters__buttons">
+    <button class="filter__btn filter__btn--active" type="button" data-filter="all">Todos</button>
     <button class="filter__btn" type="button" data-filter="borradores">Borradores</button>
     <button class="filter__btn" type="button" data-filter="enviados">Enviados</button>
     <button class="filter__btn" type="button" data-filter="aprobados">Aprobados</button>
     <button class="filter__btn" type="button" data-filter="rechazados">Rechazados</button>
+  </div>
+
+  <form id="events-search-form" class="filters__search" role="search">
+    <input id="events-search-input" type="text" placeholder="Buscar..." aria-label="Buscar">
+    <select id="events-search-by" name="search_by" aria-label="Buscar por">
+      <option value="nombre">Nombre</option>
+      <option value="fecha">Fecha (DD/MM/YYYY)</option>
+    </select>
+    <button type="submit" class="filter__btn--search">Buscar</button>
+  </form>
 </section>
+
+<!-- contenedor para mostrar cuando no hay resultados -->
+<div class="no-results-container" style="display:none; align-items:center; justify-content:center; flex-direction:column; padding:24px;">
+  <img src="{% static 'events/assets/img/sin_eventos.webp' %}" alt="No hay eventos" style="max-width:240px; margin-bottom:16px;">
+  <h3>No hay eventos creados hasta el momento</h3>
+  <p>Prueba a cambiar filtros o crea un nuevo evento.</p>
+</div>

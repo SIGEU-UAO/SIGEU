@@ -49,8 +49,10 @@ def formulario_registro(request):
 def mis_eventos(request):
     status = request.GET.get('status', None)   # e.g. "Aprobado"
     page = request.GET.get('page', 1)
+    search = request.GET.get('search', None)
+    search_by = request.GET.get('search_by', None)
 
-    page_obj = EventoService.listar_por_organizador(request.user, status=status, page=page, per_page=12) 
+    page_obj = EventoService.listar_por_organizador(request.user, status=status, page=page, per_page=12, search=search, search_by=search_by) 
 
     # --- cálculo de ventana de paginación ---
     paginator = page_obj.paginator
@@ -95,5 +97,8 @@ def mis_eventos(request):
         "last_page": last_page,
         "left_has_more": left_has_more,
         "right_has_more": right_has_more,
+        # datos de búsqueda
+        "search": search or "",
+        "search_by": search_by or "",
     }
     return render(request, "events/mis_eventos.html", context)

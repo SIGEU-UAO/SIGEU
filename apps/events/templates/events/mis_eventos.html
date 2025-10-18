@@ -14,13 +14,16 @@
 {% block content %}
     {% include 'events/components/filters.html' %}
 
+    <div class="no-results-container" style="display:none; text-align:center;">
+        <img src="{% static 'events/assets/img/sin_eventos.webp' %}" alt="No hay eventos" style="max-width:260px; margin: 0 auto 16px;">
+        <h3>No hay eventos creados hasta el momento</h3>
+    </div>
+
     <section class="cards">
         {% if page_obj.object_list %}
             {% for event in page_obj.object_list %}
                 {% include 'events/components/card.html' with event=event type=event.estado %}
             {% endfor %}
-        {% else %}
-            <p>No tienes eventos registrados.</p>
         {% endif %}
 
     </section>
