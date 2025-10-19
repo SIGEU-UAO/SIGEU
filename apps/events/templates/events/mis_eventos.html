@@ -14,9 +14,10 @@
 {% block content %}
     {% include 'events/components/filters.html' %}
 
-    <div class="no-results-container" style="display:none; text-align:center;">
-        <img src="{% static 'events/assets/img/empty.webp' %}" alt="No hay eventos" style="max-width:260px; margin: 0 auto 16px;">
+    <div class="no-results-container" style="display:none; align-items:center; justify-content:center; flex-direction:column; padding:24px;">
+        <img src="{% static 'events/assets/img/empty.webp' %}" alt="No hay eventos" style="max-width:240px; margin-bottom:16px;">
         <h3>No hay eventos creados hasta el momento</h3>
+        <p>Prueba a cambiar filtros o crea un nuevo evento.</p>
     </div>
 
     <section class="cards">

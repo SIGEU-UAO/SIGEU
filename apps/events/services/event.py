@@ -79,7 +79,7 @@ class EventoService:
             organizaciones = []
             for oi in e.organizaciones_invitadas.all():
                 org = oi.organizacion
-                organizaciones.append({"nombre": getattr(org, "nombre", None)})
+                organizaciones.append({"nombre": getattr(org, "nombre", None),"nit": getattr(org, "nit", None)})
 
             item = {
                 "idEvento": e.idEvento,
