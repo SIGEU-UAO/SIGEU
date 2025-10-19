@@ -1,3 +1,4 @@
+// static/events/js/mis_eventos.js
 document.addEventListener('DOMContentLoaded', () => {
   const mapping = {
     "all": "",
@@ -7,15 +8,19 @@ document.addEventListener('DOMContentLoaded', () => {
     "rechazados": "Rechazado"
   };
 
+  // filtros por estado (botones)
   document.querySelectorAll('.filter__btn').forEach(btn => {
-    const token = btn.getAttribute('data-filter'); // p.e. "aprobados" o "all"
+    const token = btn.getAttribute('data-filter'); // 'aprobados', 'all', etc.
     btn.addEventListener('click', () => {
       const status = mapping[token] || "";
       const url = new URL(window.location.href);
       if (status) url.searchParams.set('status', status);
       else url.searchParams.delete('status');
+
+      // eliminar page (resetear)
       url.searchParams.set('page', 1);
 
+      // conservar búsqueda actual en inputs
       const searchInput = document.querySelector('#events-search-input');
       const searchBy = document.querySelector('#events-search-by');
       if (searchInput && searchInput.value.trim()) {
@@ -47,21 +52,24 @@ document.addEventListener('DOMContentLoaded', () => {
         url.searchParams.delete('search_by');
       }
 
+      // mantener status si existe (no lo tocamos)
       url.searchParams.set('page', 1);
       window.location.href = url.toString();
     });
   }
 
+  // mostrar mensaje bonito si no hay resultados (después de que el servidor haya renderizado)
   const cardsContainer = document.querySelector('.cards');
   const cards = cardsContainer ? cardsContainer.querySelectorAll('.card') : [];
   const noResultsContainer = document.querySelector('.no-results-container');
 
   if (cards.length === 0 && noResultsContainer) {
-    noResultsContainer.style.display = 'flex';
+    noResultsContainer.style.display = 'flex'; // o block según tu CSS
   } else if (noResultsContainer) {
     noResultsContainer.style.display = 'none';
   }
 
+  // Marcar botón activo según status en querystring
   const urlParams = new URLSearchParams(window.location.search);
   const currentStatus = urlParams.get('status') || '';
   document.querySelectorAll('.filter__btn').forEach(btn => {
@@ -72,4 +80,5 @@ document.addEventListener('DOMContentLoaded', () => {
     } else btn.classList.remove('filter__btn--active');
   });
 });
+
 

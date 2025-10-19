@@ -61,3 +61,28 @@ class EventoService:
             page_obj = paginator.page(paginator.num_pages)
 
         return page_obj
+    
+    @staticmethod
+    def serializar_eventos(page_obj, request=None):
+        results = []
+        for e in page_obj.object_list:
+            item = {
+                "idEvento": e.idEvento,
+                "nombre": e.nombre,
+                "fecha": e.fecha.isoformat() if e.fecha else None,
+                "horaInicio": e.horaInicio.isoformat() if e.horaInicio else None,
+                "estado": e.estado,
+                "instalaciones": [ getattr(a.instalacion, "nombre", str(a.instalacion)) for a in e.instalaciones_asignadas.all() ],
+            }
+            # para incluir urls de archivos y si se tiene `request`, construir la url absoluta:
+            # if request:
+            #     item["alguna_url"] = request.build_absolute_uri(e.algun_filefield.url) if e.algun_filefield else None
+
+            results.append(item)
+
+        return {
+            "count": page_obj.paginator.count,
+            "num_pages": page_obj.paginator.num_pages,
+            "current_page": page_obj.number,
+            "results": results,
+        }

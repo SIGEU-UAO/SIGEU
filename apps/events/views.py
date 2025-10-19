@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from sigeu.decorators import no_superuser_required, organizador_required
 from .forms.event import RegistroEventoForm
 from .forms.associations.OrganizadorEvento import OrganizadorEventoForm
@@ -102,3 +103,20 @@ def mis_eventos(request):
         "search_by": search_by or "",
     }
     return render(request, "events/mis_eventos.html", context)
+
+@no_superuser_required
+@login_required()
+@organizador_required
+def mis_eventos_api(request):
+    status = request.GET.get('status')
+    page = request.GET.get('page', 1)
+    search = request.GET.get('search')
+    search_by = request.GET.get('search_by')
+
+    page_obj = EventoService.listar_por_organizador(
+        request.user, status, page, 12, search, search_by
+    )
+
+    data = EventoService.serializar_eventos(page_obj)
+    return JsonResponse(data)
+
