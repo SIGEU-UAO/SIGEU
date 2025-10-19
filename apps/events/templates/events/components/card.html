@@ -19,7 +19,7 @@
         </div>
         {% if type == "Borrador" or type == "Rechazado" %}
             <div class="card__header--right">
-                <button class="card__btn card__btn--send">Enviar</button>
+                <button class="card__btn card__btn--send" data-id="{{ event.idEvento }}">Enviar</button>
             </div>
         {% endif %}
     </div>
