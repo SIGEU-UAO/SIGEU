@@ -14,15 +14,22 @@
 {% block content %}
     {% include 'events/components/filters.html' %}
 
-    <section class="cards">
-        {% comment %} TODO: Aqui esta generacion de cards debera de hacerse con un for desde aqui, usando include {% endcomment %}
+    <div class="no-results-container" style="display:none; align-items:center; justify-content:center; flex-direction:column; padding:24px;">
+        <img src="{% static 'events/assets/img/empty.webp' %}" alt="No hay eventos" style="max-width:240px; margin-bottom:16px;">
+        <h3>No hay eventos creados hasta el momento</h3>
+        <p>Prueba a cambiar filtros o crea un nuevo evento.</p>
+    </div>
 
-        {% include 'events/components/card.html' with type="Borrador" %}
-        {% include 'events/components/card.html' with type="Enviado" %}
-        {% include 'events/components/card.html' with type="Aprobado" %}
-        {% include 'events/components/card.html' with type="Rechazado" %}
+    <section class="cards">
+        {% if page_obj.object_list %}
+            {% for event in page_obj.object_list %}
+                {% include 'events/components/card.html' with event=event type=event.estado %}
+            {% endfor %}
+        {% endif %}
+
     </section>
 
-    {% comment %} TODO: Aquí hay que validar si hay al menos 2 paginas para renderizar la paginación, sino, no tiene sentido {% endcomment %}
-    {% include 'events/components/pagination.html' %}
+    {% if page_obj.paginator.num_pages > 1 %}
+        {% include 'events/components/pagination.html' %}
+    {% endif %}
 {% endblock content %}

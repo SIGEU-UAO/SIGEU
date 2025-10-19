@@ -25,3 +25,24 @@ class EventoAPI:
             else:
                 return JsonResponse({"error": form.errors}, status=400)
         return JsonResponse({"error": "Método no permitido"}, status=405)
+    
+
+    @login_required()
+    @organizador_required
+    def mis_eventos(request):
+        status = request.GET.get('status')
+        page = request.GET.get('page', 1)
+        search = request.GET.get('search')
+        search_by = request.GET.get('search_by')
+
+        try:
+            page = int(page)
+        except (TypeError, ValueError):
+            page = 1
+
+        page_obj = EventoService.listar_por_organizador(
+            request.user, status=status, page=page, per_page=12, search=search, search_by=search_by
+        )
+
+        data = EventoService.serializar_eventos(page_obj, request=request)
+        return JsonResponse(data, safe=False)

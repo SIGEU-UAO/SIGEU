@@ -1,15 +1,45 @@
-{% comment %} TODO: SOLO SE PERMITIRAN 12 CARDS POR PAGINA {% endcomment %}
+{% if page_obj.paginator.num_pages > 1 %}
 <section class="pagination">
-    <button type="button" class="pagination__item pagination__item--prev"><i class="ri-arrow-left-s-line"></i></button>
+    {# Prev #}
+    {% if page_obj.has_previous %}
+        <a class="pagination__item" href="?page={{ page_obj.previous_page_number }}{% if status %}&status={{ status }}{% endif %}" aria-label="Previous"><i class="ri-arrow-left-s-line"></i></a>
+    {% else %}
+        <button class="pagination__item pagination__item--disabled" disabled><i class="ri-arrow-left-s-line"></i></button>
+    {% endif %}
 
     <div class="pagination__pages">
-        {% comment %} TODO: AQUI MAXIMO SE MUESTRAN 5 PERO DEBEN IR ACTUALIZANDOSE SI SE VA A UNA PAGINA SIGUIENTE, EJEMPLO 6 {% endcomment %}
-        <button type="button" class="pagination__item pagination__item--active">1</button>
-        <button type="button" class="pagination__item">2</button>
-        <button type="button" class="pagination__item">3</button>
-        <button type="button" class="pagination__item">4</button>
-        <button type="button" class="pagination__item">5</button>
+        {# Mostrar primer enlace si hace falta #}
+        {% if show_first %}
+            <a class="pagination__item" href="?page={{ first_page }}{% if status %}&status={{ status }}{% endif %}">{{ first_page }}</a>
+            {% if left_has_more %}
+                <span class="pagination__dots">…</span>
+            {% endif %}
+        {% endif %}
+
+        {# Ventana de páginas calculada desde la vista #}
+        {% for p in page_numbers %}
+            {% if p == page_obj.number %}
+                <a class="pagination__item pagination__item--active" href="?page={{ p }}{% if status %}&status={{ status }}{% endif %}">{{ p }}</a>
+            {% else %}
+                <a class="pagination__item" href="?page={{ p }}{% if status %}&status={{ status }}{% endif %}">{{ p }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {# Mostrar último enlace si hace falta #}
+        {% if show_last %}
+            {% if right_has_more %}
+                <span class="pagination__dots">…</span>
+            {% endif %}
+            <a class="pagination__item" href="?page={{ last_page }}{% if status %}&status={{ status }}{% endif %}">{{ last_page }}</a>
+        {% endif %}
     </div>
 
-    <button type="button" class="pagination__item pagination__item--prev"><i class="ri-arrow-right-s-line"></i></button>
+    {# Next #}
+    {% if page_obj.has_next %}
+        <a class="pagination__item" href="?page={{ page_obj.next_page_number }}{% if status %}&status={{ status }}{% endif %}" aria-label="Next"><i class="ri-arrow-right-s-line"></i></a>
+    {% else %}
+        <button class="pagination__item pagination__item--disabled" disabled><i class="ri-arrow-right-s-line"></i></button>
+    {% endif %}
 </section>
+{% endif %}
+

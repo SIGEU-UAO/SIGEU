@@ -1,3 +1,5 @@
+@import url("/static/css/components/forms/form.css");
+
 .filters{
     display: flex;
     justify-content: center;
