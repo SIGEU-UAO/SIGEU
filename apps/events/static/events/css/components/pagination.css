@@ -8,6 +8,10 @@
 .pagination__item{
     cursor: pointer;
     font-family: Arial, Helvetica, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
     width: 40px;
     height: 40px;
     border: 1px solid #F1F1F1;

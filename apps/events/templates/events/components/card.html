@@ -36,55 +36,52 @@
     <div class="card__main">
         <p class="card__description">{{ event.descripcion|truncatechars:200 }}</p>
 
-        <hr>
-
         {% if event.instalaciones_asignadas.exists %}
-        <details class="card__details card__installations">
-            <summary class="card__sub--label">Instalaciones:</summary>
-            <ul class="card__sub--list">
-                {% for asign in event.instalaciones_asignadas.all %}
-                    <li class="card__sub--item">{{ asign.instalacion }}</li>
-                {% endfor %}
-            </ul>
-        </details>
-
-        <hr>
+            <hr>
+            <details class="card__details card__installations">
+                <summary class="card__sub--label">Instalaciones:</summary>
+                <ul class="card__sub--list">
+                    {% for asign in event.instalaciones_asignadas.all %}
+                        <li class="card__sub--item">{{ asign.instalacion }}</li>
+                    {% endfor %}
+                </ul>
+            </details>
         {% endif %}
-
+        
         {% if event.organizadores_asignados.exists %}
-        <details class="card__details card__organizators">
-            <summary class="card__sub--label">Organizadores:</summary>
-            <ul class="card__sub--list">
-                {% for o in event.organizadores_asignados.all %}
-                <li class="card__sub--item card__sub--item--group">
-                    <div class="card__sub--item--info">
-                        <h6>{{ o.organizador.nombres }} {{ o.organizador.apellidos }}</h6>
-                        <span>ROL: {{ o.get_tipo_display }}</span>
-                    </div>
-                    <a href="{{ o.aval.url }}" target="__blank" class="card__sub--item--file" title="Abrir Aval"><i class="ri-file-pdf-2-fill"></i></a>
-                </li>
-                {% endfor %}
-            </ul>
-        </details>
-
-        <hr>
+            <hr>
+            <details class="card__details card__organizators">
+                <summary class="card__sub--label">Organizadores:</summary>
+                <ul class="card__sub--list">
+                    {% for o in event.organizadores_asignados.all %}
+                    <li class="card__sub--item card__sub--item--group">
+                        <div class="card__sub--item--info">
+                            <h6>{{ o.organizador.nombres }} {{ o.organizador.apellidos }}</h6>
+                            <span>ROL: {{ o.get_tipo_display }}</span>
+                        </div>
+                        <a href="{{ o.aval.url }}" target="__blank" class="card__sub--item--file" title="Abrir Aval"><i class="ri-file-pdf-2-fill"></i></a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </details>
         {% endif %}
-
+            
         {% if event.organizaciones_invitadas.exists %}
-        <details class="card__details card__organizations">
-            <summary class="card__sub--label">Organizaciones Externas:</summary>
-            <ul class="card__sub--list">
-                {% for oi in event.organizaciones_invitadas.all %}
-                <li class="card__sub--item card__sub--item--group">
-                    <div class="card__sub--item--info">
-                        <h6>{{ oi.organizacion.nombre }}</h6>
-                        <span>NIT: {{ oi.organizacion.nit }}</span>
-                    </div>
-                    <a href="{{ oi.certificado_participacion.url }}" target="__blank" class="card__sub--item--file" title="Abrir Certificado"><i class="ri-file-pdf-2-fill"></i></a>
-                </li>
-                {% endfor %}
-            </ul>
-        </details>
+            <hr>
+            <details class="card__details card__organizations">
+                <summary class="card__sub--label">Organizaciones Externas:</summary>
+                <ul class="card__sub--list">
+                    {% for oi in event.organizaciones_invitadas.all %}
+                    <li class="card__sub--item card__sub--item--group">
+                        <div class="card__sub--item--info">
+                            <h6>{{ oi.organizacion.nombre }}</h6>
+                            <span>NIT: {{ oi.organizacion.nit }}</span>
+                        </div>
+                        <a href="{{ oi.certificado_participacion.url }}" target="__blank" class="card__sub--item--file" title="Abrir Certificado"><i class="ri-file-pdf-2-fill"></i></a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </details>
         {% endif %}
 
         {% if type == "Borrador" or type == "Rechazado" %}

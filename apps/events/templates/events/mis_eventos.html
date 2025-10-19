@@ -8,14 +8,14 @@
 {% endblock css_files %}
 
 {% block js_files %}
-    <script defer type="module" src="{% static 'events/js/mis_eventos.js' %}" ></script>
+    <script type="module" defer src="{% static 'events/js/mis_eventos.js' %}" ></script>
 {% endblock js_files %}
 
 {% block content %}
     {% include 'events/components/filters.html' %}
 
-    <div class="no-results-container" style="display:none; align-items:center; justify-content:center; flex-direction:column; padding:24px;">
-        <img src="{% static 'events/assets/img/empty.webp' %}" alt="No hay eventos" style="max-width:240px; margin-bottom:16px;">
+    <div class="no-results-container">
+        <img src="{% static 'events/assets/img/empty.webp' %}" alt="No hay eventos">
         <h3>No hay eventos creados hasta el momento</h3>
         <p>Prueba a cambiar filtros o crea un nuevo evento.</p>
     </div>
@@ -26,7 +26,6 @@
                 {% include 'events/components/card.html' with event=event type=event.estado %}
             {% endfor %}
         {% endif %}
-
     </section>
 
     {% if page_obj.paginator.num_pages > 1 %}
