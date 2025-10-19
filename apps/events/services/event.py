@@ -66,6 +66,21 @@ class EventoService:
     def serializar_eventos(page_obj, request=None):
         results = []
         for e in page_obj.object_list:
+            # organizadores asignados (resumido)
+            organizadores = []
+            for o in e.organizadores_asignados.all():
+                u = o.organizador
+                organizadores.append({
+                    "nombre": ((getattr(u, "nombres", "") or "") + " " + (getattr(u, "apellidos", "") or "")).strip(),
+                    "rol_organizador": o.get_tipo_display() if hasattr(o, "get_tipo_display") else o.tipo
+                })
+
+            # organizaciones invitadas (resumido)
+            organizaciones = []
+            for oi in e.organizaciones_invitadas.all():
+                org = oi.organizacion
+                organizaciones.append({"nombre": getattr(org, "nombre", None)})
+
             item = {
                 "idEvento": e.idEvento,
                 "nombre": e.nombre,
@@ -73,11 +88,10 @@ class EventoService:
                 "horaInicio": e.horaInicio.isoformat() if e.horaInicio else None,
                 "estado": e.estado,
                 "instalaciones": [ getattr(a.instalacion, "nombre", str(a.instalacion)) for a in e.instalaciones_asignadas.all() ],
+                "organizadores": organizadores,
+                "organizaciones_invitadas": organizaciones
             }
-            # para incluir urls de archivos y si se tiene `request`, construir la url absoluta:
-            # if request:
-            #     item["alguna_url"] = request.build_absolute_uri(e.algun_filefield.url) if e.algun_filefield else None
-
+            
             results.append(item)
 
         return {

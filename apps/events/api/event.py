@@ -29,7 +29,7 @@ class EventoAPI:
 
     @login_required()
     @organizador_required
-    def mis_eventos_api(request):
+    def mis_eventos(request):
         status = request.GET.get('status')
         page = request.GET.get('page', 1)
         search = request.GET.get('search')
