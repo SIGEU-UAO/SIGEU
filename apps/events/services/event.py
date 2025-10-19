@@ -3,7 +3,6 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from datetime import datetime
 from ..models import Evento
 
-
 class EventoService:
     @staticmethod
     def registrar(request, data):
@@ -31,7 +30,7 @@ class EventoService:
             return False
     
     @staticmethod
-    def listar_por_organizador(usuario, status=None, page=1, per_page=12, search=None, search_by=None):
+    def  listar_por_organizador(usuario, status=None, page=1, per_page=12, search=None, search_by=None):
         qs = Evento.objects.filter(creador=usuario).order_by('-fecha', '-horaInicio')
         if status:
             qs = qs.filter(estado__iexact=status)
@@ -100,3 +99,10 @@ class EventoService:
             "current_page": page_obj.number,
             "results": results,
         }
+
+    @staticmethod
+    def es_creador(usuario, id_event):
+        event = EventoService.obtener_por_id(id_event)
+        if not event:
+            return None 
+        return usuario.idUsuario == event.creador_id

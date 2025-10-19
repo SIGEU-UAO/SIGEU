@@ -173,6 +173,7 @@
 
 .card__btn--edit{
     background-color: var(--blue);
+    text-decoration: none;
 }
 
 .card__btn--delete{
