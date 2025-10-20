@@ -12,6 +12,5 @@ class OrganizacionesInvitadasService:
 
         except IntegrityError as e:
             raise ValueError("Esta organización externa ya fue invitada a este evento.") from e
-
         except Exception as e:
             raise ValueError(f"Error inesperado: {e}")

@@ -11,11 +11,7 @@ class EventoAPI:
     @organizador_required
     def registro(request):
         if request.method == "POST":
-            try:
-                data = json.loads(request.body)
-            except json.JSONDecodeError:
-                return JsonResponse({"error": "Formato JSON inválido."}, status=400)
-
+            data = json.loads(request.body)
             form = RegistroEventoForm(data)
             if form.is_valid():
                 try:
@@ -52,13 +48,14 @@ class EventoAPI:
     @organizador_required
     def actualizar(request, id):
         if request.method == "PUT":
+            # Get the event
+            if not EventoService.obtener_por_id(id):
+                return JsonResponse({ "error": "El evento especificado no existe" }, status=404)
+            
             #Validates if the user is the creator of the event
-            try:
-                response = EventoService.es_creador(request.user, id)
-                if not response:
-                    return JsonResponse({"error": "No tienes permiso para actualizar este evento."}, status=403)
-            except Exception as e:
-                return JsonResponse({"error": str(e)}, status=400)
+            es_creador = EventoService.es_creador(request.user, id)
+            if not es_creador:
+                return JsonResponse({"error": "No tienes permiso para actualizar este evento."}, status=403)
 
             data = json.loads(request.body)
             form = RegistroEventoForm(data)

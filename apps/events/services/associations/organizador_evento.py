@@ -17,6 +17,5 @@ class OrganizadoresEventosService:
         
         except IntegrityError as e:
             raise ValueError("Este coordinador/organizador ya fue asignado a este evento.") from e
-
         except Exception as e:
             raise ValueError(f"Error inesperado: {e}")

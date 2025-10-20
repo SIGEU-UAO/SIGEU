@@ -9,8 +9,6 @@ class InstalacionesAsignadasService:
     def crearInstalacionAsignada(data):
         try:
             asignacion = InstalacionAsignada.objects.create(evento=data["evento"], instalacion=data["instalacion"])
-            return True
-        
         except IntegrityError as e:
             raise ValueError("Esta instalación ya fue asignada a este evento.") from e
         except Exception as e:
@@ -22,3 +20,13 @@ class InstalacionesAsignadasService:
         instalaciones = evento.instalaciones_asignadas.all()
         data = InstalacionSerializer.serialize_instalaciones(instalaciones, many=True)
         return data
+    
+    @staticmethod
+    def eliminarInstalacionAsignada(data):
+        try:
+            asignacion = InstalacionAsignada.objects.get(evento=data["evento"], instalacion=data["instalacion"])
+            asignacion.delete()
+        except ObjectDoesNotExist:
+            raise ValueError("La instalación que se pretende eliminar no está asginada al evento")
+        except Exception as e:
+            raise ValueError(f"Error al eliminar la instalación asignada: {e}")

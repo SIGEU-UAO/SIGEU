@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from django.http import JsonResponse
 from ...services.event import EventoService
 from ...services.associations.instalacion_fisica import InstalacionesAsignadasService
@@ -12,10 +13,7 @@ class InstalacionesAsignadasAPI:
     @organizador_required
     def asignar_instalaciones_fisicas(request):
         if request.method == "POST":
-            try:
-                data = json.loads(request.body)
-            except json.JSONDecodeError:
-                return JsonResponse({"error": "Formato JSON inválido."}, status=400)
+            data = json.loads(request.body)
                 
             evento_id = data.get("evento")
             if not evento_id:
@@ -46,15 +44,11 @@ class InstalacionesAsignadasAPI:
                     
                     # If the installation was not found, add an error.
                     if not instalacion:
-                        errores.append({
-                            "id": item["id"],
-                            "error": "Instalación no encontrada."
-                        })
+                        errores.append({ "id": item["id"], "error": "Instalación no encontrada."})
                         continue
 
-                    creada = InstalacionesAsignadasService.crearInstalacionAsignada({ "evento": evento, "instalacion": instalacion })
-                    if creada:
-                        guardadas.append(instalacion.idInstalacion)
+                    InstalacionesAsignadasService.crearInstalacionAsignada({ "evento": evento, "instalacion": instalacion })
+                    guardadas.append(instalacion.idInstalacion)
 
                 except Exception as e:
                     # Catch any other errors
@@ -86,4 +80,77 @@ class InstalacionesAsignadasAPI:
                 return JsonResponse({"error": "No tienes permiso para listar las instalaciones fisicas asignadas a este evento."}, status=403)
             
             return JsonResponse({ "instalaciones": InstalacionesAsignadasService.listarInstalacionesAsignadas(eventoId) })
+        return JsonResponse({"error": "Método no permitido"}, status=405)
+    
+    @login_required()
+    @organizador_required
+    def actualizar_instalaciones_fisicas(request, eventoId):
+        if request.method == "PUT":
+            data = json.loads(request.body)
+            
+            # Get the event
+            evento = EventoService.obtener_por_id(eventoId)
+            if not evento:
+                return JsonResponse({ "error": "El evento especificado no existe" }, status=404)
+
+            # Verify if it is the event creator
+            es_creador = EventoService.es_creador(request.user, eventoId)
+            if not es_creador:
+                return JsonResponse({"error": "No tienes permiso para modificar las instalaciones de este evento."}, status=403)
+            
+            instalaciones = data.get("records")
+
+            if not validate_collection(instalaciones, SCHEMAS["instalaciones_asignadas"]):
+                return JsonResponse({ "error": "Datos de instalaciones físicas inválidos." }, status=400)
+
+            agregadas = []
+            eliminadas = []
+            errores = []
+
+            # * Try to assign all facilities
+            for item in instalaciones:
+                inst_id = item.get("id")
+                accion = (item.get("accion") or "").strip().lower()
+
+                if not inst_id or accion not in ("agregar", "eliminar"):
+                    errores.append({"id": inst_id, "error": "Formato inválido o acción no reconocida."})
+                    continue
+
+                try:
+                    instalacion = InstalacionesFisicasService.obtener_por_id(inst_id)
+                    if not instalacion:
+                        errores.append({"id": inst_id, "error": "Instalación no encontrada."})
+                        continue
+
+                    # Handle the actions
+                    if accion == "agregar":
+                        try:
+                            InstalacionesAsignadasService.crearInstalacionAsignada({ "evento": evento, "instalacion": instalacion})
+                            agregadas.append(instalacion.idInstalacion)
+                        except Exception as e:
+                            errores.append({"id": inst_id, "error": str(e)})
+                    elif accion == "eliminar":
+                        try:
+                            InstalacionesAsignadasService.eliminarInstalacionAsignada({ "evento": evento, "instalacion": instalacion})
+                            eliminadas.append(instalacion.idInstalacion)
+                        except Exception as e:
+                            errores.append({"id": inst_id, "error": str(e)})
+
+                except Exception as e:
+                    errores.append({"id": inst_id, "error": str(e)})
+
+            if errores:
+                return JsonResponse({
+                    "error": "Error al asignar alguna instalación física",
+                    "agregadas": agregadas,
+                    "eliminadas": eliminadas,
+                    "errores": errores
+                }, status=207)
+
+            return JsonResponse({
+                "agregadas": agregadas,
+                "eliminadas": eliminadas,
+                "message": "Instalaciones físicas actualizadas correctamente"
+            }, status=201)
+
         return JsonResponse({"error": "Método no permitido"}, status=405)

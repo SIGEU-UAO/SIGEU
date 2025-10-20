@@ -66,7 +66,8 @@ def validate_type(value, expected_type):
 SCHEMAS = {
     "instalaciones_asignadas": {
         "required_keys": ["id"],
-        "types": {"id": int}
+        "optional_keys": ["accion"],
+        "types": {"id": int, "accion": str}
     },
     "organizadores_evento": {
         "required_keys": ["id", "aval"],

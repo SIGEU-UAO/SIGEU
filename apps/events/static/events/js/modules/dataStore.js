@@ -1,6 +1,7 @@
 const dataStore = {
     eventoId: getEventId(),
     instalaciones: [],
+    instalaciones_cambios: [],
     organizadores: [],
     organizaciones: [],
 

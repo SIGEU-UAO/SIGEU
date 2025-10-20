@@ -14,9 +14,11 @@ urlpatterns = [
     # --- API ---
     path("eventos/api/registro/", EventoAPI.registro, name="registro_evento_api"),
     path('eventos/api/listado-eventos/', EventoAPI.mis_eventos, name='mis_eventos_api'),
+    path('eventos/api/editar/<int:id>/', EventoAPI.actualizar, name="actualizar_evento_api"),
 
     path("eventos/api/asignar-instalaciones/", InstalacionesAsignadasAPI.asignar_instalaciones_fisicas, name="asignar_instalaciones_api"),
     path("eventos/api/listar-instalaciones/<int:eventoId>/", InstalacionesAsignadasAPI.listar_instalaciones_asignadas, name="listar_instalaciones_api"),
+    path("eventos/api/actualizar-instalaciones/<int:eventoId>/", InstalacionesAsignadasAPI.actualizar_instalaciones_fisicas, name="actualizar_instalaciones_api"),
 
     path("eventos/api/asignar-organizadores/", OrganizadorEventoAPI.asignar_coordinadores_evento, name="asignar_coordinadores_api"),
 
