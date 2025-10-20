@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from ...services.associations.organizacion_invitada import OrganizacionesInvitadasService
 from apps.external_organizations.service import OrganizacionExternaService;
+from ...services.event import EventoService
 from ...validations.data_validators import validate_collection, SCHEMAS
 from django.contrib.auth.decorators import login_required
 from sigeu.decorators import organizador_required
@@ -11,9 +12,18 @@ class OrganizacionInvitadaAPI:
     def asignar_organizaciones_invitadas(request):
         if request.method == "POST":
             evento_id = request.POST.get("evento")
-
             if not evento_id:
                 return JsonResponse({ "error": "No se suministró el id del evento" }, status=400)
+            
+            # Get the event
+            evento = EventoService.obtener_por_id(evento_id)
+            if not evento:
+                return JsonResponse({ "error": "El evento especificado no existe" }, status=404)
+            
+            # Verify if it is the event creator
+            es_creador = EventoService.es_creador(request.user, evento_id)
+            if not es_creador:
+                return JsonResponse({"error": "No tienes permiso para asignar una instalación en este evento."}, status=403)
             
             # Detectar cuántas organizaciones vienen según las claves del POST
             total = len([k for k in request.POST.keys() if k.startswith("organizaciones[") and k.endswith("[id]")])
@@ -47,7 +57,7 @@ class OrganizacionInvitadaAPI:
                         })
                         continue
 
-                    creada = OrganizacionesInvitadasService.crearOrganizacionInvitada({ "evento_id": evento_id, "organizacion": organizacion, "representante_asiste":item["representante_asiste"], "representante_alterno":item["representante_alterno"], "certificado_participacion": item["certificado_participacion"] })
+                    creada = OrganizacionesInvitadasService.crearOrganizacionInvitada({ "evento": evento, "organizacion": organizacion, "representante_asiste":item["representante_asiste"], "representante_alterno":item["representante_alterno"], "certificado_participacion": item["certificado_participacion"] })
                     if creada:
                         guardadas.append(item["id"])
 

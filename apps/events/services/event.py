@@ -30,7 +30,7 @@ class EventoService:
             return False
     
     @staticmethod
-    def  listar_por_organizador(usuario, status=None, page=1, per_page=12, search=None, search_by=None):
+    def listar_por_organizador(usuario, status=None, page=1, per_page=12, search=None, search_by=None):
         qs = Evento.objects.filter(creador=usuario).order_by('-fecha', '-horaInicio')
         if status:
             qs = qs.filter(estado__iexact=status)
@@ -60,45 +60,6 @@ class EventoService:
             page_obj = paginator.page(paginator.num_pages)
 
         return page_obj
-    
-    @staticmethod
-    def serializar_eventos(page_obj, request=None):
-        results = []
-        for e in page_obj.object_list:
-            # organizadores asignados (resumido)
-            organizadores = []
-            for o in e.organizadores_asignados.all():
-                u = o.organizador
-                organizadores.append({
-                    "nombre": ((getattr(u, "nombres", "") or "") + " " + (getattr(u, "apellidos", "") or "")).strip(),
-                    "rol_organizador": o.get_tipo_display() if hasattr(o, "get_tipo_display") else o.tipo
-                })
-
-            # organizaciones invitadas (resumido)
-            organizaciones = []
-            for oi in e.organizaciones_invitadas.all():
-                org = oi.organizacion
-                organizaciones.append({"nombre": getattr(org, "nombre", None),"nit": getattr(org, "nit", None)})
-
-            item = {
-                "idEvento": e.idEvento,
-                "nombre": e.nombre,
-                "fecha": e.fecha.isoformat() if e.fecha else None,
-                "horaInicio": e.horaInicio.isoformat() if e.horaInicio else None,
-                "estado": e.estado,
-                "instalaciones": [ getattr(a.instalacion, "nombre", str(a.instalacion)) for a in e.instalaciones_asignadas.all() ],
-                "organizadores": organizadores,
-                "organizaciones_invitadas": organizaciones
-            }
-            
-            results.append(item)
-
-        return {
-            "count": page_obj.paginator.count,
-            "num_pages": page_obj.paginator.num_pages,
-            "current_page": page_obj.number,
-            "results": results,
-        }
 
     @staticmethod
     def es_creador(usuario, id_event):
@@ -106,3 +67,20 @@ class EventoService:
         if not event:
             return None 
         return usuario.idUsuario == event.creador_id
+    
+    @staticmethod
+    def actualizar(id, data):
+        #Validate integrity errors for unique fields
+        try:
+            event = Evento.objects.get(pk=id)
+            event.nombre = data["nombre"]
+            event.tipo = data["tipo"]
+            event.descripcion = data["descripcion"]
+            event.fecha = data["fecha"]
+            event.horaInicio = data["horaInicio"]
+            event.horaFin = data["horaFin"]
+            event.save()
+        except Evento.DoesNotExist:
+            raise ValueError("No se encontró el evento especificado.")
+        
+        return event

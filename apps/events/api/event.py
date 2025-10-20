@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from ..forms.event import RegistroEventoForm
 from ..services.event import EventoService
+from ..serializers.eventoSerializer import EventoSerializer 
 from django.contrib.auth.decorators import login_required
 from sigeu.decorators import organizador_required
 import json
@@ -44,5 +45,29 @@ class EventoAPI:
             request.user, status=status, page=page, per_page=12, search=search, search_by=search_by
         )
 
-        data = EventoService.serializar_eventos(page_obj, request=request)
+        data = EventoSerializer.serialize_page(page_obj)
         return JsonResponse(data, safe=False)
+
+    @login_required()
+    @organizador_required
+    def actualizar(request, id):
+        if request.method == "PUT":
+            #Validates if the user is the creator of the event
+            try:
+                response = EventoService.es_creador(request.user, id)
+                if not response:
+                    return JsonResponse({"error": "No tienes permiso para actualizar este evento."}, status=403)
+            except Exception as e:
+                return JsonResponse({"error": str(e)}, status=400)
+
+            data = json.loads(request.body)
+            form = RegistroEventoForm(data)
+            if form.is_valid():
+                try:
+                    EventoService.actualizar(id, form.cleaned_data)
+                    return JsonResponse({"message": "Información básica del evento actualizada correctamente."}, status=200)
+                except ValueError as e:
+                    return JsonResponse({"error": str(e)}, status=400)
+            else:
+                return JsonResponse({"error": form.errors}, status=400)
+        return JsonResponse({"error": "Método no permitido"}, status=405)

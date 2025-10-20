@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from ...services.associations.organizador_evento import OrganizadoresEventosService
+from ...services.event import EventoService
 from apps.users.service import UserService;
 from ...validations.data_validators import validate_collection, SCHEMAS
 from django.contrib.auth.decorators import login_required
@@ -11,9 +12,18 @@ class OrganizadorEventoAPI:
     def asignar_coordinadores_evento(request):
         if request.method == "POST":
             evento_id = request.POST.get("evento")
-
             if not evento_id:
                 return JsonResponse({ "error": "No se suministró el id del evento" }, status=400)
+            
+            # Get the event
+            evento = EventoService.obtener_por_id(evento_id)
+            if not evento:
+                return JsonResponse({ "error": "El evento especificado no existe" }, status=404)
+            
+            # Verify if it is the event creator
+            es_creador = EventoService.es_creador(request.user, evento_id)
+            if not es_creador:
+                return JsonResponse({"error": "No tienes permiso para asignar una instalación en este evento."}, status=403)
 
             ids = request.POST.getlist("organizadores_id[]")
             avales = request.FILES.getlist("organizadores_aval[]")
@@ -58,7 +68,7 @@ class OrganizadorEventoAPI:
                     elif organizador.get("rol") == "Docente":
                         tipo = "director_docencia"
 
-                    creada = OrganizadoresEventosService.crearOrganizadorEvento({ "evento_id": evento_id, "organizador": organizador.get("idUsuario"), "aval":item["aval"], "tipo":tipo })
+                    creada = OrganizadoresEventosService.crearOrganizadorEvento({ "evento": evento, "organizador": organizador.get("idUsuario"), "aval":item["aval"], "tipo":tipo })
                     if creada:
                         guardadas.append(organizador.get("idUsuario"))
 

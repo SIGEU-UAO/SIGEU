@@ -8,17 +8,13 @@ class OrganizadoresEventosService:
     @staticmethod
     def crearOrganizadorEvento(data):
         try:
-            # 1. Obtain event & organizator
-            evento = EventoService.obtener_por_id(data["evento_id"])
+            # 1. Obtain organizator instance
             organizador = UserService.obtener_instance_por_id(data["organizador"])
 
             # 2. Create intermediate table record
-            asignacion = OrganizadorEvento.objects.create(evento=evento, organizador=organizador, aval=data["aval"], tipo=data["tipo"])
+            asignacion = OrganizadorEvento.objects.create(evento=data["evento"], organizador=organizador, aval=data["aval"], tipo=data["tipo"])
             return asignacion
-
-        except ObjectDoesNotExist as e:
-            raise ValueError("El evento o el coordinador/organizador de evento no existen.") from e
-
+        
         except IntegrityError as e:
             raise ValueError("Este coordinador/organizador ya fue asignado a este evento.") from e
 

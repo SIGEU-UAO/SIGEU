@@ -30,6 +30,7 @@ const organizationValidationRules = {
 
 //* Selectors
 const mainForm = document.getElementById("main-form");
+const mainFormAction = mainForm.getAttribute("data-action");
 const fileInputs = document.querySelectorAll('input.input-file');
 
 //* Slide section
@@ -40,10 +41,11 @@ const createOrganizationForm = document.getElementById("crear-organizacion-form"
 
 //* Step sections
 const nextStepBtns = document.querySelectorAll(".step__button--next[data-skip]")
+const prevStepBtns = document.querySelectorAll(".step__button--prev")
 const finishStepBtn = document.querySelector(".step__button--finish");
 
 //* Event Listeners
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     if (!window.currentUser) window.location.reload();
     const currentUser = window.currentUser;
 
@@ -70,13 +72,19 @@ document.addEventListener("DOMContentLoaded", () => {
     //* Others event listeners
     mainForm.addEventListener("submit", handleMainFormSubmit);
     nextStepBtns.forEach(btn => btn.onclick = skipHandler)
-    finishStepBtn.onclick = () => goToListHandler("/dashboard/");
+    prevStepBtns.forEach(btn => btn.addEventListener("click", () => goStep("prev")))
+    finishStepBtn.onclick = () => goToListHandler("eventos/mis-eventos/");
     fileInputs.forEach(input => handleFileInputsInfo(input))
 
     //* Slide section event listeners
     openSlideSectionBtn.addEventListener("click", openSlideSection)
     closeSlideSectionBtn.addEventListener("click", closeSlideSection)
     createOrganizationForm.addEventListener("submit", handleOrganizationFormSubmit)
+
+    // TODO: If it's editing
+    if (mainFormAction === "edit" && dataStore.eventoId) {
+        await loadInstalacionesEvento(dataStore.eventoId)
+    }
 
     //* Load the current user as the default/main organizer
     const assignedOrganizatorsContainer = document.querySelector(".main__step--3 .step__cards");
@@ -98,11 +106,11 @@ async function handleMainFormSubmit(e) {
     if (!validarFormData(formData, validationRules)) return;
 
     //Fetch the endpoint
-    const result = await API.post("/eventos/api/registro/", formData);
+    const result = mainFormAction === "add" ? await API.post("/eventos/api/registro/", formData) : await API.put(`/eventos/api/editar/${dataStore.eventoId}/`, formData);
     if (result.error) return;
 
-    Alert.success("Evento registrado en estado borrador");
-    dataStore.eventoId = result.data.evento; // Save the event ID
+    Alert.success(mainFormAction === "add" ? "Evento registrado en estado borrador" : "Información del evento actualizada correctamente");
+    if (mainFormAction === "add") dataStore.eventoId = result.data.evento;
     goStep("next")
     mainForm.reset();
 }
@@ -128,4 +136,29 @@ async function handleOrganizationFormSubmit(e) {
 
     Alert.success("Organización registrada exitosamente");
     setTimeout(closeSlideSection, 1500);
+}
+
+//* Editing Functions
+async function loadInstalacionesEvento(eventoId) {
+    const result = await API.fetchGet(`/eventos/api/listar-instalaciones/${eventoId}/`);
+    if (result.error) {
+        Alert.error("Error al cargar las instalaciones fisicas asignadas")
+        setTimeout(() => window.location.href = "/eventos/mis-eventos/", 1000);
+    }
+
+    const instalaciones = result.data.instalaciones;
+
+    // Save only the IDs in the datastore
+    dataStore.instalaciones = instalaciones.map(inst => ({ id: inst.idInstalacion }));
+
+    const container = document.querySelector(".main__step--2 .step__cards");
+
+    result.data.instalaciones.forEach(inst => {
+        AssociatedRecords.addRecordToUI(
+            inst.idInstalacion,
+            { ubicacion: inst.ubicacion, tipo: inst.tipo },
+            "instalaciones",
+            container
+        );
+    });
 }

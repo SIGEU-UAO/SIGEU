@@ -1,5 +1,5 @@
 const dataStore = {
-    eventoId: null,
+    eventoId: getEventId(),
     instalaciones: [],
     organizadores: [],
     organizaciones: [],
@@ -11,6 +11,7 @@ const dataStore = {
         });
         if (alreadyExists) return false
         this[type].push(record);
+        //! QUITAR METODO
         this.listFormDataRecords(type)
         return { success: true, message: "Registro agregado correctamente" };
     },
@@ -109,5 +110,13 @@ const dataStore = {
         this[type] = [];
     }
 };
+
+function getEventId() {
+  const path = window.location.pathname;
+  const parts = path.split('/').filter(Boolean);
+  const lastSegment = parts[parts.length - 1];
+  const isNumeric = /^\d+$/.test(lastSegment);
+  return isNumeric ? parseInt(lastSegment, 10) : null;
+}
 
 export default dataStore;

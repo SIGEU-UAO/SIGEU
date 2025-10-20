@@ -29,6 +29,7 @@ def formulario_registro(request):
     registroOrganizacionForm = RegistroForm()
 
     return render(request, "events/registro_evento.html", {
+        "page__title": "SIGEU | Registro Evento",
         "header_title": "Registrar Evento Universitario", 
         "header_paragraph": "Administra las entidades que participan en tus eventos. Organiza y lleva el control de todos tus eventos en un solo lugar",
         "form": mainForm,
@@ -142,8 +143,10 @@ def formulario_edicion(request, pk):
     registroOrganizacionForm = RegistroForm()
 
     return render(request, "events/registro_evento.html", {
+        "page__title": "SIGEU | Edición Evento",
         "header_title": "Editar Evento Universitario", 
         "header_paragraph": "Administra las entidades que participan en tus eventos. Organiza y lleva el control de todos tus eventos en un solo lugar",
+        "is_editing": True,
         "form": mainForm,
         "modal_buscar_instalaciones_form": modalBuscarInstalacionesForm,
         "modal_buscar_organizadores_form": modalBuscarOrganizadoresForm,

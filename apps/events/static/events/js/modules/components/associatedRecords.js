@@ -23,7 +23,7 @@ const stepDataKeys = {
         annotation: "nit",
         title: "nombre",
         icon: "ri-building-2-fill",
-        saveHandler: (container) => () => AssociatedRecords.saveDBRecords("/eventos/api/asignar-organizaciones/", "organizaciones", container, true, "/dashboard/")
+        saveHandler: (container) => () => AssociatedRecords.saveDBRecords("/eventos/api/asignar-organizaciones/", "organizaciones", container, true, "/eventos/mis-eventos/")
     },
 }
 
@@ -272,7 +272,7 @@ export default class AssociatedRecords{
         const recordsLength = dataStore[type]?.length || 0;
 
         if (buttonStep.classList.contains("step__button--finish")) {
-            finishStepHandler(buttonStep, recordsLength, stepDataKeys[type].saveHandler(container), "/dashboard/");
+            finishStepHandler(buttonStep, recordsLength, stepDataKeys[type].saveHandler(container), "/eventos/mis-eventos/");
         } else {
             toggleSkip(buttonStep, recordsLength === 0, stepDataKeys[type].saveHandler(container));
         }
