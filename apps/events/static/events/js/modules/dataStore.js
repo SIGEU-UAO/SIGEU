@@ -3,7 +3,9 @@ const dataStore = {
     instalaciones: [],
     instalaciones_cambios: [],
     organizadores: [],
+    organizadores_cambios: [],
     organizaciones: [],
+    organizaciones_cambios: [],
 
     addRecord(type, record, id) {
         const alreadyExists = this[type].some(item => {
@@ -15,6 +17,48 @@ const dataStore = {
         //! QUITAR METODO
         this.listFormDataRecords(type)
         return { success: true, message: "Registro agregado correctamente" };
+    },
+
+    //* Method to edit an event
+    registerChange(type, id, action, record = null){
+        const changes = this[`${type}_cambios`];
+        const original = this[type];
+
+        // Check if there is already a change registered for this id
+        const idx = changes.findIndex(c => Number(c.id) === Number(id));
+        const originalHas = original.some(r => Number(r.id) === Number(id));
+
+        //* Add a new record
+        if (action === "agregar") {
+            // If there was already a “delete” change, it is canceled.
+            if (idx !== -1 && changes[idx].accion === 'eliminar') {
+                changes.splice(idx, 1);
+                return { success: true, message: `El registro ${id} fue restaurado correctamente.` };
+            }
+
+            // If “add” already existed or was in the original, return
+            if ((idx !== -1 && changes[idx].accion === 'agregar') || originalHas) return { success: false, message: `El registro con id ${id} ya existe o ya fue agregado.` };
+
+            // Add new change
+            changes.push({ id: Number(id), accion: 'agregar' });
+            return { success: true, message: `Se registró la adición del registro con id ${id}` };
+        }
+
+        if (action === "eliminar") {
+            // If there was already an “add” change, it is canceled.
+            if (idx !== -1 && changes[idx].accion === 'agregar') {
+                changes.splice(idx, 1);
+                return { success: true, message: `Se deshizo la adición del registro ${id}.` };
+            }
+            // If “delete” already existed, return
+            if ((idx !== -1 && changes[idx].accion === 'eliminar') || !originalHas) return { success: false, message: `El registro con id ${id} no puede eliminarse o ya fue marcado para eliminación.` };
+
+            // Add new change
+            changes.push({ id: Number(id), accion: 'eliminar' });
+            return { success: true, message: `Se registró la eliminación del registro con id ${id}.` };
+        }
+        
+        return { success: false, message: `Acción no válida: ${action}` };
     },
 
     getAllRecords(type){

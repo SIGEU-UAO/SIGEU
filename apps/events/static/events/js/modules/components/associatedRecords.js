@@ -6,12 +6,21 @@ import API from "/static/js/modules/classes/API.js";
 import Alert from "/static/js/modules/classes/Alert.js";
 import { finishStepHandler, goStep, toggleSkip } from "./stepper.js";
 
+const mainForm = document.getElementById("main-form");
+const mainFormAction = mainForm.getAttribute("data-action");
+
 const stepDataKeys = {
     instalaciones: {
         annotation: "tipo",
         title: "ubicacion",
         icon: "ri-map-fill",
-        saveHandler: (container) => () => AssociatedRecords.saveDBRecords("/eventos/api/asignar-instalaciones/", "instalaciones", container)
+        saveHandler: (container) => () => {
+            if (mainFormAction === "add") {
+                AssociatedRecords.saveDBRecords("/eventos/api/asignar-instalaciones/", "instalaciones", container);
+            } else if (mainFormAction === "edit") {
+                AssociatedRecords.updateDBRecords("/eventos/api/actualizar-instalaciones/", "instalaciones", container);
+            }
+        }
     },
     organizadores: {
         annotation: "rol",
@@ -35,12 +44,25 @@ export default class AssociatedRecords{
         // Extract id
         const id = isFormData ? data.get("id") : data["id"];
         const record = isFormData ? data : { id: data["id"] }
-        const result = dataStore.addRecord(type, record, id);
 
-        //If it already exists, return
-        if (!result) {
-            Alert.error(`El registro con id ${id} ya fue agregado`)
-            return;
+        let result;
+
+        if (mainFormAction === "add"){
+            result = dataStore.addRecord(type, record, id);
+
+            //If it already exists, return
+            if (!result) {
+                Alert.error(`El registro con id ${id} ya fue agregado`)
+                return;
+            }
+        }
+        else if (mainFormAction === "edit"){
+            result = dataStore.registerChange(type, id, 'agregar');
+
+            if (!result.success) {
+                Alert.error(result.message);
+                return;
+            }
         }
 
         Alert.success(result.message);
@@ -105,18 +127,28 @@ export default class AssociatedRecords{
         });
     
         if (!result.isConfirmed) return;
-        
-        const { success, message } = dataStore.removeRecord(type, id);
+
+        let success = false;
+        let message = "";
+
+        if (mainFormAction === "add") {
+            const removeResult = dataStore.removeRecord(type, id);
+            success = removeResult.success;
+            message = removeResult.message;
+        } 
+        else if (mainFormAction === "edit") {
+            const registerResult = dataStore.registerChange(type, id, "eliminar");
+            success = registerResult.success;
+            message = registerResult.message;
+        }
 
         if (success) {
             Alert.success(message);
             stepCard.remove();
+            this.updateStepBtn(type, buttonStep, container);
         } else {
             Alert.error(message);
-            return;
         }
-
-        this.updateStepBtn(type, buttonStep, container)
     }
 
     static async saveDBRecords(endpoint, type, container, isFinishStep = false, finishURL = ""){
@@ -151,6 +183,45 @@ export default class AssociatedRecords{
             setTimeout(() => window.location.href = finishURL, 1500);
         }else{
             goStep("next")
+        }
+    }
+
+    static async updateDBRecords(endpoint, type, container, isFinishStep = false, finishURL = ""){
+        const eventoId = dataStore.eventoId;
+        const updatedRecords = dataStore[`${type}_cambios`] || [];
+        const originalRecords = dataStore[type] || [];
+
+        const originalIds = originalRecords.map(r => typeof r === "object" ? r.id : r);
+        let finalIds = [...originalIds];
+
+        // Apply the changes
+        for (const { id, accion } of updatedRecords) {
+            if (accion === "agregar" && !finalIds.includes(id)) finalIds.push(id);
+            if (accion === "eliminar") finalIds = finalIds.filter(x => x !== id);
+        }
+
+        const noChanges = originalIds.length === finalIds.length && originalIds.every(id => finalIds.includes(id)); 
+        if (noChanges) {
+            goStep("next");
+            return;
+        }
+
+        const body = JSON.stringify({ records: updatedRecords});
+        const result = await API.put(`${endpoint}${eventoId}/`, body);
+        if (result.error) {
+            if (result.data.errores) dataStore.excludeRecords(type, result.data.errores, container);
+            return;
+        };
+
+        // Update the base dataStore with the new records and clean up the changes.
+        dataStore[type] = finalIds.map(id => ({ id: Number(id) }));
+        dataStore[`${type}_cambios`] = [];
+        Alert.success(`Datos de ${type} actualizados correctamente.`);
+
+        if (isFinishStep) {
+            setTimeout(() => window.location.href = finishURL, 1500);
+        } else {
+            goStep("next");
         }
     }
 
@@ -270,11 +341,12 @@ export default class AssociatedRecords{
 
     static updateStepBtn(type, buttonStep, container){
         const recordsLength = dataStore[type]?.length || 0;
+        const isEnabledToSkip = recordsLength === 0 && dataStore[`${type}_cambios`].length === 0;
 
         if (buttonStep.classList.contains("step__button--finish")) {
             finishStepHandler(buttonStep, recordsLength, stepDataKeys[type].saveHandler(container), "/eventos/mis-eventos/");
         } else {
-            toggleSkip(buttonStep, recordsLength === 0, stepDataKeys[type].saveHandler(container));
+            toggleSkip(buttonStep, isEnabledToSkip, stepDataKeys[type].saveHandler(container));
         }
     }
 }
