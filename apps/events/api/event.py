@@ -46,29 +46,12 @@ class EventoAPI:
 
         data = EventoService.serializar_eventos(page_obj, request=request)
         return JsonResponse(data, safe=False)
-
-    @login_required()
-    @organizador_required
-    def actualizar_estado_evento(request, id_evento):
-        if request.method == "PUT":
-            try:
-                data = json.loads(request.body)
-                nuevo_estado = data.get("estado")
-                if not nuevo_estado:
-                    return JsonResponse({"error": "El nuevo estado es requerido."}, status=400)
-                actualizado = EventoService.actualizar_estado(id_evento, nuevo_estado)
-                if actualizado:
-                    return JsonResponse({"message": "Estado del evento actualizado."}, status=200)
-                else:
-                    return JsonResponse({"error": "Evento no encontrado."}, status=404)
-            except json.JSONDecodeError:
-                return JsonResponse({"error": "Formato JSON inválido."}, status=400)
-        return JsonResponse({"error": "Método no permitido"}, status=405)
+    
     
     @login_required()
     @organizador_required
     def enviar_evento_validacion(request, id_evento):
-        if request.method == "POST":
+        if request.method == "PATCH":
             evento = EventoService.obtener_por_id(id_evento)
             if not evento:
                 return JsonResponse({"error": "Evento no encontrado."}, status=404)

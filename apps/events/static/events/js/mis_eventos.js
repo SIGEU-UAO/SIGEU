@@ -10,6 +10,7 @@ noResultsContainer.style.display = cards.length === 0 ? 'flex' : 'none';
 
 const searchForm = document.querySelector('#events-search-form');
 const filtersResetBtn = document.querySelector('#reset-filters-btn');
+const sendBtns = document.querySelectorAll(".card__btn--send")
 
 //* Event Listeners
 document.querySelectorAll('.filters__buttons .filter__btn').forEach(btn => {
@@ -20,9 +21,7 @@ document.querySelectorAll('.filters__buttons .filter__btn').forEach(btn => {
 searchForm.addEventListener('submit', searchByForm)
 if (filtersResetBtn) filtersResetBtn.addEventListener("click", resetFilters);
 
-document.addEventListener("click", async (event) => {
-    const btn = event.target.closest(".card__btn--send");
-    if (!btn) return;
+sendBtns.forEach(btn => btn.addEventListener('click', async () => {
 
     const id = btn.dataset.id;
     const url = `/eventos/api/enviar-validacion/${id}/`;
@@ -37,7 +36,7 @@ document.addEventListener("click", async (event) => {
 
         if (!result.isConfirmed) return;
 
-        const response = await API.post(url);
+        const response = await API.patch(url);
         if (response.error) {
             Alert.error(response.error);
             return;
@@ -52,4 +51,4 @@ document.addEventListener("click", async (event) => {
         Alert.error("Error al procesar la solicitud");
         console.error(error);
     }
-});
+}));
