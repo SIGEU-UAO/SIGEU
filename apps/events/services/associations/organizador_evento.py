@@ -1,8 +1,8 @@
 from django.db import IntegrityError
-from django.db.models import ObjectDoesNotExist
 from ..event import EventoService
 from apps.users.service import UserService
 from ...models import OrganizadorEvento
+from ...serializers.organizadorSerializer import OrganizadorSerializer
 
 class OrganizadoresEventosService:
     @staticmethod
@@ -19,3 +19,10 @@ class OrganizadoresEventosService:
             raise ValueError("Este coordinador/organizador ya fue asignado a este evento.") from e
         except Exception as e:
             raise ValueError(f"Error inesperado: {e}")
+
+    @staticmethod
+    def listarOrganizadores(eventoId):
+        evento = EventoService.obtener_por_id(eventoId)
+        organizadores = evento.organizadores_asignados.all()
+        data = OrganizadorSerializer.serialize_organizadores(organizadores, many=True)
+        return data

@@ -72,6 +72,8 @@ class InstalacionesAsignadasAPI:
 
         return JsonResponse({"error": "Método no permitido"}, status=405)
     
+    @login_required()
+    @organizador_required
     def listar_instalaciones_asignadas(request, eventoId):
         if request.method == "GET":
             # Verify if it is the event creator

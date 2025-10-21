@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     mainForm.addEventListener("submit", handleMainFormSubmit);
     nextStepBtns.forEach(btn => btn.onclick = skipHandler)
     prevStepBtns.forEach(btn => btn.addEventListener("click", () => goStep("prev")))
-    finishStepBtn.onclick = () => goToListHandler("eventos/mis-eventos/");
+    finishStepBtn.onclick = () => goToListHandler("/eventos/mis-eventos/");
     fileInputs.forEach(input => handleFileInputsInfo(input))
 
     //* Slide section event listeners

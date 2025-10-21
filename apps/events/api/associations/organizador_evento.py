@@ -9,7 +9,7 @@ from sigeu.decorators import organizador_required
 class OrganizadorEventoAPI:
     @login_required()
     @organizador_required
-    def asignar_coordinadores_evento(request):
+    def asignar_organizadores_evento(request):
         if request.method == "POST":
             evento_id = request.POST.get("evento")
             if not evento_id:
@@ -92,4 +92,16 @@ class OrganizadorEventoAPI:
                 "message": "Organizadores asignados correctamente"
             }, status=201)
 
+        return JsonResponse({"error": "Método no permitido"}, status=405)
+
+    @login_required()
+    @organizador_required
+    def listar_organizadores(request, eventoId):
+        if request.method == "GET":
+            # Verify if it is the event creator
+            es_creador = EventoService.es_creador(request.user, eventoId)
+            if not es_creador:
+                return JsonResponse({"error": "No tienes permiso para listar las instalaciones fisicas asignadas a este evento."}, status=403)
+            
+            return JsonResponse({ "organizadores": OrganizadoresEventosService.listarOrganizadores(eventoId) })
         return JsonResponse({"error": "Método no permitido"}, status=405)
