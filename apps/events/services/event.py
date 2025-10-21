@@ -100,3 +100,13 @@ class EventoService:
             "current_page": page_obj.number,
             "results": results,
         }
+    
+    @staticmethod
+    def actualizar_estado(id_evento, nuevo_estado):
+        try:
+            evento = Evento.objects.get(idEvento=id_evento)
+            evento.estado = nuevo_estado
+            evento.save()
+            return True
+        except Evento.DoesNotExist:
+            return False

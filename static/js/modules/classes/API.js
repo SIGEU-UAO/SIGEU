@@ -209,4 +209,38 @@ export default class API {
             Alert.error("Error de red. Intenta de nuevo.");
         }
     }
+
+    static async patch(url, requestBody) {
+        // Get csrf token
+        const csrf = getCookie("csrftoken")
+        
+        // Detect whether the body is FormData or an object/JSON
+        const isFormData = requestBody instanceof FormData;
+        let jsonBody = requestBody;
+        //Convert the formData to JSON
+        if (isFormData) jsonBody = formDataToJSON(jsonBody);
+        try {
+            // Fetch the endpoint
+            const res = await fetch(url, {
+                method: "PATCH",
+                headers: {
+                    "X-CSRFToken": csrf,
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: jsonBody
+            });
+            const json = await res.json();
+            if (!res.ok) {
+                let msg = json.error || "¡Error en la operación!";
+                Alert.error(msg);
+                return { error: true, data: json };
+            }
+            return { error: false, data: json };
+        } catch (err) {
+            // Network error or other type of exception
+            Alert.error(err.message || `¡Error de Red!`)
+            return { error: true };
+        }
+    }
 }
