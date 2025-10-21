@@ -25,12 +25,14 @@ const stepDataKeys = {
     organizadores: {
         annotation: "rol",
         title: "nombreCompleto",
+        file: "aval",
         icon: "ri-map-pin-user-fill",
         saveHandler: (container) => () => AssociatedRecords.saveDBRecords("/eventos/api/asignar-organizadores/", "organizadores", container)
     },
     organizaciones: {
         annotation: "nit",
         title: "nombre",
+        file: "aval",
         icon: "ri-building-2-fill",
         saveHandler: (container) => () => AssociatedRecords.saveDBRecords("/eventos/api/asignar-organizaciones/", "organizaciones", container, true, "/eventos/mis-eventos/")
     },
@@ -253,7 +255,7 @@ export default class AssociatedRecords{
             const cardList = document.createElement("UL");
             cardList.classList.add("card__list")
 
-            data["associate_fields"].forEach((field, index) => {
+            data["associate_fields"].forEach((field) => {
                 const cardListItem = document.createElement("LI");
                 cardListItem.textContent = field;
                 cardListItem.classList.add('card__item')
@@ -266,13 +268,25 @@ export default class AssociatedRecords{
         const cardButtons = document.createElement("DIV");
         cardButtons.classList.add("card__buttons");
         
-        let cardButtonEdit;
+        let cardButtonEdit, cardFileBtn;
+
         if (type !== "instalaciones") {
             cardButtonEdit = document.createElement("BUTTON");
             cardButtonEdit.type = "button";
             cardButtonEdit.classList.add("card__button")
             cardButtonEdit.textContent = "Editar";
             cardButtonEdit.onclick = () => Modal.editRecordHandler(type, id)
+
+            //* If a file exists
+            const file = data[stepDataKeys[type]["file"]]
+
+            if (file) {
+                cardFileBtn = document.createElement("A")
+                cardFileBtn.href = `/media/${file}`
+                cardFileBtn.target = "_blank"
+                cardFileBtn.classList.add("card__button", "card__button--file")
+                cardFileBtn.innerHTML = '<i class="ri-file-pdf-2-fill"></i>'
+            }
         }
 
         //* Disassociate button
@@ -287,6 +301,7 @@ export default class AssociatedRecords{
 
         if (cardButtonEdit) cardButtons.appendChild(cardButtonEdit);
         if (cardButtonDisassociate) cardButtons.appendChild(cardButtonDisassociate);
+        if (cardFileBtn) cardButtons.appendChild(cardFileBtn);
 
         cardContent.appendChild(cardHeader);
         cardContent.appendChild(cardButtons)

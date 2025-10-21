@@ -81,11 +81,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     closeSlideSectionBtn.addEventListener("click", closeSlideSection)
     createOrganizationForm.addEventListener("submit", handleOrganizationFormSubmit)
 
-    // TODO: If it's editing
-    if (mainFormAction === "edit" && dataStore.eventoId) {
-        await loadInstalacionesEvento(dataStore.eventoId)
-    }
-
     //* Load the current user as the default/main organizer
     const assignedOrganizatorsContainer = document.querySelector(".main__step--3 .step__cards");
 
@@ -95,6 +90,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     AssociatedRecords.addRecordToUI(currentUser.id, recordUI, "organizadores", assignedOrganizatorsContainer, true)
+
+    // TODO: If it's editing
+    if (mainFormAction === "edit" && dataStore.eventoId) {
+        await loadInstalacionesEvento(dataStore.eventoId)
+        await loadOrganizadoresEvento(dataStore.eventoId)
+    }
 });
 
 //* Functions
@@ -148,16 +149,55 @@ async function loadInstalacionesEvento(eventoId) {
 
     const instalaciones = result.data.instalaciones;
 
+    // If no installations were found, return
+    if (instalaciones.length === 0) return
+
     // Save only the IDs in the datastore
     dataStore.instalaciones = instalaciones.map(inst => ({ id: inst.idInstalacion }));
 
     const container = document.querySelector(".main__step--2 .step__cards");
 
-    result.data.instalaciones.forEach(inst => {
+    instalaciones.forEach(inst => {
         AssociatedRecords.addRecordToUI(
             inst.idInstalacion,
             { ubicacion: inst.ubicacion, tipo: inst.tipo },
             "instalaciones",
+            container
+        );
+    });
+}
+
+async function loadOrganizadoresEvento(eventoId) {
+    const result = await API.fetchGet(`/eventos/api/listar-organizadores/${eventoId}/`);
+    if (result.error) {
+        Alert.error("Error al cargar los organizadores del evento")
+        setTimeout(() => window.location.href = "/eventos/mis-eventos/", 1000);
+    }
+    
+    const organizators = result.data.organizadores;
+    
+    // If no organizers were found, return
+    if (organizators.length === 0) return
+
+    const currentUserId = window.currentUser.id;
+
+    // Update the datastore 
+    //! ¿Es necesario el aval o basta solo con el id?
+    dataStore.organizadores = organizators.map(org => ({ id: org.idOrganizador, aval: org.aval }));
+    
+    const container = document.querySelector(".main__step--3 .step__cards");
+
+    organizators.forEach(org => {
+        // If it matches currentUser, remove the existing card from the DOM.
+        if (org.idOrganizador === currentUserId) {
+            const existingCard = container.querySelector(`.step__card[data-id="${currentUserId}"]`);
+            if (existingCard) existingCard.remove();
+        }
+
+        AssociatedRecords.addRecordToUI(
+            org.idOrganizador,
+            { rol: org.rol, nombreCompleto: org.nombreCompleto, aval: org.aval },
+            "organizadores",
             container
         );
     });
