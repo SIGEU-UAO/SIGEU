@@ -15,8 +15,16 @@ def validate_collection(data, schema):
 
         keys = set(item.keys())
 
+        # Detect action if exists
+        accion = item.get("accion", "").strip().lower()
+
+        # Determine which required keys to validate
+        keys_required = required_keys.copy()
+        if accion == "eliminar" and schema == SCHEMAS["organizadores_evento"]:
+            keys_required.remove("aval")  # No need to validate aval when deleting
+
         # It must have exactly the required keys.
-        if not set(required_keys).issubset(keys):
+        if not set(keys_required).issubset(keys):
             return False
         
         # There should be no keys other than those required or optional.
@@ -25,7 +33,7 @@ def validate_collection(data, schema):
             return False
 
         # 3 Validate required types
-        for k in required_keys:
+        for k in keys_required:
             expected_type = types[k]
             value = item.get(k)
             if not validate_type(value, expected_type):
@@ -71,7 +79,8 @@ SCHEMAS = {
     },
     "organizadores_evento": {
         "required_keys": ["id", "aval"],
-        "types": { "id": int, "aval": "file/pdf" }
+        "optional_keys": ["accion"],
+        "types": { "id": int, "aval": "file/pdf", "accion": str }
     },
     "organizaciones_invitadas": {
         "required_keys": ["id", "representante_asiste", "certificado_participacion"],

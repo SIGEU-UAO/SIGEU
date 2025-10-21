@@ -1,4 +1,3 @@
-from django.db import IntegrityError
 from django.http import JsonResponse
 from ...services.event import EventoService
 from ...services.associations.instalacion_fisica import InstalacionesAsignadasService
@@ -143,7 +142,7 @@ class InstalacionesAsignadasAPI:
 
             if errores:
                 return JsonResponse({
-                    "error": "Error al asignar alguna instalación física",
+                    "error": "Error al actualizar alguna instalación física",
                     "agregadas": agregadas,
                     "eliminadas": eliminadas,
                     "errores": errores
