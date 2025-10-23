@@ -1,6 +1,6 @@
 class OrganizadorSerializer:
     def serialize_organizador(organizador):
-        """Converts an Instalacion instance into a JSON-serializable dictionary."""
+        """Converts an Instalacion instance into a JSON-serializable dictionary"""
         organizador_instance = organizador.organizador
 
         return {
@@ -10,8 +10,16 @@ class OrganizadorSerializer:
             "rol": getattr(organizador_instance, "rol", ""),
         }
 
-    def serialize_organizadores(organizadores, many=False):
-        """If many=True, serializes a list of installations."""
-        if many:
-            return [OrganizadorSerializer.serialize_organizador(org) for org in organizadores]
-        return OrganizadorSerializer.serialize_organizador(organizadores)
+    def serialize_organizadores(organizadores, many=False, evento=None):
+        """If many=True, serializes a list of installations"""
+        if not many:
+            return OrganizadorSerializer.serialize_organizador(organizadores)
+
+        data = [OrganizadorSerializer.serialize_organizador(org) for org in organizadores]
+
+        # If the event passes, prioritize the creator (first position)
+        if evento:
+            creador_id = getattr(evento.creador, "idUsuario", None)
+            data.sort(key=lambda org: org["idOrganizador"] != creador_id)
+
+        return data

@@ -180,16 +180,23 @@ async function loadOrganizadoresEvento(eventoId) {
     if (organizators.length === 0) return
 
     const currentUserId = window.currentUser.id;
-
-    // Update the datastore 
-    //! ¿Es necesario el aval o basta solo con el id?
-    dataStore.organizadores = organizators.map(org => ({ id: org.idOrganizador, aval: org.aval }));
-    
     const container = document.querySelector(".main__step--3 .step__cards");
 
+    // Update the datastore 
+    dataStore.organizadores = organizators.map(org => {
+        const fd = new FormData();
+        fd.append("id", org.idOrganizador);
+        fd.append("aval", org.aval);
+        return fd;
+    });
+
+    console.log(dataStore.listFormDataRecords("organizadores"))
+    
     organizators.forEach(org => {
+        let isCurrentUser = false;
         // If it matches currentUser, remove the existing card from the DOM.
         if (org.idOrganizador === currentUserId) {
+            isCurrentUser = true;
             const existingCard = container.querySelector(`.step__card[data-id="${currentUserId}"]`);
             if (existingCard) existingCard.remove();
         }
@@ -198,7 +205,8 @@ async function loadOrganizadoresEvento(eventoId) {
             org.idOrganizador,
             { rol: org.rol, nombreCompleto: org.nombreCompleto, aval: org.aval },
             "organizadores",
-            container
+            container,
+            isCurrentUser
         );
     });
 }

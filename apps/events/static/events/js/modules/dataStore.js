@@ -23,38 +23,111 @@ const dataStore = {
     registerChange(type, id, action, record = null){
         const changes = this[`${type}_cambios`];
         const original = this[type];
+        const isFormData = record instanceof FormData;
+
+        // Helpers
+        const getChangeId = (c) => c instanceof FormData ? Number(c.get('id')) : Number(c.id);
+        const getChangeAction = (c) => c instanceof FormData ? c.get('accion') : c.accion;
+        const setAction = (c, a) => c instanceof FormData ? c.set('accion', a) : c.accion = a;
 
         // Check if there is already a change registered for this id
-        const idx = changes.findIndex(c => Number(c.id) === Number(id));
-        const originalHas = original.some(r => Number(r.id) === Number(id));
+        let idx = changes.findIndex(c => getChangeId(c) === Number(id));
+        let exists = idx !== -1;
+        const originalHas = original.some(r => Number(r instanceof FormData ? r.get("id") : r.id) === Number(id));
 
-        //* Add a new record
+        // Prepare change to record if it is formdata
+        if (record && record instanceof FormData) record.set("accion", action)
+
+        //* -------------------- ADD A NEW RECORD --------------------
         if (action === "agregar") {
-            // If there was already a “delete” change, it is canceled.
-            if (idx !== -1 && changes[idx].accion === 'eliminar') {
-                changes.splice(idx, 1);
-                return { success: true, message: `El registro ${id} fue restaurado correctamente.` };
+            if (exists && getChangeAction(changes[idx]) === "eliminar") {
+                if (isFormData && originalHas) {
+                    // Existed in DB → update with new data
+                    setAction(record, "actualizar");
+                    changes[idx] = record;
+                    this.listFormDataRecords("organizadores_cambios")
+                    console.log("-------------------------------------------------------------")
+                    return { success: true, message: `Registro ${id} marcado para actualización.` };
+                }else{
+                    // Simple case → undo deletion only
+                    changes.splice(idx, 1);
+                    this.listFormDataRecords(`${type}_cambios`);
+                    console.log("-------------------------------------------------------------")
+                    return { success: true, message: `Se restauró el registro ${id}.` };
+                }
             }
 
-            // If “add” already existed or was in the original, return
-            if ((idx !== -1 && changes[idx].accion === 'agregar') || originalHas) return { success: false, message: `El registro con id ${id} ya existe o ya fue agregado.` };
-
-            // Add new change
-            changes.push({ id: Number(id), accion: 'agregar' });
-            return { success: true, message: `Se registró la adición del registro con id ${id}` };
+            if ((exists && getChangeAction(changes[idx]) === "agregar") || (!isFormData && originalHas)) {
+                return { success: false, message: `El registro con id ${id} ya existe o ya fue agregado.` };
+            }
+    
+            changes.push(isFormData ? record : { id: Number(id), accion: "agregar" });
+            this.listFormDataRecords(`${type}_cambios`);
+            console.log("-------------------------------------------------------------")
+            return { success: true, message: `Se registró la adición del registro con id ${id}.` };
         }
 
-        if (action === "eliminar") {
-            // If there was already an “add” change, it is canceled.
-            if (idx !== -1 && changes[idx].accion === 'agregar') {
-                changes.splice(idx, 1);
-                return { success: true, message: `Se deshizo la adición del registro ${id}.` };
-            }
-            // If “delete” already existed, return
-            if ((idx !== -1 && changes[idx].accion === 'eliminar') || !originalHas) return { success: false, message: `El registro con id ${id} no puede eliminarse o ya fue marcado para eliminación.` };
+        //* -------------------- UPDATE (only FormData) --------------------
+        if (action === "actualizar") {
+            const isUpdatable =
+                originalHas ||
+                (exists && ["agregar", "actualizar"].includes(getChangeAction(changes[idx])));
 
-            // Add new change
-            changes.push({ id: Number(id), accion: 'eliminar' });
+            if (!isUpdatable) {
+                return { success: false, message: `No se puede actualizar un registro inexistente.` };
+            }
+
+            if (exists) {
+                const existing = changes[idx];
+                for (let [key, value] of record.entries()) existing.set(key, value);
+                setAction(existing, "actualizar");
+            } else {
+                setAction(record, "actualizar");
+                changes.push(record);
+            }
+    
+            this.listFormDataRecords(`${type}_cambios`);
+            console.log("-------------------------------------------------------------")
+            return { success: true, message: `Registro ${id} actualizado correctamente.` };
+        }        
+
+        // -------------------- REMOVE --------------------
+        if (action === "eliminar") {
+            if (!originalHas) {
+                if (exists) {
+                    const ch = getChangeAction(changes[idx]);
+                    if (ch === "agregar" || ch === "actualizar") {
+                        // It was a local addition: undo it.
+                        changes.splice(idx, 1);
+                        this.listFormDataRecords(`${type}_cambios`);
+                        return { success: true, message: `Se deshizo la adición del registro ${id}.` };
+                    }
+                }
+                // There is nothing in the database or local changes to undo -> cannot be deleted
+                return { success: false, message: `El registro con id ${id} no existe y no puede eliminarse.` };
+            }
+
+            if (exists && getChangeAction(changes[idx]) === "agregar") {
+                changes.splice(idx, 1);
+                this.listFormDataRecords(`${type}_cambios`);
+                return { success: true, message: `Se restauró el registro ${id}.` };
+            }
+
+            if (exists && getChangeAction(changes[idx]) === "actualizar" && isFormData) {
+                changes.splice(idx, 1);
+            }
+
+            // recompute idx/exists after possible splices to avoid reading undefined
+            const newIdx = changes.findIndex(c => getChangeId(c) === Number(id));
+            const newExists = newIdx !== -1;
+
+            // If it is already marked as ‘delete’ -> we do not allow it to be duplicated.
+            if (newExists && getChangeAction(changes[newIdx]) === "eliminar") {
+                return { success: false, message: `El registro con id ${id} ya fue marcado para eliminación.` };
+            }
+
+            changes.push(isFormData ? record : { id: Number(id), accion: "eliminar" });
+            this.listFormDataRecords(`${type}_cambios`);
             return { success: true, message: `Se registró la eliminación del registro con id ${id}.` };
         }
         

@@ -155,5 +155,5 @@ def formulario_edicion(request, pk):
         "modal_asociar_organizacion_form": modalAsociarOrganizacionForm,
         "registro_organizacion_form": registroOrganizacionForm,
         "current_user_data": { "id": current_user.idUsuario, "nombreCompleto": f"{current_user.nombres} {current_user.apellidos}", "rol": current_user.rol },
-        "active_page": "registrar-evento"
+        "active_page": "mis-eventos"
     })

@@ -116,7 +116,7 @@ class OrganizadorEventoAPI:
 
             ids = request.POST.getlist("organizadores_id[]")
             avales = request.FILES.getlist("organizadores_aval[]")
-            acciones = request.POST.getlist("acciones[]")
+            acciones = request.POST.getlist("organizadores_accion[]")
             
             organizadores = []
             file_index = 0

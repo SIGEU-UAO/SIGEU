@@ -22,7 +22,7 @@ class OrganizadoresEventosService:
     def listarOrganizadores(eventoId):
         evento = EventoService.obtener_por_id(eventoId)
         organizadores = evento.organizadores_asignados.all()
-        data = OrganizadorSerializer.serialize_organizadores(organizadores, many=True)
+        data = OrganizadorSerializer.serialize_organizadores(organizadores, many=True, evento=evento)
         return data
     
     @staticmethod
