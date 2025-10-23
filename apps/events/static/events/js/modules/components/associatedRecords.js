@@ -97,7 +97,12 @@ export default class AssociatedRecords{
         // Update or add as appropriate and capture the result
         let result;
         if (!dataStore.getByID(type, id) && isCurrentUser) {
-            result = dataStore.addRecord(type, record, id);
+            if (mainFormAction === "add") {
+                result = dataStore.addRecord(type, record, id);
+            }else if (mainFormAction === "edit") {
+                result = dataStore.registerChange(type, id, "agregar", record)
+            }
+
             this.updateStepBtn(type, buttonStep, container);
         } else {
             if (mainFormAction === "add"){
