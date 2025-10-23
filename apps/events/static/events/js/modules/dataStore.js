@@ -45,14 +45,10 @@ const dataStore = {
                     // Existed in DB → update with new data
                     setAction(record, "actualizar");
                     changes[idx] = record;
-                    this.listFormDataRecords("organizadores_cambios")
-                    console.log("-------------------------------------------------------------")
                     return { success: true, message: `Registro ${id} marcado para actualización.` };
                 }else{
                     // Simple case → undo deletion only
                     changes.splice(idx, 1);
-                    this.listFormDataRecords(`${type}_cambios`);
-                    console.log("-------------------------------------------------------------")
                     return { success: true, message: `Se restauró el registro ${id}.` };
                 }
             }
@@ -62,8 +58,6 @@ const dataStore = {
             }
     
             changes.push(isFormData ? record : { id: Number(id), accion: "agregar" });
-            this.listFormDataRecords(`${type}_cambios`);
-            console.log("-------------------------------------------------------------")
             return { success: true, message: `Se registró la adición del registro con id ${id}.` };
         }
 
@@ -85,9 +79,7 @@ const dataStore = {
                 setAction(record, "actualizar");
                 changes.push(record);
             }
-    
-            this.listFormDataRecords(`${type}_cambios`);
-            console.log("-------------------------------------------------------------")
+
             return { success: true, message: `Registro ${id} actualizado correctamente.` };
         }        
 
@@ -147,23 +139,6 @@ const dataStore = {
             }
         }) || null;
     },   
-
-    listFormDataRecords(type){
-        dataStore[type].forEach((record, index) => {
-            console.log(`Registro #${index}:`);
-            if (record instanceof FormData) {
-                for (let [key, value] of record.entries()) {
-                    if (value instanceof File) {
-                        console.log(`  ${key}: File { name: ${value.name}, size: ${value.size} }`);
-                    } else {
-                        console.log(`  ${key}: ${value}`);
-                    }
-                }
-            } else {
-                console.log("Record no es FormData:", record);
-            }
-        });
-    },
     
     updateRecord(type, newRecord) {
         const id = newRecord instanceof FormData ? newRecord.get('id') : newRecord.id;

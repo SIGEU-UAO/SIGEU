@@ -40,7 +40,13 @@ const stepDataKeys = {
         title: "nombre",
         file: "certificado_participacion",
         icon: "ri-building-2-fill",
-        saveHandler: (container) => () => AssociatedRecords.saveDBRecords("/eventos/api/asignar-organizaciones/", "organizaciones", container, true, "/eventos/mis-eventos/")
+        saveHandler: (container) => () => {
+            if (mainFormAction === "add") {
+                AssociatedRecords.saveDBRecords("/eventos/api/asignar-organizaciones/", "organizaciones", container, true, "/eventos/mis-eventos/");
+            } else if (mainFormAction === "edit") {
+                AssociatedRecords.updateDBRecords("/eventos/api/actualizar-organizaciones/", "organizaciones", container, true, "/eventos/mis-eventos/");
+            }
+        }
     },
 }
 
@@ -208,7 +214,11 @@ export default class AssociatedRecords{
         const originalRecords = dataStore[type] || [];
 
         if (updatedRecords.length === 0) {
-            goStep("next");
+            if (isFinishStep) {
+                Alert.success("Actualización del evento completada correctamente")
+                setTimeout(() => window.location.href = finishURL, 1500);
+            }
+            else goStep("next");
             return;
         }
 
@@ -268,8 +278,6 @@ export default class AssociatedRecords{
             return found || originalRecords.find(r => (r instanceof FormData ? Number(r.get("id")) : Number(r.id)) === id);
         });
         dataStore[`${type}_cambios`] = [];
-        console.log("Datastore actualizado")
-        console.log(dataStore[type])
         Alert.success(`Datos de ${type} actualizados correctamente.`);
 
         if (isFinishStep) {

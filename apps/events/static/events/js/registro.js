@@ -233,8 +233,6 @@ async function loadOrganizacionesInvitadasEvento(eventoId) {
         fd.append("certificado_participacion", org.certificado_participacion);
         return fd;
     });
-
-    console.log(dataStore.listFormDataRecords("organizaciones"))
     
     organizations.forEach(org => {
         AssociatedRecords.addRecordToUI(
