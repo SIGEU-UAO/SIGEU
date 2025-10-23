@@ -62,6 +62,6 @@ class OrganizadoresEventosService:
             
             asignacion.delete()
         except ObjectDoesNotExist:
-            raise ValueError("La instalación que se pretende eliminar no está asginada al evento")
+            raise ValueError("El organizador que se pretende eliminar no está asginado al evento")
         except Exception as e:
-            raise ValueError(f"Error al eliminar la instalación asignada: {e}")
+            raise ValueError(f"Error al eliminar el organizador del evento: {e}")

@@ -23,6 +23,10 @@ def validate_collection(data, schema):
         if accion == "eliminar" and schema == SCHEMAS["organizadores_evento"]:
             keys_required.remove("aval")  # No need to validate aval when deleting
 
+        if accion == "eliminar" and schema == SCHEMAS["organizaciones_invitadas"]:
+            keys_required.remove("representante_asiste")
+            keys_required.remove("certificado_participacion")
+
         # It must have exactly the required keys.
         if not set(keys_required).issubset(keys):
             return False
@@ -51,7 +55,7 @@ def validate_collection(data, schema):
         if item.get("representante_asiste") and item.get("representante_alterno") and schema == SCHEMAS["organizaciones_invitadas"]:
             return False    
         
-        if not item.get("representante_asiste") and not item.get("representante_alterno") and schema == SCHEMAS["organizaciones_invitadas"]:
+        if not item.get("representante_asiste") and not item.get("representante_alterno") and accion != "eliminar" and schema == SCHEMAS["organizaciones_invitadas"]:
             return False
     
     return True
@@ -84,12 +88,13 @@ SCHEMAS = {
     },
     "organizaciones_invitadas": {
         "required_keys": ["id", "representante_asiste", "certificado_participacion"],
-        "optional_keys": ["representante_alterno"],
+        "optional_keys": ["representante_alterno", "accion"],
         "types": {
             "id": int,
             "representante_asiste": bool,
             "representante_alterno": str,
-            "certificado_participacion": "file/pdf"
+            "certificado_participacion": "file/pdf",
+            "accion": str
         }
     }
 }

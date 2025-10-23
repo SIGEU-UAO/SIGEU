@@ -136,14 +136,14 @@ class OrganizadorEventoAPI:
                 })
 
             if not validate_collection(organizadores, SCHEMAS["organizadores_evento"]):
-                return JsonResponse({ "error": "Datos de instalaciones físicas inválidos." }, status=400)
+                return JsonResponse({ "error": "Datos de organizadores de eventos inválidos." }, status=400)
 
             agregados = []
             actualizados = []
             eliminados = []
             errores = []
 
-            # * Try to assign all facilities
+            # * Try to update all organizers
             for item in organizadores:
                 org_id = item.get("id")
                 accion = (item.get("accion") or "").strip().lower()
