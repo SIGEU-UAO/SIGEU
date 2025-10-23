@@ -92,7 +92,6 @@ class OrganizacionesExternasAPI:
             data = []
             for org in page.object_list:
                 data.append({
-                    "id": org.idOrganizacion,
                     "nit": org.nit,
                     "nombre": org.nombre,
                     "representanteLegal": org.representanteLegal,
@@ -100,11 +99,8 @@ class OrganizacionesExternasAPI:
                     "ubicacion": org.ubicacion,
                     "sectorEconomico": org.sectorEconomico,
                     "actividadPrincipal": org.actividadPrincipal,
-                    "esCreador": request.user.idUsuario == org.creador_id
                 })
             
-            
-
             return JsonResponse({
                 "draw": draw,
                 "recordsTotal": total_records,

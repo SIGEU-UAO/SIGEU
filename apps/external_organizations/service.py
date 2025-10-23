@@ -1,7 +1,7 @@
 from django.db.models import Q
 from django.db import IntegrityError
 from .models import OrganizacionExterna
-from django.shortcuts import get_object_or_404
+from .serializer import ExternalOrganizationSerializer
 
 class OrganizacionExternaService:
     @staticmethod
@@ -34,19 +34,8 @@ class OrganizacionExternaService:
         return OrganizacionExterna.objects.all()
     
     @staticmethod
-    @staticmethod
     def listar_json():
-        return list(OrganizacionExterna.objects.values(
-            "idOrganizacion",
-            "nit",
-            "nombre",
-            "representanteLegal",
-            "telefono",
-            "ubicacion",
-            "sectorEconomico",
-            "actividadPrincipal",
-            "creador_id"
-        ))
+        return ExternalOrganizationSerializer.serialize_organizations(OrganizacionExterna.objects.all(), many=True)
     
     @staticmethod
     def buscar(termino):

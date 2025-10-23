@@ -1,6 +1,6 @@
 class OrganizadorSerializer:
     def serialize_organizador(organizador):
-        """Converts an Instalacion instance into a JSON-serializable dictionary"""
+        """Converts an Organizador instance into a JSON-serializable dictionary"""
         organizador_instance = organizador.organizador
 
         return {

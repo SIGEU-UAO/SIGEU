@@ -1,6 +1,6 @@
 class OrganizacionInvitadaSerializer:
     def serialize_organizacion(organizacion):
-        """Converts an Instalacion instance into a JSON-serializable dictionary"""
+        """Converts an Organizacion Externa instance into a JSON-serializable dictionary"""
         organizacion_instance = organizacion.organizacion
 
         return {
