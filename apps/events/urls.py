@@ -25,7 +25,7 @@ urlpatterns = [
     path("eventos/api/actualizar-organizadores/<int:eventoId>/", OrganizadorEventoAPI.actualizar_organizadores, name="actualizar_organizadores_api"),
 
     path("eventos/api/asignar-organizaciones/", OrganizacionInvitadaAPI.asignar_organizaciones_invitadas, name="asignar_organizaciones_api"),
-
+    path("eventos/api/listar-organizaciones/<int:eventoId>/", OrganizacionInvitadaAPI.listar_organizaciones_invitadas, name="listar_organizaciones_invitadas_api"),
 
     path("eventos/api/editar/<int:id>/", EventoAPI.actualizar, name="actualizar_evento_api"),
 ]

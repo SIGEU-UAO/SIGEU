@@ -82,3 +82,15 @@ class OrganizacionInvitadaAPI:
             }, status=201)
 
         return JsonResponse({"error": "Método no permitido"}, status=405)
+    
+    @login_required()
+    @organizador_required
+    def listar_organizaciones_invitadas(request, eventoId):
+        if request.method == "GET":
+            # Verify if it is the event creator
+            es_creador = EventoService.es_creador(request.user, eventoId)
+            if not es_creador:
+                return JsonResponse({"error": "No tienes permiso para listar las instalaciones fisicas asignadas a este evento."}, status=403)
+            
+            return JsonResponse({ "organizadores": OrganizacionesInvitadasService.listarOrganizacionesInvitadas(eventoId) })
+        return JsonResponse({"error": "Método no permitido"}, status=405)
