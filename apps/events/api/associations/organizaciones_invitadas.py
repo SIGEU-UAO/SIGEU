@@ -92,5 +92,5 @@ class OrganizacionInvitadaAPI:
             if not es_creador:
                 return JsonResponse({"error": "No tienes permiso para listar las instalaciones fisicas asignadas a este evento."}, status=403)
             
-            return JsonResponse({ "organizadores": OrganizacionesInvitadasService.listarOrganizacionesInvitadas(eventoId) })
+            return JsonResponse({ "organizaciones": OrganizacionesInvitadasService.listarOrganizacionesInvitadas(eventoId) })
         return JsonResponse({"error": "Método no permitido"}, status=405)

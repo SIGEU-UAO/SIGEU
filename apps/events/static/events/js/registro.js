@@ -95,6 +95,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (mainFormAction === "edit" && dataStore.eventoId) {
         await loadInstalacionesEvento(dataStore.eventoId)
         await loadOrganizadoresEvento(dataStore.eventoId)
+        await loadOrganizacionesInvitadasEvento(dataStore.eventoId)
     }
 });
 
@@ -189,8 +190,6 @@ async function loadOrganizadoresEvento(eventoId) {
         fd.append("aval", org.aval);
         return fd;
     });
-
-    console.log(dataStore.listFormDataRecords("organizadores"))
     
     organizators.forEach(org => {
         let isCurrentUser = false;
@@ -207,6 +206,50 @@ async function loadOrganizadoresEvento(eventoId) {
             "organizadores",
             container,
             isCurrentUser
+        );
+    });
+}
+
+async function loadOrganizacionesInvitadasEvento(eventoId) {
+    const result = await API.fetchGet(`/eventos/api/listar-organizaciones/${eventoId}/`);
+    if (result.error) {
+        Alert.error("Error al cargar las organizaciones invitadas del evento")
+        setTimeout(() => window.location.href = "/eventos/mis-eventos/", 1000);
+    }
+
+    const organizations = result.data.organizaciones;
+    
+    // If no organizers were found, return
+    if (organizations.length === 0) return
+
+    const container = document.querySelector(".main__step--4 .step__cards");
+
+    // Update the datastore 
+    dataStore.organizaciones = organizations.map(org => {
+        const fd = new FormData();
+        fd.append("id", org.idOrganizacion);
+        if (org.representante_asiste) fd.append("representante_asiste", "on")
+        else fd.append("representante_alterno", org.representante_alterno)
+        fd.append("certificado_participacion", org.certificado_participacion);
+        return fd;
+    });
+
+    console.log(dataStore.listFormDataRecords("organizaciones"))
+    
+    organizations.forEach(org => {
+        AssociatedRecords.addRecordToUI(
+            org.idOrganizacion,
+            { 
+                nit: org.nit,
+                nombre: org.nombre, 
+                certificado_participacion: org.certificado_participacion,
+                associate_fields: [ 
+                    org.representante_asiste === "on" ? "El representante legal ASISTE" : "El representante legal NO ASISTE",
+                    org.representante_alterno && `Representante alterno: ${org.representante_alterno}`
+                ].filter(Boolean)
+            },
+            "organizaciones",
+            container
         );
     });
 }
