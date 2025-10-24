@@ -83,5 +83,6 @@ async function handleSubmit(e) {
   if (result.error) return;
 
   Alert.success(`${rolSelect.value.charAt(0).toUpperCase() + rolSelect.value.slice(1).toLowerCase()} registrado exitosamente`);
+  Alert.success("Correo de bienvenida enviado exitosamente")
   setTimeout(() => { window.location.href = loginUrl; }, 1500);
 }

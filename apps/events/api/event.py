@@ -43,7 +43,6 @@ class EventoAPI:
 
         data = EventoSerializer.serialize_page(page_obj)
         return JsonResponse(data, safe=False)
-
     @login_required()
     @organizador_required
     def actualizar(request, id):
@@ -72,3 +71,22 @@ class EventoAPI:
             else:
                 return JsonResponse({"error": form.errors}, status=400)
         return JsonResponse({"error": "Método no permitido"}, status=405)
+    
+    @login_required()
+    @organizador_required
+    def enviar_evento_validacion(request, id_evento):
+        if request.method == "PATCH":
+            evento = EventoService.obtener_por_id(id_evento)
+            if not evento:
+                return JsonResponse({"error": "Evento no encontrado."}, status=404)
+            if evento.estado != "Borrador":
+                return JsonResponse({"error": "Solo los eventos en estado 'borrador' pueden ser enviados a validación."}, status=400)
+            if evento.creador != request.user:
+                return JsonResponse({"error": "No tienes permiso para enviar este evento a validación."}, status=403)
+            if not evento.instalaciones_asignadas.exists():
+                return JsonResponse({"error": "El evento debe tener al menos una instalación asignada antes de enviarlo a validación."}, status=400)
+            actualizado = EventoService.actualizar_estado(id_evento, "Enviado")
+            if actualizado:
+                return JsonResponse({"message": "El evento ha sido enviado a validación correctamente."}, status=200)
+            else:
+                return JsonResponse({"error": "No se pudo actualizar el estado del evento."}, status=500)

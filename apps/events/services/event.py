@@ -114,3 +114,51 @@ class EventoService:
     def actualizar_fecha_ultimo_cambio(evento):
         evento.fecha_ultimo_cambio = timezone.now()
         evento.save(update_fields=["fecha_ultimo_cambio"])
+        
+    def serializar_eventos(page_obj, request=None):
+        results = []
+        for e in page_obj.object_list:
+            # organizadores asignados (resumido)
+            organizadores = []
+            for o in e.organizadores_asignados.all():
+                u = o.organizador
+                organizadores.append({
+                    "nombre": ((getattr(u, "nombres", "") or "") + " " + (getattr(u, "apellidos", "") or "")).strip(),
+                    "rol_organizador": o.get_tipo_display() if hasattr(o, "get_tipo_display") else o.tipo
+                })
+
+            # organizaciones invitadas (resumido)
+            organizaciones = []
+            for oi in e.organizaciones_invitadas.all():
+                org = oi.organizacion
+                organizaciones.append({"nombre": getattr(org, "nombre", None),"nit": getattr(org, "nit", None)})
+
+            item = {
+                "idEvento": e.idEvento,
+                "nombre": e.nombre,
+                "fecha": e.fecha.isoformat() if e.fecha else None,
+                "horaInicio": e.horaInicio.isoformat() if e.horaInicio else None,
+                "estado": e.estado,
+                "instalaciones": [ getattr(a.instalacion, "nombre", str(a.instalacion)) for a in e.instalaciones_asignadas.all() ],
+                "organizadores": organizadores,
+                "organizaciones_invitadas": organizaciones
+            }
+            
+            results.append(item)
+
+        return {
+            "count": page_obj.paginator.count,
+            "num_pages": page_obj.paginator.num_pages,
+            "current_page": page_obj.number,
+            "results": results,
+        }
+    
+    @staticmethod
+    def actualizar_estado(id_evento, nuevo_estado):
+        try:
+            evento = Evento.objects.get(idEvento=id_evento)
+            evento.estado = nuevo_estado
+            evento.save()
+            return True
+        except Evento.DoesNotExist:
+            return False
