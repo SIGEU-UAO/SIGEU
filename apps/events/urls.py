@@ -8,7 +8,8 @@ from .api.associations.organizaciones_invitadas import OrganizacionInvitadaAPI
 urlpatterns = [
     # --- Views ---
     path("eventos/registro/", views.formulario_registro, name="registrar_evento"),  
-    path("eventos/mis-eventos/", views.mis_eventos, name="mis_eventos"),     
+    path("eventos/mis-eventos/", views.mis_eventos, name="mis_eventos"),   
+    path("eventos/enviados/", views.eventos_enviados, name="eventos_enviados"),  
 
     # --- API ---
     path("eventos/api/registro/", EventoAPI.registro, name="registro_evento_api"),
@@ -16,5 +17,6 @@ urlpatterns = [
     path("eventos/api/asignar-instalaciones/", InstalacionesAsignadasAPI.asignar_instalaciones_fisicas, name="asignar_instalaciones_api"),
     path("eventos/api/asignar-organizadores/", OrganizadorEventoAPI.asignar_coordinadores_evento, name="asignar_coordinadores_api"),
     path("eventos/api/asignar-organizaciones/", OrganizacionInvitadaAPI.asignar_organizaciones_invitadas, name="asignar_organizaciones_api"),
-    path("eventos/api/enviar-validacion/<int:id_evento>/",EventoAPI.enviar_evento_validacion,name="enviar_evento_validacion_api")
+    path("eventos/api/enviar-validacion/<int:id_evento>/",EventoAPI.enviar_evento_validacion,name="enviar_evento_validacion_api"),
+    path("eventos/api/listar-enviados/",EventoAPI.listar_eventos_enviados,name="listar_eventos_enviados_api")
 ]

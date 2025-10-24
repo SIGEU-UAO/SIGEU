@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from sigeu.decorators import no_superuser_required, organizador_required
+from sigeu.decorators import no_superuser_required, organizador_required, secretaria_required
 from .forms.event import RegistroEventoForm
 from .forms.associations.OrganizadorEvento import OrganizadorEventoForm
 from .forms.associations.OrganizacionesInvitadas import OrganizacionInvitadaForm
@@ -106,3 +106,66 @@ def mis_eventos(request):
     }
 
     return render(request, "events/mis_eventos.html", context)
+
+
+@no_superuser_required
+@login_required()
+@secretaria_required
+def eventos_enviados(request):
+    status = request.GET.get('status', None)   # e.g. "Aprobado"
+    page = request.GET.get('page', 1)
+
+    try:
+        page = int(page)
+    except (TypeError, ValueError):
+        page = 1
+
+    page_obj = EventoService.listar_eventos_enviados(page=page, per_page=12)
+
+
+    # --- cálculo de ventana de paginación ---
+    paginator = page_obj.paginator
+    current = page_obj.number
+    total = paginator.num_pages
+
+    # ventana de páginas: mostrar up to 5 páginas centradas en la actual
+    window_size = 5
+    half = window_size // 2
+
+    start = current - half
+    end = current + half
+
+    if start < 1:
+        start = 1
+        end = min(window_size, total)
+    if end > total:
+        end = total
+        start = max(1, total - window_size + 1)
+
+    page_numbers = list(range(start, end + 1))
+
+    # banderas para primeros/ultimos y puntos suspensivos
+    show_first = (1 not in page_numbers)
+    show_last = (total not in page_numbers)
+    first_page = 1
+    last_page = total
+    left_has_more = start > 2   # hay hueco entre 1 y start
+    right_has_more = end < total - 1
+
+    context = {
+        "header_title": "Eventos Pendientes de Validación",
+        "header_paragraph": "Administra y lleva el control de todos tus eventos en un solo lugar.",
+        "active_page": "eventos-enviados",
+        "page_obj": page_obj,
+        "status": status or "",
+        # datos para paginación
+        "page_numbers": page_numbers,
+        "show_first": show_first,
+        "show_last": show_last,
+        "first_page": first_page,
+        "last_page": last_page,
+        "left_has_more": left_has_more,
+        "right_has_more": right_has_more,
+    }
+
+    return render(request, "events/eventos_enviados.html", context)

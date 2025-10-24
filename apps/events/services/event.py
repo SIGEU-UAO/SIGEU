@@ -1,7 +1,9 @@
 from django.db import IntegrityError
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from datetime import datetime
-from ..models import Evento
+from django.utils import timezone
+from apps.users.models import Usuario
+from ..models import Evento, OrganizadorEvento
 
 
 class EventoService:
@@ -110,3 +112,28 @@ class EventoService:
             return True
         except Evento.DoesNotExist:
             return False
+        
+    @staticmethod
+    def actualizar_fecha_envio(id_evento):
+        try:
+            evento = Evento.objects.get(idEvento=id_evento)
+            evento.fechaEnvio = timezone.now()
+            evento.save()
+            return True
+        except Evento.DoesNotExist:
+            return False
+
+    @staticmethod
+    def listar_eventos_enviados(page=1, per_page=12):
+        # listar eventos en estado "Enviado"
+        qs = Evento.objects.filter(estado__iexact="Enviado").order_by('-fechaEnvio')
+
+        paginator = Paginator(qs, per_page)
+        try:
+            page_obj = paginator.page(page)
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)
+
+        return page_obj

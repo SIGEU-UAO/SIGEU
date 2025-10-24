@@ -1,0 +1,30 @@
+{% extends 'layouts/dashboard.html' %}
+{% load static %}
+
+{% block page_title %} SIGEU | Eventos en Validación {% endblock page_title %}
+
+{% block css_files %}
+    <link rel="stylesheet" href="{% static 'events/css/eventos_enviados.css' %}">
+{% endblock css_files %}
+
+{% block content %}
+
+    <div class="no-results-container">
+        <img src="{% static 'events/assets/img/empty.webp' %}" alt="No hay eventos">
+        <h3>No hay eventos enviados hasta el momento</h3>
+        <p>Prueba a cambiar filtros o espera hasta más tarde.</p>
+    </div>
+
+    <section class="cards">
+        {% if page_obj.object_list %}
+            {% for event in page_obj.object_list %}
+                {% include 'events/components/cards_enviados.html' with event=event type=event.estado %}
+            {% endfor %}
+        {% endif %}
+    </section>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+        {% include 'events/components/pagination.html' %}
+    {% endif %}
+
+{% endblock content %}

@@ -1,0 +1,25 @@
+{% load static %}
+{# <link rel="stylesheet" href="{% static 'events/css/components/modal_organizadores.css' %}"> #}
+
+<dialog id="modal-organizador-{{ usuario.idUsuario }}" class="modal">
+  <div class="modal__content">
+    <button type="button" class="modal__close" title="Cerrar Modal"
+            onclick="this.closest('dialog').close()">&times;</button>
+
+    <div id="modal-organizadores-container">
+      <h2>Organizador</h2>
+      <span>{{ usuario.nombres }} {{ usuario.apellidos }}</span>
+      <hr>
+
+      <h2>Tipo</h2>
+      <span>{{ tipo }}</span>
+      <hr>
+
+      <h2>Información de Contacto</h2>
+      <div class="modal__info--group">
+        <span><strong>Correo Electrónico:</strong> {{ usuario.email }}</span>
+        <span><strong>Teléfono:</strong> {{ usuario.telefono }}</span>
+      </div>
+    </div>
+  </div>
+</dialog>

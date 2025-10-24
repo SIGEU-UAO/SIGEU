@@ -3,6 +3,7 @@ from ..forms.event import RegistroEventoForm
 from ..services.event import EventoService
 from django.contrib.auth.decorators import login_required
 from sigeu.decorators import organizador_required
+from sigeu.decorators import secretaria_required
 import json
 
 class EventoAPI:
@@ -62,7 +63,27 @@ class EventoAPI:
             if not evento.instalaciones_asignadas.exists():
                 return JsonResponse({"error": "El evento debe tener al menos una instalación asignada antes de enviarlo a validación."}, status=400)
             actualizado = EventoService.actualizar_estado(id_evento, "Enviado")
-            if actualizado:
+            fecha = EventoService.actualizar_fecha_envio(id_evento)
+            if actualizado and fecha:
                 return JsonResponse({"message": "El evento ha sido enviado a validación correctamente."}, status=200)
             else:
                 return JsonResponse({"error": "No se pudo actualizar el estado del evento."}, status=500)
+            
+
+    login_required()
+    secretaria_required()
+    def listar_eventos_enviados(request):
+        if request.method == "GET":
+            page = request.GET.get('page', 1)
+
+            try:
+                page = int(page)
+            except (TypeError, ValueError):
+                page = 1
+
+            page_obj = EventoService.listar_eventos_enviados(
+                page=page, per_page=12
+            )
+
+            data = EventoService.serializar_eventos(page_obj, request=request)
+            return JsonResponse(data, safe=False)
