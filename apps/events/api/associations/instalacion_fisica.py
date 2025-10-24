@@ -147,6 +147,9 @@ class InstalacionesAsignadasAPI:
                     "eliminadas": eliminadas,
                     "errores": errores
                 }, status=207)
+            
+            if agregadas or eliminadas:
+                EventoService.actualizar_fecha_ultimo_cambio(evento)
 
             return JsonResponse({
                 "agregadas": agregadas,

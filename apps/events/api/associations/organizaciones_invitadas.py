@@ -188,6 +188,9 @@ class OrganizacionInvitadaAPI:
                     "eliminadas": eliminadas,
                     "errores": errores
                 }, status=207)
+            
+            if agregadas or actualizadas or eliminadas:
+                EventoService.actualizar_fecha_ultimo_cambio(evento)
 
             return JsonResponse({
                 "agregadas": agregadas,

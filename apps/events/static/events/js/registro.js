@@ -111,10 +111,14 @@ async function handleMainFormSubmit(e) {
     const result = mainFormAction === "add" ? await API.post("/eventos/api/registro/", formData) : await API.put(`/eventos/api/editar/${dataStore.eventoId}/`, formData);
     if (result.error) return;
 
-    Alert.success(mainFormAction === "add" ? "Evento registrado en estado borrador" : "Información del evento actualizada correctamente");
-    if (mainFormAction === "add") dataStore.eventoId = result.data.evento;
+    if (mainFormAction === "add") {
+        Alert.success("Evento registrado en estado borrador")
+        dataStore.eventoId = result.data.evento
+        mainForm.reset();
+    }else if(mainFormAction === "edit"){
+        Alert.success(result.data.message)   
+    }
     goStep("next")
-    mainForm.reset();
 }
 
 function openSlideSection() {

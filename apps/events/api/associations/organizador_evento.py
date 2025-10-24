@@ -191,6 +191,9 @@ class OrganizadorEventoAPI:
                     "eliminados": eliminados,
                     "errores": errores
                 }, status=207)
+            
+            if agregados or actualizados or eliminados:
+                EventoService.actualizar_fecha_ultimo_cambio(evento)
 
             return JsonResponse({
                 "agregados": agregados,

@@ -1,5 +1,6 @@
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.utils import timezone
 from datetime import datetime
 from ..models import Evento
 
@@ -31,7 +32,7 @@ class EventoService:
     
     @staticmethod
     def listar_por_organizador(usuario, status=None, page=1, per_page=12, search=None, search_by=None):
-        qs = Evento.objects.filter(creador=usuario).order_by('-fecha', '-horaInicio')
+        qs = Evento.objects.filter(creador=usuario).order_by('-fecha_ultimo_cambio')
         if status:
             qs = qs.filter(estado__iexact=status)
 
@@ -69,18 +70,47 @@ class EventoService:
         return usuario.idUsuario == event.creador_id
     
     @staticmethod
-    def actualizar(id, data):
+    def actualizar(event, data):
         #Validate integrity errors for unique fields
         try:
-            event = Evento.objects.get(pk=id)
-            event.nombre = data["nombre"]
-            event.tipo = data["tipo"]
-            event.descripcion = data["descripcion"]
-            event.fecha = data["fecha"]
-            event.horaInicio = data["horaInicio"]
-            event.horaFin = data["horaFin"]
-            event.save()
+            campos = ["nombre", "tipo", "descripcion", "fecha", "horaInicio", "horaFin"]
+            cambios = {}
+
+            for campo in campos:
+                valor_actual = getattr(event, campo)
+                valor_nuevo = data.get(campo)
+
+                if str(valor_actual) != str(valor_nuevo):
+                    cambios[campo] = valor_nuevo
+                    
+                # Normalize types
+                if campo == "fecha" and isinstance(valor_nuevo, str):
+                    valor_nuevo = datetime.strptime(valor_nuevo, "%Y-%m-%d").date()
+
+                if campo in ["horaInicio", "horaFin"] and isinstance(valor_nuevo, str):
+                    valor_nuevo = datetime.strptime(valor_nuevo, "%H:%M").time()
+
+                # Compare normalized values
+                if valor_actual != valor_nuevo:
+                    cambios[campo] = valor_nuevo
+
+            if not cambios:
+                return None
+            
+            # Update only the modified fields
+            for campo, valor in cambios.items():
+                setattr(event, campo, valor)
+
+            with transaction.atomic():
+                event.save()
+
+            # Update last_change_date
+            
         except Evento.DoesNotExist:
             raise ValueError("No se encontró el evento especificado.")
         
         return event
+    
+    def actualizar_fecha_ultimo_cambio(evento):
+        evento.fecha_ultimo_cambio = timezone.now()
+        evento.save(update_fields=["fecha_ultimo_cambio"])

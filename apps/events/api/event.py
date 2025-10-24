@@ -49,7 +49,8 @@ class EventoAPI:
     def actualizar(request, id):
         if request.method == "PUT":
             # Get the event
-            if not EventoService.obtener_por_id(id):
+            evento = EventoService.obtener_por_id(id)
+            if not evento:
                 return JsonResponse({ "error": "El evento especificado no existe" }, status=404)
             
             #Validates if the user is the creator of the event
@@ -61,7 +62,10 @@ class EventoAPI:
             form = RegistroEventoForm(data)
             if form.is_valid():
                 try:
-                    EventoService.actualizar(id, form.cleaned_data)
+                    result = EventoService.actualizar(evento, form.cleaned_data)
+                    if result is None:
+                        return JsonResponse({"message": "Tu información está al día."}, status=200)
+                    
                     return JsonResponse({"message": "Información básica del evento actualizada correctamente."}, status=200)
                 except ValueError as e:
                     return JsonResponse({"error": str(e)}, status=400)
