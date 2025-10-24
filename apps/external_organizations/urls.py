@@ -6,7 +6,6 @@ urlpatterns = [
     # --- Views ---
     path("orgs/listado/", views.listado, name="listado_orgs"),
     path("orgs/listado/orgs/editar/<int:pk>/", views.editar, name="editar_org"),
-    path("orgs/listado/error/no-encontrada/", views.org_no_encontrada, name="org_no_encontrada"),
 
     # --- API ---
     path("orgs/api/", OrganizacionesExternasAPI.listar, name="orgs_api_list"),

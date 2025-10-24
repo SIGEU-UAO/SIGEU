@@ -108,7 +108,6 @@ export default class API {
         }
     }
 
-
     static async postFormData(url, formData) {
         const csrf = getCookie("csrftoken");
     

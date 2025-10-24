@@ -3,7 +3,7 @@ from .models import InstalacionFisica
 class InstalacionesFisicasService:
     @staticmethod
     def listar():
-        return InstalacionFisica.objects.values()
+        return InstalacionFisica.objects.values("ubicacion", "tipo", "capacidad")
 
     @staticmethod
     def filtrar_por_ubicacion(ubicacion):

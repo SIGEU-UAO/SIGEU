@@ -7,9 +7,10 @@
 <div class="step__cards"></div>
 
 <div class="step__actions">
+    {% if is_editing %} <button class="step__button step__button--prev">Atrás</button>{% endif %}
     {% if type == "Organizaciones" %}
         <button class="step__button step__button--finish">Finalizar</button>
-    {% else %}
+    {% else %} 
         <button class="step__button step__button--next" data-skip>Omitir</button>
     {% endif %}
 </div>

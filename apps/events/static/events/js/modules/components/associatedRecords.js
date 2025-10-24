@@ -6,24 +6,47 @@ import API from "/static/js/modules/classes/API.js";
 import Alert from "/static/js/modules/classes/Alert.js";
 import { finishStepHandler, goStep, toggleSkip } from "./stepper.js";
 
+const mainForm = document.getElementById("main-form");
+const mainFormAction = mainForm.getAttribute("data-action");
+
 const stepDataKeys = {
     instalaciones: {
         annotation: "tipo",
         title: "ubicacion",
         icon: "ri-map-fill",
-        saveHandler: (container) => () => AssociatedRecords.saveDBRecords("/eventos/api/asignar-instalaciones/", "instalaciones", container)
+        saveHandler: (container) => () => {
+            if (mainFormAction === "add") {
+                AssociatedRecords.saveDBRecords("/eventos/api/asignar-instalaciones/", "instalaciones", container);
+            } else if (mainFormAction === "edit") {
+                AssociatedRecords.updateDBRecords("/eventos/api/actualizar-instalaciones/", "instalaciones", container);
+            }
+        }
     },
     organizadores: {
         annotation: "rol",
         title: "nombreCompleto",
+        file: "aval",
         icon: "ri-map-pin-user-fill",
-        saveHandler: (container) => () => AssociatedRecords.saveDBRecords("/eventos/api/asignar-organizadores/", "organizadores", container)
+        saveHandler: (container) => () => {
+            if (mainFormAction === "add") {
+                AssociatedRecords.saveDBRecords("/eventos/api/asignar-organizadores/", "organizadores", container);
+            } else if (mainFormAction === "edit") {
+                AssociatedRecords.updateDBRecords("/eventos/api/actualizar-organizadores/", "organizadores", container);
+            }
+        }
     },
     organizaciones: {
         annotation: "nit",
         title: "nombre",
+        file: "certificado_participacion",
         icon: "ri-building-2-fill",
-        saveHandler: (container) => () => AssociatedRecords.saveDBRecords("/eventos/api/asignar-organizaciones/", "organizaciones", container, true, "/dashboard/")
+        saveHandler: (container) => () => {
+            if (mainFormAction === "add") {
+                AssociatedRecords.saveDBRecords("/eventos/api/asignar-organizaciones/", "organizaciones", container, true, "/eventos/mis-eventos/");
+            } else if (mainFormAction === "edit") {
+                AssociatedRecords.updateDBRecords("/eventos/api/actualizar-organizaciones/", "organizaciones", container, true, "/eventos/mis-eventos/");
+            }
+        }
     },
 }
 
@@ -35,12 +58,22 @@ export default class AssociatedRecords{
         // Extract id
         const id = isFormData ? data.get("id") : data["id"];
         const record = isFormData ? data : { id: data["id"] }
-        const result = dataStore.addRecord(type, record, id);
 
-        //If it already exists, return
-        if (!result) {
-            Alert.error(`El registro con id ${id} ya fue agregado`)
-            return;
+        let result;
+
+        if (mainFormAction === "add"){
+            result = dataStore.addRecord(type, record, id);
+            if (!result) {
+                Alert.error(`El registro con id ${id} ya fue agregado`)
+                return;
+            }
+        }
+        else if (mainFormAction === "edit"){
+            result = type === "instalaciones" ? dataStore.registerChange(type, id, 'agregar') : dataStore.registerChange(type, id, 'agregar', record);
+            if (!result.success) {
+                Alert.error(result.message);
+                return;
+            }
         }
 
         Alert.success(result.message);
@@ -70,10 +103,19 @@ export default class AssociatedRecords{
         // Update or add as appropriate and capture the result
         let result;
         if (!dataStore.getByID(type, id) && isCurrentUser) {
-            result = dataStore.addRecord(type, record, id);
+            if (mainFormAction === "add") {
+                result = dataStore.addRecord(type, record, id);
+            }else if (mainFormAction === "edit") {
+                result = dataStore.registerChange(type, id, "agregar", record)
+            }
+
             this.updateStepBtn(type, buttonStep, container);
         } else {
-            result = dataStore.updateRecord(type, record);
+            if (mainFormAction === "add"){
+                result = dataStore.updateRecord(type, record);
+            }else if (mainFormAction === "edit"){
+                result = dataStore.registerChange(type, id, 'actualizar', record);
+            }
         }
     
         // Display message to user based on result
@@ -87,7 +129,7 @@ export default class AssociatedRecords{
         }
     
         // Update the UI
-        if (type !== "organizadores") this.updateRecordUI(record, container);
+        this.updateRecordUI(record, type, container);
     
         // Update file input info
         form.querySelectorAll('input[type="file"]').forEach(input => {
@@ -105,18 +147,30 @@ export default class AssociatedRecords{
         });
     
         if (!result.isConfirmed) return;
-        
-        const { success, message } = dataStore.removeRecord(type, id);
+
+        let success = false;
+        let message = "";
+
+        if (mainFormAction === "add") {
+            const removeResult = dataStore.removeRecord(type, id);
+            success = removeResult.success;
+            message = removeResult.message;
+        } 
+        else if (mainFormAction === "edit") {
+            const recordFormData = new FormData();
+            recordFormData.set("id", id);
+            const registerResult = type === "instalaciones" ? dataStore.registerChange(type, id, "eliminar") : dataStore.registerChange(type, id, "eliminar", recordFormData);
+            success = registerResult.success;
+            message = registerResult.message;
+        }
 
         if (success) {
             Alert.success(message);
             stepCard.remove();
+            this.updateStepBtn(type, buttonStep, container);
         } else {
             Alert.error(message);
-            return;
         }
-
-        this.updateStepBtn(type, buttonStep, container)
     }
 
     static async saveDBRecords(endpoint, type, container, isFinishStep = false, finishURL = ""){
@@ -154,6 +208,85 @@ export default class AssociatedRecords{
         }
     }
 
+    static async updateDBRecords(endpoint, type, container, isFinishStep = false, finishURL = ""){
+        const eventoId = dataStore.eventoId;
+        const updatedRecords = dataStore[`${type}_cambios`] || [];
+        const originalRecords = dataStore[type] || [];
+
+        if (updatedRecords.length === 0) {
+            if (isFinishStep) {
+                Alert.success("Actualización del evento completada correctamente")
+                setTimeout(() => window.location.href = finishURL, 1500);
+            }
+            else goStep("next");
+            return;
+        }
+
+        if (!validateCollection(type, updatedRecords, mainFormAction)) {
+            Alert.error(`Datos de ${type} inválidos`);
+            return
+        }
+        
+        const isFormData = updatedRecords[0] instanceof FormData;
+
+        const originalIds = originalRecords.map(r => isFormData ? Number(r.get("id")) : Number(r.id));
+        let finalIds = [...originalIds];
+        let hasActionChange = false;
+
+        // Apply the changes
+        for (const record of updatedRecords) {
+            const id = isFormData ? Number(record.get("id")) : Number(record.id);
+            const accion = isFormData ? record.get("accion") : record.accion;
+
+            if (accion === "agregar" && !finalIds.includes(id)) {
+                finalIds.push(id)
+                hasActionChange = true;
+            };
+
+            if (accion === "actualizar") hasActionChange = true
+
+            if (accion === "eliminar") {
+                finalIds = finalIds.filter(x => x !== id);
+                hasActionChange = true;
+            }
+        }
+
+        const hasChanges = originalIds.length !== finalIds.length || !originalIds.every(id => finalIds.includes(id)) || hasActionChange;
+        if (!hasChanges) {
+            goStep("next");
+            return;
+        }
+
+        let result;
+        if (isFormData) {
+            const bigForm = (type === "organizaciones")
+                ? mergeFormDataIndexed(updatedRecords, type)
+                : mergeFormDataFieldsArray(updatedRecords, type);
+            result = await API.postFormData(`${endpoint}${eventoId}/`, bigForm);
+        } else {
+            result = await API.put(`${endpoint}${eventoId}/`, JSON.stringify({ records: updatedRecords }));
+        }
+
+        if (result.error) {
+            if (result.data.errores) dataStore.excludeRecords(type, result.data.errores, container);
+            return;    
+        }
+
+        // Update the base dataStore with the new records and clean up the changes.
+        dataStore[type] = finalIds.map(id => {
+            const found = updatedRecords.find(r => (r instanceof FormData ? Number(r.get("id")) : Number(r.id)) === id);
+            return found || originalRecords.find(r => (r instanceof FormData ? Number(r.get("id")) : Number(r.id)) === id);
+        });
+        dataStore[`${type}_cambios`] = [];
+        Alert.success(`Datos de ${type} actualizados correctamente.`);
+
+        if (isFinishStep) {
+            setTimeout(() => window.location.href = finishURL, 1500);
+        } else {
+            goStep("next");
+        }
+    }
+
     static addRecordToUI(id, data, type, container, isCurrentUser = false){
         const buttonStep = container.nextElementSibling.lastElementChild;
 
@@ -182,7 +315,7 @@ export default class AssociatedRecords{
             const cardList = document.createElement("UL");
             cardList.classList.add("card__list")
 
-            data["associate_fields"].forEach((field, index) => {
+            data["associate_fields"].forEach((field) => {
                 const cardListItem = document.createElement("LI");
                 cardListItem.textContent = field;
                 cardListItem.classList.add('card__item')
@@ -195,13 +328,26 @@ export default class AssociatedRecords{
         const cardButtons = document.createElement("DIV");
         cardButtons.classList.add("card__buttons");
         
-        let cardButtonEdit;
+        let cardButtonEdit, cardFileBtn;
+
         if (type !== "instalaciones") {
             cardButtonEdit = document.createElement("BUTTON");
             cardButtonEdit.type = "button";
             cardButtonEdit.classList.add("card__button")
             cardButtonEdit.textContent = "Editar";
             cardButtonEdit.onclick = () => Modal.editRecordHandler(type, id)
+
+            //* If a file exists
+            const file = data[stepDataKeys[type]["file"]]
+
+            if (file) {
+                cardFileBtn = document.createElement("A");
+                cardFileBtn.classList.add("card__button", "card__button--file");
+                cardFileBtn.innerHTML = '<i class="ri-file-pdf-2-fill"></i>';
+                cardFileBtn.target = "_blank";
+                cardFileBtn.title = "Previsualizar PDF"
+                this.setFileLink(cardFileBtn, file)
+            }
         }
 
         //* Disassociate button
@@ -216,6 +362,7 @@ export default class AssociatedRecords{
 
         if (cardButtonEdit) cardButtons.appendChild(cardButtonEdit);
         if (cardButtonDisassociate) cardButtons.appendChild(cardButtonDisassociate);
+        if (cardFileBtn) cardButtons.appendChild(cardFileBtn);
 
         cardContent.appendChild(cardHeader);
         cardContent.appendChild(cardButtons)
@@ -232,11 +379,33 @@ export default class AssociatedRecords{
         this.updateStepBtn(type, buttonStep, container)
     }
 
-    // * Function to update the record in UI (Applies only to external organizations...)
-    static updateRecordUI(record, container){
+    // * Function to update the record in UI
+    static updateRecordUI(record, type, container){
         const id = record.get('id');
         const card = container.querySelector(`.step__card[data-id="${id}"]`);
         if (!card) return;
+        
+        // * If the record has a file (PDF), the file button is updated.
+        const fileKey = stepDataKeys[type]?.file;
+        if (fileKey && record.has(fileKey)) {
+            const file = record.get(fileKey);
+            const cardButtons = card.querySelector(".card__buttons");
+            let cardFileBtn = card.querySelector(".card__button--file");
+
+            if (!cardFileBtn) {
+                cardFileBtn = document.createElement("A");
+                cardFileBtn.classList.add("card__button", "card__button--file");
+                cardFileBtn.innerHTML = '<i class="ri-file-pdf-2-fill"></i>';
+                cardFileBtn.target = "_blank";
+                cardFileBtn.title = "Previsualizar PDF" 
+                cardButtons.appendChild(cardFileBtn)
+            }
+
+            this.setFileLink(cardFileBtn, file)
+    
+            // If the type is "organizadores", just update the file and finish here.
+            if (type === "organizadores") return;
+        }
     
         // Update visible fields
         const cardList = card.querySelector(".card__list")
@@ -266,15 +435,29 @@ export default class AssociatedRecords{
                 item.textContent = texts[index] || "";
             });
         }
-    }    
+    } 
+    
+    static setFileLink(cardFileBtn, file){
+        // Case 1: new file (not yet uploaded)
+        if (file instanceof File) {
+            // Create a temporary local blob for preview
+            const blobUrl = URL.createObjectURL(file);
+            cardFileBtn.href = blobUrl;
+        } 
+        // Case 2: Existing file on the SIGEU file storage system
+        else if (typeof file === "string") {
+            cardFileBtn.href = `/media/${file}?v=${Date.now()}`;
+        }
+    }
 
     static updateStepBtn(type, buttonStep, container){
         const recordsLength = dataStore[type]?.length || 0;
+        const isEnabledToSkip = recordsLength === 0 && dataStore[`${type}_cambios`].length === 0;
 
         if (buttonStep.classList.contains("step__button--finish")) {
-            finishStepHandler(buttonStep, recordsLength, stepDataKeys[type].saveHandler(container), "/dashboard/");
+            finishStepHandler(buttonStep, recordsLength, stepDataKeys[type].saveHandler(container), "/eventos/mis-eventos/");
         } else {
-            toggleSkip(buttonStep, recordsLength === 0, stepDataKeys[type].saveHandler(container));
+            toggleSkip(buttonStep, isEnabledToSkip, stepDataKeys[type].saveHandler(container));
         }
     }
 }

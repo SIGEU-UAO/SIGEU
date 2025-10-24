@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from ..forms.event import RegistroEventoForm
 from ..services.event import EventoService
+from ..serializers.eventoSerializer import EventoSerializer 
 from django.contrib.auth.decorators import login_required
 from sigeu.decorators import organizador_required
 import json
@@ -10,11 +11,7 @@ class EventoAPI:
     @organizador_required
     def registro(request):
         if request.method == "POST":
-            try:
-                data = json.loads(request.body)
-            except json.JSONDecodeError:
-                return JsonResponse({"error": "Formato JSON inválido."}, status=400)
-
+            data = json.loads(request.body)
             form = RegistroEventoForm(data)
             if form.is_valid():
                 try:
@@ -44,9 +41,36 @@ class EventoAPI:
             request.user, status=status, page=page, per_page=12, search=search, search_by=search_by
         )
 
-        data = EventoService.serializar_eventos(page_obj, request=request)
+        data = EventoSerializer.serialize_page(page_obj)
         return JsonResponse(data, safe=False)
-    
+    @login_required()
+    @organizador_required
+    def actualizar(request, id):
+        if request.method == "PUT":
+            # Get the event
+            evento = EventoService.obtener_por_id(id)
+            if not evento:
+                return JsonResponse({ "error": "El evento especificado no existe" }, status=404)
+            
+            #Validates if the user is the creator of the event
+            es_creador = EventoService.es_creador(request.user, id)
+            if not es_creador:
+                return JsonResponse({"error": "No tienes permiso para actualizar este evento."}, status=403)
+
+            data = json.loads(request.body)
+            form = RegistroEventoForm(data)
+            if form.is_valid():
+                try:
+                    result = EventoService.actualizar(evento, form.cleaned_data)
+                    if result is None:
+                        return JsonResponse({"message": "Tu información está al día."}, status=200)
+                    
+                    return JsonResponse({"message": "Información básica del evento actualizada correctamente."}, status=200)
+                except ValueError as e:
+                    return JsonResponse({"error": str(e)}, status=400)
+            else:
+                return JsonResponse({"error": form.errors}, status=400)
+        return JsonResponse({"error": "Método no permitido"}, status=405)
     
     @login_required()
     @organizador_required
