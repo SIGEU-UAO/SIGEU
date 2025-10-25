@@ -116,7 +116,7 @@ hr {
     }
 }
 
-.cardEnviados__sub--item--file{
+.cardEnviados__sub--item--file, .modal__aval-btn, .modal__cert-btn{
     padding: 20px;
     background-color: var(--red);
     border-radius: 50%;

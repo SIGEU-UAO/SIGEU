@@ -22,7 +22,6 @@ class Evento(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
     estado = models.CharField(max_length=10, choices=ESTADOS, default="Borrador")
-    fechaEnvio = models.DateTimeField(default=None, null=True, blank=True)
     tipo = models.CharField(max_length=100, choices=TIPOS)
     fecha = models.DateField()
     horaInicio = models.TimeField()

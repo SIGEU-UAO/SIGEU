@@ -1,30 +1,29 @@
 {% load static %}
-
-<dialog id="modal-organizador-{{ usuario.idUsuario }}" class="modal">
+<dialog id="modal-organizador" class="modal">
   <div class="modal__content">
     <button type="button" class="modal__close" title="Cerrar Modal"
             onclick="this.closest('dialog').close()">&times;</button>
 
     <div id="modal-organizadores-container">
       <h2>Organizador</h2>
-      <span>{{ usuario.nombres }} {{ usuario.apellidos }}</span>
+      <span class="nombreOrg"></span>
       <hr>
 
       <h2>Rol</h2>
-      <span> {{usuario.rol}} </span>
+      <span class="rolOrg"></span>
       <hr>
 
       <h2>Información de Contacto</h2>
       <div class="modal__info--group">
-        <span><strong>Correo Electrónico:</strong> {{ usuario.email }}</span>
-        <span><strong>Teléfono:</strong> {{ usuario.telefono }}</span>
-        <span><strong>Numero Identificación: </strong> {{usuario.numeroIdentificacion}}</span>
+        <span><strong>Correo Electrónico:</strong></span> <span class="correoOrg"></span>
+        <span><strong>Teléfono:</strong> </span><span class="telefonoOrg"></span>
+        <span><strong>Numero Identificación: </strong></span><span class="identificacionOrg"></span>
       </div>
       <div class="modal__aval">
         <h2>AVAL</h2>
         <li class="card__sub--item card__sub--item--group">
-          <span><strong>Tipo De AVAL:</strong> {{ tipo }}</span>
-          <a href="{{ o.aval.url }}" target="__blank" class="cardEnviados__sub--item--file" title="Abrir Aval"><i class="ri-file-pdf-2-fill"></i></a>
+          <span><strong>Tipo De AVAL:</strong> </span><span class="tipoAvalOrg"></span>
+          <a href="#" target="__blank" class="modal__aval-btn" title="Abrir Aval"><i class="ri-file-pdf-2-fill"></i></a>
         </li>
       </div>
     </div>

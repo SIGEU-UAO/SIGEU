@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="{% static 'events/css/eventos_enviados.css' %}">
 {% endblock css_files %}
 
+{% block js_files %}
+    <script type="module" defer src="{% static 'events/js/eventos_enviados.js' %}" ></script>
+{% endblock js_files %}
+
 {% block content %}
 
     <div class="no-results-container">
@@ -26,5 +30,8 @@
     {% if page_obj.paginator.num_pages > 1 %}
         {% include 'events/components/pagination.html' %}
     {% endif %}
+
+    {% include "events/components/modal_organizadores.html"%}
+    {% include "events/components/modal_organizaciones_externas.html"%}
 
 {% endblock content %}
