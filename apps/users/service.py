@@ -1,9 +1,12 @@
+from django.conf import settings
 from django.db import IntegrityError
 from django.contrib.auth.models import Group
 from django.contrib.auth.hashers import check_password
 from django.db.models import Q, Value, Case, When, CharField
 from django.db.models.functions import Concat
 import re
+
+from apps.users.email_service import send_email
 from .models import *
 
 # Password history limit
@@ -103,6 +106,20 @@ class UserService:
                 facultad = Facultad.objects.get(pk=data["facultad_id"])
                 Secretaria.objects.create(usuario=usuario, facultad=facultad)
                 usuario.groups.add(secretarias)
+                
+            send_email(
+                    subject="Bienvenido/a a SIGEU 🎓",
+                    to_email=usuario.email,
+                    template_name="users/successful_register/correo_registro.html",
+                    context={
+                        "nombre": usuario.nombres,
+                        "email": usuario.email,
+                        "rol": rol,
+                        "login_url": "http://localhost:8000/users/inicio-sesion/",
+                        "soporte_email": settings.DEFAULT_FROM_EMAIL,
+                    },
+                    text_body=f"Hola {usuario.nombres}, tu registro como {rol} en SIGEU ha sido exitoso.",
+                )
 
         except (Programa.DoesNotExist, UnidadAcademica.DoesNotExist, Facultad.DoesNotExist) as e:
             usuario.delete()

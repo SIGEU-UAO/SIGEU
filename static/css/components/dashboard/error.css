@@ -1,0 +1,69 @@
+figure img{
+    width: 320px;
+}
+
+.button {
+    text-decoration: none;
+    max-width: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    background-color: var(--primary);
+    border: 5px solid var(--pale-primary);
+    color: white;
+    gap: 8px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.text {
+    font-size: 1.3em;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.svg {
+    padding-top: 5px;
+    height: 100%;
+    width: fit-content;
+}
+
+.svg svg {
+    width: 40px;
+    height: 20px;
+}
+
+.button:active {
+    border: 5px solid #c0dfff;
+}
+
+.button:hover .svg svg {
+    animation: jello-vertical 0.9s both;
+    transform-origin: left;
+}
+
+@keyframes jello-vertical {
+    0% {
+        transform: scale3d(1, 1, 1);
+    }
+    30% {
+        transform: scale3d(0.75, 1.25, 1);
+    }
+    40% {
+        transform: scale3d(1.25, 0.75, 1);
+    }
+    50% {
+        transform: scale3d(0.85, 1.15, 1);
+    }
+    65% {
+        transform: scale3d(1.05, 0.95, 1);
+    }
+    75% {
+        transform: scale3d(0.95, 1.05, 1);
+    }
+    100% {
+        transform: scale3d(1, 1, 1);
+    }
+}

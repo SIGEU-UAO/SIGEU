@@ -1,7 +1,7 @@
 {% extends 'layouts/dashboard.html' %}
 {% load static %}
 
-{% block page_title %} SIGEU | Registro Evento {% endblock page_title %}
+{% block page_title %} {{page__title}} {% endblock page_title %}
 
 {% block css_files %}
     <link rel="stylesheet" href="{% static 'events/css/registro.css' %}">
@@ -39,7 +39,7 @@
         </div>          
 
         {% comment "Step 1" %}-------------- STEP 1 --------------{% endcomment %}
-        <form class="form main__step main__step--1" id="main-form" method="POST" >
+        <form class="form main__step main__step--1" id="main-form" method="POST" data-action="{% if is_editing %}edit{% else %}add{% endif %}">
             {% csrf_token %}
     
             <div class="form__row">
@@ -58,7 +58,7 @@
             </div>
     
             <div class="form__actions">
-                <button type="submit" class="form__button form__button--norounded">Registrar evento</button>
+                <button type="submit" class="form__button form__button--norounded">{% if is_editing %} Guardar Cambios {% else %} Registrar Evento {% endif %}</button>
             </div>
         </form>
     

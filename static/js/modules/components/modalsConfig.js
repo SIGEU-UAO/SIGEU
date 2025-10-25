@@ -62,7 +62,8 @@ export const modalsConfig = [
             id: [{ check: (val) => !isNaN(Number(val)) && Number(val) > 0, msg: "El ID debe ser un número válido mayor que 0"}],
             aval: [{ check: (val) => val instanceof File && val.name.endsWith('.pdf'), msg: "Debes subir un archivo PDF"}]
         },
-        fieldsRecordUI: ["rol"]
+        fieldsRecordUI: ["rol"],
+        fileField: "aval"
     },
     {
         buttonId: 'asignar-organizacion-btn',
@@ -95,6 +96,7 @@ export const modalsConfig = [
             id: [{ check: (val) => !isNaN(Number(val)) && Number(val) > 0, msg: "El ID debe ser un número válido mayor que 0"}],
             certificado_participacion: [{ check: (val) => val instanceof File && val.name.endsWith('.pdf'), msg: "Debes subir un archivo PDF"}]
         },
-        fieldsRecordUI: ["nit", "nombre"]
+        fieldsRecordUI: ["nit", "nombre"],
+        fileField: "certificado_participacion"
     }
 ];

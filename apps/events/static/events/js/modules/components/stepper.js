@@ -9,8 +9,11 @@ export function goStep(direction) {
 
     // Determine the new index
     let newIndex;
+
     if (direction === 'next') {
         newIndex = Math.min(currentIndex + 1, radios.length - 1);
+    }else if(direction === 'prev') {
+        newIndex = Math.max(currentIndex - 1, 0);
     }else if (typeof direction === 'number') {
         newIndex = Math.min(Math.max(direction - 1, 0), radios.length - 1);
     }else {

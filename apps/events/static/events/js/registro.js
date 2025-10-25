@@ -30,6 +30,7 @@ const organizationValidationRules = {
 
 //* Selectors
 const mainForm = document.getElementById("main-form");
+const mainFormAction = mainForm.getAttribute("data-action");
 const fileInputs = document.querySelectorAll('input.input-file');
 
 //* Slide section
@@ -40,10 +41,11 @@ const createOrganizationForm = document.getElementById("crear-organizacion-form"
 
 //* Step sections
 const nextStepBtns = document.querySelectorAll(".step__button--next[data-skip]")
+const prevStepBtns = document.querySelectorAll(".step__button--prev")
 const finishStepBtn = document.querySelector(".step__button--finish");
 
 //* Event Listeners
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     if (!window.currentUser) window.location.reload();
     const currentUser = window.currentUser;
 
@@ -70,7 +72,8 @@ document.addEventListener("DOMContentLoaded", () => {
     //* Others event listeners
     mainForm.addEventListener("submit", handleMainFormSubmit);
     nextStepBtns.forEach(btn => btn.onclick = skipHandler)
-    finishStepBtn.onclick = () => goToListHandler("/dashboard/");
+    prevStepBtns.forEach(btn => btn.addEventListener("click", () => goStep("prev")))
+    finishStepBtn.onclick = () => goToListHandler("/eventos/mis-eventos/");
     fileInputs.forEach(input => handleFileInputsInfo(input))
 
     //* Slide section event listeners
@@ -87,6 +90,13 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     AssociatedRecords.addRecordToUI(currentUser.id, recordUI, "organizadores", assignedOrganizatorsContainer, true)
+
+    // TODO: If it's editing
+    if (mainFormAction === "edit" && dataStore.eventoId) {
+        await loadInstalacionesEvento(dataStore.eventoId)
+        await loadOrganizadoresEvento(dataStore.eventoId)
+        await loadOrganizacionesInvitadasEvento(dataStore.eventoId)
+    }
 });
 
 //* Functions
@@ -98,13 +108,17 @@ async function handleMainFormSubmit(e) {
     if (!validarFormData(formData, validationRules)) return;
 
     //Fetch the endpoint
-    const result = await API.post("/eventos/api/registro/", formData);
+    const result = mainFormAction === "add" ? await API.post("/eventos/api/registro/", formData) : await API.put(`/eventos/api/editar/${dataStore.eventoId}/`, formData);
     if (result.error) return;
 
-    Alert.success("Evento registrado en estado borrador");
-    dataStore.eventoId = result.data.evento; // Save the event ID
+    if (mainFormAction === "add") {
+        Alert.success("Evento registrado en estado borrador")
+        dataStore.eventoId = result.data.evento
+        mainForm.reset();
+    }else if(mainFormAction === "edit"){
+        Alert.success(result.data.message)   
+    }
     goStep("next")
-    mainForm.reset();
 }
 
 function openSlideSection() {
@@ -128,4 +142,116 @@ async function handleOrganizationFormSubmit(e) {
 
     Alert.success("Organización registrada exitosamente");
     setTimeout(closeSlideSection, 1500);
+}
+
+//* Editing Functions
+async function loadInstalacionesEvento(eventoId) {
+    const result = await API.fetchGet(`/eventos/api/listar-instalaciones/${eventoId}/`);
+    if (result.error) {
+        Alert.error("Error al cargar las instalaciones fisicas asignadas")
+        setTimeout(() => window.location.href = "/eventos/mis-eventos/", 1000);
+    }
+
+    const instalaciones = result.data.instalaciones;
+
+    // If no installations were found, return
+    if (instalaciones.length === 0) return
+
+    // Save only the IDs in the datastore
+    dataStore.instalaciones = instalaciones.map(inst => ({ id: inst.idInstalacion }));
+
+    const container = document.querySelector(".main__step--2 .step__cards");
+
+    instalaciones.forEach(inst => {
+        AssociatedRecords.addRecordToUI(
+            inst.idInstalacion,
+            { ubicacion: inst.ubicacion, tipo: inst.tipo },
+            "instalaciones",
+            container
+        );
+    });
+}
+
+async function loadOrganizadoresEvento(eventoId) {
+    const result = await API.fetchGet(`/eventos/api/listar-organizadores/${eventoId}/`);
+    if (result.error) {
+        Alert.error("Error al cargar los organizadores del evento")
+        setTimeout(() => window.location.href = "/eventos/mis-eventos/", 1000);
+    }
+    
+    const organizators = result.data.organizadores;
+    
+    // If no organizers were found, return
+    if (organizators.length === 0) return
+
+    const currentUserId = window.currentUser.id;
+    const container = document.querySelector(".main__step--3 .step__cards");
+
+    // Update the datastore 
+    dataStore.organizadores = organizators.map(org => {
+        const fd = new FormData();
+        fd.append("id", org.idOrganizador);
+        fd.append("aval", org.aval);
+        return fd;
+    });
+    
+    organizators.forEach(org => {
+        let isCurrentUser = false;
+        // If it matches currentUser, remove the existing card from the DOM.
+        if (org.idOrganizador === currentUserId) {
+            isCurrentUser = true;
+            const existingCard = container.querySelector(`.step__card[data-id="${currentUserId}"]`);
+            if (existingCard) existingCard.remove();
+        }
+
+        AssociatedRecords.addRecordToUI(
+            org.idOrganizador,
+            { rol: org.rol, nombreCompleto: org.nombreCompleto, aval: org.aval },
+            "organizadores",
+            container,
+            isCurrentUser
+        );
+    });
+}
+
+async function loadOrganizacionesInvitadasEvento(eventoId) {
+    const result = await API.fetchGet(`/eventos/api/listar-organizaciones/${eventoId}/`);
+    if (result.error) {
+        Alert.error("Error al cargar las organizaciones invitadas del evento")
+        setTimeout(() => window.location.href = "/eventos/mis-eventos/", 1000);
+    }
+
+    const organizations = result.data.organizaciones;
+    
+    // If no organizers were found, return
+    if (organizations.length === 0) return
+
+    const container = document.querySelector(".main__step--4 .step__cards");
+
+    // Update the datastore 
+    dataStore.organizaciones = organizations.map(org => {
+        const fd = new FormData();
+        fd.append("id", org.idOrganizacion);
+        if (org.representante_asiste) fd.append("representante_asiste", "on")
+        else fd.append("representante_alterno", org.representante_alterno)
+        fd.append("certificado_participacion", org.certificado_participacion);
+        return fd;
+    });
+    
+    organizations.forEach(org => {
+        AssociatedRecords.addRecordToUI(
+            org.idOrganizacion,
+            { 
+                nit: org.nit,
+                nombre: org.nombre, 
+                certificado_participacion: org.certificado_participacion,
+                associate_fields: [ 
+                    org.representante_asiste === "on" ? "El representante legal ASISTE" : "El representante legal NO ASISTE",
+                    org.representante_alterno && `Representante alterno: ${org.representante_alterno}`
+                ].filter(Boolean)
+            },
+            "organizaciones",
+            container
+        );
+    });
 }
