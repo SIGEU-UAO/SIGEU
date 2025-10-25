@@ -180,11 +180,15 @@ class OrganizacionesExternasAPI:
 
         try:
             es_creador = OrganizacionExternaService.es_creador(request.user, pk)
-            if es_creador is None:
+            esta_asociada_evento = OrganizacionExternaService.esta_asociada_evento(pk)
+            if es_creador is None or esta_asociada_evento is None:
                 return JsonResponse({"error": "Organización no encontrada."}, status=404)
             if not es_creador:
                 return JsonResponse({"error": "No tienes permiso para eliminar esta organización."}, status=403)
-
+        
+            if esta_asociada_evento:
+                return JsonResponse({"error": "Organización asociada a un evento."}, status = 409)
+            
             resultado = OrganizacionExternaService.eliminar(pk)
             if resultado.get("error"):
                 return JsonResponse({"error": resultado.get("mensaje")}, status=400)

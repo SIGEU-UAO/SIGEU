@@ -1,6 +1,7 @@
 from django.db.models import Q
 from django.db import IntegrityError
-from .models import OrganizacionExterna
+
+from apps.events.models import Evento, OrganizacionExterna, OrganizacionInvitada
 from .serializer import ExternalOrganizationSerializer
 
 class OrganizacionExternaService:
@@ -115,3 +116,6 @@ class OrganizacionExternaService:
         except Exception as e:
             return {"error": True, "mensaje": f"Error interno: {str(e)}"}
     
+    @staticmethod
+    def esta_asociada_evento(org_id):
+        return OrganizacionInvitada.objects.filter(organizacion_id = org_id).exists()
