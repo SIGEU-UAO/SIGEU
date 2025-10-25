@@ -28,7 +28,7 @@ class Evento(models.Model):
     horaFin = models.TimeField()
     creador = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="eventos_creados")
     fecha_ultimo_cambio = models.DateTimeField(auto_now=True)
-    fechaEnvio = models.DateTimeField(default=None, null=True, blank=True)
+    fechaEnvio = models.DateTimeField(default=None, null=True, blank=True)
 
     def __str__(self):
         return f"{self.nombre} - {self.tipo} ({ self.estado })"
