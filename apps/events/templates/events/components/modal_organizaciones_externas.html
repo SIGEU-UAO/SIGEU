@@ -1,5 +1,5 @@
 {% load static %}
-{# <link rel="stylesheet" href="{% static 'events/css/components/modal_organizadores.css' %}"> #}
+
 <dialog id="modal-organizacion-externa-" class="modal">
   <div class="modal__content">
     <button type="button" class="modal__close" title="Cerrar Modal"
@@ -10,21 +10,29 @@
       <span>{{ organizacion.nombre }}</span>
       <hr>
       <h2>Detalles</h2> <br>
-        <span>NIT: {{ organizacion.nit }}</span> <br>
-        <span>Sector Económico: {{ organizacion.sectorEconomico }}</span> <br>
-        <span>Actividad Principal: {{ organizacion.actividadPrincipal }}</span> <br>
+        <span><strong>NIT:</strong> {{ organizacion.nit }}</span> <br>
+        <span><strong>Sector Económico:</strong> {{ organizacion.sectorEconomico }}</span> <br>
+        <span><strong>Actividad Principal:</strong> {{ organizacion.actividadPrincipal }}</span> <br>
         {% if organizacion.invitada.representante %}
-            <span>Representante Sustituto: {{ organizacion.invitada.representante_alterno }}</span>
+            <span><strong>Representante Sustituto:</strong> {{ organizacion.invitada.representante_alterno }}</span>
         {% else %}
-            <span>Representante: {{ organizacion.representanteLegal }}</span>
-          <hr>
+            <span><strong>Representante:</strong> {{ organizacion.representanteLegal }}</span>
         {% endif %}
-
-      <h2>Información de Contacto</h2>
-      <div class="modal__info--group">
-        <span><strong>Teléfono:</strong> {{ organizacion.telefono }}</span>
-        <span><strong>Ubicación:</strong> {{ organizacion.ubicacion }}</span>
-      </div>
+      <hr>
+      <li class="card__sub--item card__sub--item--group">
+        <div class="informacion">
+          <h2>Información de Contacto</h2>
+          <div class="modal__info--group">
+            <span><strong>Teléfono:</strong> {{ organizacion.telefono }}</span>
+            <span><strong>Ubicación:</strong> {{ organizacion.ubicacion }}</span>
+          </div>
+        </div>
+        <div class="modal__certificado"> 
+            <h2>Certificado:</h2>  
+            <hr>
+            <a href="{{ oi.certificado_participacion.url }}" target="__blank" class="cardEnviados__sub--item--file" title="Abrir Aval"><i class="ri-file-pdf-2-fill"></i></a>
+        </div>
+      </li>
     </div>
   </div>
 </dialog>

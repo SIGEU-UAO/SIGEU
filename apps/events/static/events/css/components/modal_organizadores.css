@@ -115,3 +115,17 @@ hr {
         font-size: 1.1rem;
     }
 }
+
+.cardEnviados__sub--item--file{
+    padding: 20px;
+    background-color: var(--red);
+    border-radius: 50%;
+    color: #fff;
+    text-decoration: none;
+    font-size: 2.5rem;
+    /*border:1px solid black;*/
+}
+
+.modal__certificado {
+    text-align: center;
+}

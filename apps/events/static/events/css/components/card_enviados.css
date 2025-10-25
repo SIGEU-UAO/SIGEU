@@ -201,21 +201,21 @@
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
-    color: #000000; /* 👈 Negro puro para el ícono */
+    color: #000000; 
 }
 
 .card__btn--infoOrg i,
 .card__btn--infoOrgExt i {
     font-size: 22px;
     line-height: 1;
-    color: #000000; /* 👈 Fuerza el color negro directamente en el ícono */
+    color: #000000; 
 }
 
 /* ====== Hover ====== */
 .card__btn--infoOrg:hover,
 .card__btn--infoOrgExt:hover {
     background-color: #e9f0ff;
-    color: #000000; /* mantiene negro en hover */
+    color: #000000; 
     transform: scale(1.08);
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
 }

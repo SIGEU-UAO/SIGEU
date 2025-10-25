@@ -126,7 +126,7 @@ class EventoService:
     @staticmethod
     def listar_eventos_enviados(page=1, per_page=12):
         # listar eventos en estado "Enviado"
-        qs = Evento.objects.filter(estado__iexact="Enviado").order_by('-fechaEnvio')
+        qs = Evento.objects.filter(estado__iexact="Enviado").order_by('fechaEnvio')
 
         paginator = Paginator(qs, per_page)
         try:
