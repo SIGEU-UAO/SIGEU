@@ -1,12 +1,12 @@
 .card{
     width: 350px;
     border-radius: 16px;
-    padding: 8px 8px 24px 8px;
+    padding: 12px 12px 24px 12px;
     box-shadow: 0 0 1px rgba(12, 26, 75, 0.24);
     box-shadow: 0 3px 8px -1px rgba(50, 50, 71, 0.05);
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 18px;
 }
 
 .card__img{
@@ -19,7 +19,6 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-    padding: 0 16px;
 }
 
 .card__title{
@@ -37,11 +36,41 @@
 
 .card__cta{
     width: min-content;
-    margin: 0 16px;
     padding: 12px 20px;
     background-color: var(--primary);
     color: #fff;
     text-align: center;
     text-decoration: none;
     border-radius: 6px;
+}
+
+@media screen and (max-width: 780px) {
+    .card{
+        width: 280px;
+        gap: 14px;
+    }
+
+    .card__content{
+        gap: 12px;
+    }
+
+    .card__img{
+        height: 160px;
+    }
+
+    .card__title{
+        font-size: 14px;
+        line-height: 128%;
+    }
+
+    .card__paragraph{
+        font-size: 12px;
+        line-height: 20px;
+        font-weight: 400;
+    }
+
+    .card__cta{
+        padding: 8px 16px;
+        font-size: 14px;
+    }
 }

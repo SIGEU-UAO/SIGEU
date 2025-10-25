@@ -39,3 +39,15 @@ h1{
 .header:has(h1:empty, p:empty) {
     display: none;
 }
+
+@media screen and (max-width: 1060px) {
+    body {
+        grid-template-columns: 70px 1fr;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    h1{
+        font-size: 24px;
+    }
+}
