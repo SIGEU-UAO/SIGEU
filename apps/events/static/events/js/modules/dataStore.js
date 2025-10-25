@@ -14,8 +14,6 @@ const dataStore = {
         });
         if (alreadyExists) return false
         this[type].push(record);
-        //! QUITAR METODO
-        this.listFormDataRecords(type)
         return { success: true, message: "Registro agregado correctamente" };
     },
 
@@ -91,7 +89,6 @@ const dataStore = {
                     if (ch === "agregar" || ch === "actualizar") {
                         // It was a local addition: undo it.
                         changes.splice(idx, 1);
-                        this.listFormDataRecords(`${type}_cambios`);
                         return { success: true, message: `Se deshizo la adición del registro ${id}.` };
                     }
                 }
@@ -101,7 +98,6 @@ const dataStore = {
 
             if (exists && getChangeAction(changes[idx]) === "agregar") {
                 changes.splice(idx, 1);
-                this.listFormDataRecords(`${type}_cambios`);
                 return { success: true, message: `Se restauró el registro ${id}.` };
             }
 
@@ -119,7 +115,6 @@ const dataStore = {
             }
 
             changes.push(isFormData ? record : { id: Number(id), accion: "eliminar" });
-            this.listFormDataRecords(`${type}_cambios`);
             return { success: true, message: `Se registró la eliminación del registro con id ${id}.` };
         }
         
@@ -152,8 +147,6 @@ const dataStore = {
             }
             return item;
         });
-    
-        this.listFormDataRecords(type)
         if (!updated) return { success: false, message: "No se encontró el registro a actualizar" };
         return { success: true, message: "Registro actualizado correctamente" };
     },        
@@ -167,8 +160,6 @@ const dataStore = {
             }
             return item.id !== id;
         });
-    
-        this.listFormDataRecords(type);
     
         if (this[type].length < initialLength) {
             return { success: true, message: "Registro eliminado correctamente" };
