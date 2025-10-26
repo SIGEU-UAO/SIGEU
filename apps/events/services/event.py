@@ -1,8 +1,13 @@
+import os
+import logging
+from django.db import IntegrityError, transaction
+from django.conf import settings
 from django.db import IntegrityError
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from datetime import datetime
 from ..models import Evento
 
+logger = logging.getLogger(__name__)
 
 class EventoService:
     @staticmethod
@@ -110,3 +115,65 @@ class EventoService:
             return True
         except Evento.DoesNotExist:
             return False
+        
+    @staticmethod
+    def eliminar_evento(id_evento):
+        paths_to_delete = []
+
+        try:
+            with transaction.atomic():
+                try:
+                    evento = Evento.objects.select_for_update().get(idEvento=id_evento)
+                except Evento.DoesNotExist:
+                    raise ValueError("Evento no encontrado.")
+
+                for o in evento.organizadores_asignados.all():
+                    try:
+                        if getattr(o, "aval", None) and getattr(o.aval, "name", None):
+                            paths_to_delete.append(o.aval.path)
+                    except Exception:
+                        pass
+
+                for oi in evento.organizaciones_invitadas.all():
+                    try:
+                        if getattr(oi, "certificado_participacion", None) and getattr(oi.certificado_participacion, "name", None):
+                            paths_to_delete.append(oi.certificado_participacion.path)
+                    except Exception:
+                        pass
+
+                evento.delete()
+        except ValueError:
+            raise
+        except Exception as e:
+            logger.exception(f"Error al eliminar evento {id_evento} en la base de datos: {e}")
+            raise ValueError("Ocurrió un error al eliminar el evento en la base de datos.") from e
+
+        failed_paths = []
+        media_root = os.path.abspath(str(settings.MEDIA_ROOT))
+
+        for path in paths_to_delete:
+            try:
+                abs_path = os.path.abspath(str(path))
+                if not abs_path.startswith(media_root):
+                    continue
+
+                if os.path.isfile(abs_path):
+                    os.remove(abs_path)
+                    dirpath = os.path.dirname(abs_path)
+                    while dirpath.startswith(media_root):
+                        try:
+                            if not os.listdir(dirpath):
+                                os.rmdir(dirpath)
+                                dirpath = os.path.dirname(dirpath)
+                            else:
+                                break
+                        except OSError:
+                            break
+                else:
+                    logger.info(f"Archivo no encontrado: {abs_path}")
+
+            except Exception as ex:
+                logger.error(f"Error al eliminar archivo {path}: {ex}")
+                failed_paths.append(path)
+
+        return {"deleted": True, "failed_paths": failed_paths}

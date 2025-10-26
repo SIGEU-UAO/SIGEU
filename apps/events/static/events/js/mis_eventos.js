@@ -11,6 +11,7 @@ noResultsContainer.style.display = cards.length === 0 ? 'flex' : 'none';
 const searchForm = document.querySelector('#events-search-form');
 const filtersResetBtn = document.querySelector('#reset-filters-btn');
 const sendBtns = document.querySelectorAll(".card__btn--send")
+const deleteBtns = document.querySelectorAll(".card__btn--delete");
 
 //* Event Listeners
 document.querySelectorAll('.filters__buttons .filter__btn').forEach(btn => {
@@ -52,3 +53,30 @@ sendBtns.forEach(btn => btn.addEventListener('click', async () => {
         console.error(error);
     }
 }));
+
+deleteBtns.forEach(btn => btn.addEventListener('click', async () => {
+    const id = btn.dataset.id;
+    if (!id) {
+      Alert.error("No se encontró el id del evento. Recarga e inténtalo de nuevo.");
+      return;
+    }
+    const url = `/eventos/api/eliminar/${id}/`;
+
+    try {
+      await API.delete(
+        url,
+        "Eliminar evento",
+        "Esta acción eliminará el evento y sus archivos asociados. ¿Deseas continuar?",
+        "Evento eliminado correctamente.",
+        "No se pudo eliminar el evento.",
+        null
+      );
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+
+    } catch (err) {
+      Alert.error("Error al procesar la solicitud.");
+    }
+  }));

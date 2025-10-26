@@ -1,3 +1,4 @@
+import logging
 from django.http import JsonResponse
 from ..forms.event import RegistroEventoForm
 from ..services.event import EventoService
@@ -66,3 +67,26 @@ class EventoAPI:
                 return JsonResponse({"message": "El evento ha sido enviado a validación correctamente."}, status=200)
             else:
                 return JsonResponse({"error": "No se pudo actualizar el estado del evento."}, status=500)
+            
+    @login_required()
+    @organizador_required
+    def eliminar_evento(request, id_evento):
+        if request.method != "DELETE":
+            return JsonResponse({"error": "Método no permitido"}, status=405)
+
+        try:
+            result = EventoService.eliminar_evento(id_evento)
+        except ValueError as ve:
+            return JsonResponse({"error": str(ve)}, status=400)
+        except Exception as e:
+            logger = logging.getLogger(__name__)
+            logger.exception(f"Error al procesar eliminar_evento {id_evento}: {e}")
+            return JsonResponse({"error": "Error interno al eliminar el evento."}, status=500)
+        
+        if result.get("failed_paths"):
+            return JsonResponse({
+                "message": "Evento eliminado en base de datos, pero algunos archivos no pudieron eliminarse.",
+                "failed_paths": result["failed_paths"]
+            }, status=200)
+        else:
+            return JsonResponse({"message": "Evento eliminado correctamente."}, status=200)
