@@ -1,3 +1,4 @@
+from datetime import date
 from django.http import JsonResponse
 from ..forms.event import RegistroEventoForm
 from ..services.event import EventoService
@@ -87,6 +88,8 @@ class EventoAPI:
                 return JsonResponse({"error": "No tienes permiso para enviar este evento a validación."}, status=403)
             if not evento.instalaciones_asignadas.exists():
                 return JsonResponse({"error": "El evento debe tener al menos una instalación asignada antes de enviarlo a validación."}, status=400)
+            if evento.fecha < date.today():
+                return JsonResponse({"error": "La fecha del evento no puede ser anterior a la fecha actual."}, status=400)       
             actualizado = EventoService.actualizar_estado(id_evento, "Enviado")
             fecha = EventoService.actualizar_fecha_envio(id_evento)
             if actualizado and fecha:
