@@ -1,5 +1,4 @@
 import os
-import logging
 from django.db import IntegrityError, transaction
 from django.conf import settings
 from django.db import IntegrityError
@@ -7,8 +6,6 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils import timezone
 from datetime import datetime
 from ..models import Evento
-
-logger = logging.getLogger(__name__)
 
 class EventoService:
     @staticmethod
@@ -198,7 +195,6 @@ class EventoService:
         except ValueError:
             raise
         except Exception as e:
-            logger.exception(f"Error al eliminar evento {id_evento} en la base de datos: {e}")
             raise ValueError("Ocurrió un error al eliminar el evento en la base de datos.") from e
 
         failed_paths = []
@@ -222,11 +218,8 @@ class EventoService:
                                 break
                         except OSError:
                             break
-                else:
-                    logger.info(f"Archivo no encontrado: {abs_path}")
 
-            except Exception as ex:
-                logger.error(f"Error al eliminar archivo {path}: {ex}")
+            except Exception:
                 failed_paths.append(path)
 
         return {"deleted": True, "failed_paths": failed_paths}

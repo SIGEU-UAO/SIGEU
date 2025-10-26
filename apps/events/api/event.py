@@ -1,4 +1,3 @@
-import logging
 from django.http import JsonResponse
 from ..forms.event import RegistroEventoForm
 from ..services.event import EventoService
@@ -102,9 +101,7 @@ class EventoAPI:
             result = EventoService.eliminar_evento(id_evento)
         except ValueError as ve:
             return JsonResponse({"error": str(ve)}, status=400)
-        except Exception as e:
-            logger = logging.getLogger(__name__)
-            logger.exception(f"Error al procesar eliminar_evento {id_evento}: {e}")
+        except Exception:
             return JsonResponse({"error": "Error interno al eliminar el evento."}, status=500)
         
         if result.get("failed_paths"):
