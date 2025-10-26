@@ -89,7 +89,7 @@
         
             <div class="card__actions">
                 <a href="{% url 'editar_evento' event.idEvento %}" class="card__btn card__btn--edit">Editar</a>
-                <button class="card__btn card__btn--delete">Eliminar</button>
+                <button class="card__btn card__btn--delete" data-id="{{ event.idEvento }}">Eliminar</button>
             </div>    
         {% endif %}
 
