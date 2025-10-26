@@ -13,12 +13,40 @@ function isSuspicious(text) {
   return XSS_RE.test(v) || SQL_RE.test(v);
 }
 
+// Visual mark + attribute
+function markSuspicious(el) {
+  if (!el) return;
+  try {
+    el.style.outline = '2px solid red';
+    el.setAttribute('data-suspicious', 'true');
+  } catch (e) { /* noop */ }
+}
+
+// Remove visual mark + attribute
+function clearSuspicious(el) {
+  if (!el) return;
+  try {
+    // solo quitar si lo habíamos marcado
+    if (el.getAttribute && el.getAttribute('data-suspicious') === 'true') {
+      el.style.outline = '';
+      el.removeAttribute('data-suspicious');
+    }
+  } catch (e) {}
+}
+
 function handlePaste(e) {
   const clipboard = e.clipboardData || window.clipboardData;
   const txt = clipboard ? clipboard.getData('text') : '';
   if (isSuspicious(txt)) {
     e.preventDefault();
     Alert.error('Posible inyección detectada (XSS o SQL). Acción bloqueada.');
+  } else {
+    // if it is not suspicious, wait for the paste to occur and clean any possible marks
+    setTimeout(() => {
+      const t = e.target;
+      const val = t?.value ?? t?.innerText ?? t?.innerHTML ?? '';
+      if (!isSuspicious(val)) clearSuspicious(t);
+    }, 30);
   }
 }
 
@@ -28,7 +56,10 @@ function handleInput(e) {
   if (isSuspicious(val)) {
     Alert.error('Entrada sospechosa detectada en este campo. No use consultas SQL ni código.');
     try { t.focus(); } catch (err) {}
-    t.style.outline = '2px solid red';
+    markSuspicious(t);
+  } else {
+    // if it no longer contains anything suspicious, remove the border/attribute
+    clearSuspicious(t);
   }
 }
 
@@ -41,8 +72,11 @@ function handleSubmit(e) {
       e.preventDefault();
       Alert.error('Formulario bloqueado: contiene posible consulta SQL o código peligroso.');
       try { el.focus(); } catch (err) {}
-      el.style.outline = '2px solid red';
+      markSuspicious(el);
       break;
+    } else {
+      // we ensure that any clean field loses the mark
+      clearSuspicious(el);
     }
   }
 }
