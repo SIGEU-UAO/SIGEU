@@ -194,7 +194,7 @@ class EventoService:
         return page_obj
     
     @staticmethod
-    def obtener_datos_aval(id_evento, id_organizador):
+    def obtener_datos_organizador(id_evento, id_organizador):
         try:
             organizador_evento = OrganizadorEvento.objects.get(
                 evento_id=id_evento,

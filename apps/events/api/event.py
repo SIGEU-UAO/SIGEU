@@ -1,4 +1,3 @@
-from urllib import request
 from django.http import JsonResponse
 from ..forms.event import RegistroEventoForm
 from ..services.event import EventoService
@@ -118,10 +117,10 @@ class EventoAPI:
         
     @login_required
     @secretaria_required
-    def obtener_datos_aval(request, id_evento, id_organizador):
+    def obtener_datos_organizador(request, id_evento, id_organizador):
         if request.method == "GET":
             try:
-                datos = EventoService.obtener_datos_aval(id_evento, id_organizador)
+                datos = EventoService.obtener_datos_organizador(id_evento, id_organizador)
                 if not datos:
                     return JsonResponse({"error": "Datos no encontrados."}, status=404)
                 return JsonResponse({"error": False, "data": datos}, status=200)

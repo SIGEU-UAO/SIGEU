@@ -196,22 +196,3 @@ class UsersAPI():
             }
             return JsonResponse(data, status=200)
         return JsonResponse({"error": "Método no permitido"}, status=405)
-    
-    @login_required
-    def obtener_usuario_por_id(request, id):
-        if request.method == "GET":
-            user = UserService.obtener_usuario_por_id(id)
-            if not user: return JsonResponse({"error": "No se encontró ningun organizador con dicha ID"}, status=404)
-            data = {
-                "organizador": {  
-                    "idUsuario": user["idUsuario"],
-                    "numeroIdentificacion": user["numeroIdentificacion"],
-                    "nombres": user["nombres"],
-                    "apellidos": user["apellidos"],
-                    "email": user["email"],
-                    "telefono": user["telefono"],
-                    "rol": user["rol"]
-                }
-            }
-            return JsonResponse(data, status=200)
-        return JsonResponse({"error": "Método no permitido"}, status=405)

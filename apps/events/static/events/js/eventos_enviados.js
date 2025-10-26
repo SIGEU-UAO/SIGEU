@@ -1,13 +1,13 @@
 import API from "/static/js/modules/classes/API.js"; 
 
-// ===== Selects =====
+// ===== Selects ===== //
 const infoOrgBtns = document.querySelectorAll(".card__btn--infoOrg");
 const infoOrgExtBtns = document.querySelectorAll(".card__btn--infoOrgExt");
 
 const modalOrg = document.getElementById("modal-organizador");
 const modalOrgExt = document.getElementById("modal-organizacion-externa");
 
-// ===== References ModalOrganizador =====
+// ===== References ModalOrganizador ===== //
 const nombreOrg = modalOrg?.querySelector(".nombreOrg");
 const rolOrg = modalOrg?.querySelector(".rolOrg");
 const correoOrg = modalOrg?.querySelector(".correoOrg");
@@ -16,7 +16,7 @@ const identificacionOrg = modalOrg?.querySelector(".identificacionOrg");
 const tipoAvalOrg = modalOrg?.querySelector(".tipoAvalOrg");
 const avalBtnOrg = modalOrg?.querySelector(".modal__aval-btn");
 
-// ===== References ModalOrganizacionesExternas =====
+// ===== References ModalOrganizacionesExternas ===== //
 const nombreExt = modalOrgExt?.querySelector(".nombreOrgExt");
 
 const nitExt = modalOrgExt?.querySelector(".nitOrgExt");
@@ -28,14 +28,14 @@ const telefonoExt = modalOrgExt?.querySelector(".telefonoOrgExt");
 const ubicacionExt = modalOrgExt?.querySelector(".ubicacionOrgExt");
 const certBtnExt = modalOrgExt?.querySelector(".modal__cert-btn");
 
-// ==== ORGANIZADOR ====
+// ==== ORGANIZADOR ==== //
 infoOrgBtns.forEach(btn => {
   btn.addEventListener("click", async () => {
     const data = btn.dataset;
     const orgId = data.orgid;
     const eventId = data.eventid;
-    const url = `/users/api/obtener_usuario_por_id/${orgId}/`;
-    const urlAval = `/eventos/api/obtener-datos-aval/${eventId}/${orgId}/`
+    const url = `/organizadores/api/${orgId}/`;
+    const urlAval = `/eventos/api/obtener-datos-organizador/${eventId}/${orgId}/`
 
     try {
       // API calls //
@@ -74,7 +74,7 @@ infoOrgBtns.forEach(btn => {
   });
 });
 
-// ==== ORGANIZACIONES EXTERNAS ====
+// ==== ORGANIZACIONES EXTERNAS ==== //
 infoOrgExtBtns.forEach(btn => {
   btn.addEventListener("click", async () => {
     const data = btn.dataset;
@@ -82,7 +82,7 @@ infoOrgExtBtns.forEach(btn => {
     const eventId = data.eventoid;
 
     const urlOrg = `/orgs/api/${orgIdExt}/`;
-    const urlInv = `/eventos/api/obtener_datos_organizacion_invitada/${eventId}/${orgIdExt}/`;
+    const urlInv = `/eventos/api/obtener-datos-organizacion-invitada/${eventId}/${orgIdExt}/`;
 
     try {
       //API calls//
