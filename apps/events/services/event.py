@@ -5,7 +5,10 @@ from django.db import IntegrityError
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils import timezone
 from datetime import datetime
-from ..models import Evento
+from django.utils import timezone
+from apps.users.models import Usuario
+from ..models import Evento, OrganizadorEvento, OrganizacionInvitada
+from django.db.models import Q
 
 class EventoService:
     @staticmethod
@@ -165,6 +168,67 @@ class EventoService:
             return True
         except Evento.DoesNotExist:
             return False
+        
+    @staticmethod
+    def actualizar_fecha_envio(id_evento):
+        try:
+            evento = Evento.objects.get(idEvento=id_evento)
+            evento.fechaEnvio = timezone.now()
+            evento.save()
+            return True
+        except Evento.DoesNotExist:
+            return False
+
+    @staticmethod
+    def listar_eventos_enviados(facultad, page=1, per_page=12):
+        qs = Evento.objects.filter(
+            estado__iexact="Enviado"
+        ).filter(
+            Q(creador__estudiante__programa__facultad=facultad) | Q(creador__docente__unidadAcademica__facultad=facultad)
+        ).order_by('fechaEnvio')
+
+        paginator = Paginator(qs, per_page)
+        try:
+            page_obj = paginator.page(page)
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)
+        return page_obj
+    
+    @staticmethod
+    def obtener_datos_organizador(id_evento, id_organizador):
+        try:
+            organizador_evento = OrganizadorEvento.objects.get(
+                evento_id=id_evento,
+                organizador_id=id_organizador
+            )
+            return {
+                "organizador_evento": {
+                    "aval": organizador_evento.aval.url if organizador_evento.aval else None,
+                    "tipo": organizador_evento.get_tipo_display(),
+                }
+            }
+        except OrganizadorEvento.DoesNotExist:
+            return None
+        
+    @staticmethod
+    def obtener_datos_organizacion_invitada(id_evento, id_organizacion):
+        try:
+            org_invitada = (OrganizacionInvitada.objects.get(
+                    evento=id_evento,
+                    organizacion=id_organizacion
+                )
+            )
+            return { 
+                "OrganizacionInvitada": {
+                    "representante_asiste": org_invitada.representante_asiste,
+                    "representante_alterno": org_invitada.representante_alterno,
+                    "certificado_participacion": org_invitada.certificado_participacion.url if org_invitada.certificado_participacion else None,
+                }
+            }
+        except OrganizacionInvitada.DoesNotExist:
+            return None
         
     @staticmethod
     def eliminar_evento(id_evento):

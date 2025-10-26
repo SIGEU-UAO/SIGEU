@@ -8,8 +8,9 @@ from .api.associations.organizaciones_invitadas import OrganizacionInvitadaAPI
 urlpatterns = [
     # --- Views ---
     path("eventos/registro/", views.formulario_registro, name="registrar_evento"),  
-    path("eventos/mis-eventos/", views.mis_eventos, name="mis_eventos"),     
+    path("eventos/mis-eventos/", views.mis_eventos, name="mis_eventos"),   
     path("eventos/editar/<int:pk>/", views.formulario_edicion, name="editar_evento"),
+    path("eventos/enviados/", views.eventos_enviados, name="eventos_enviados"),
 
     # --- API ---
     path("eventos/api/registro/", EventoAPI.registro, name="registro_evento_api"),
@@ -29,5 +30,8 @@ urlpatterns = [
     path("eventos/api/listar-organizaciones/<int:eventoId>/", OrganizacionInvitadaAPI.listar_organizaciones_invitadas, name="listar_organizaciones_invitadas_api"),
     path("eventos/api/actualizar-organizaciones/<int:eventoId>/", OrganizacionInvitadaAPI.actualizar_organizaciones, name="actualizar_organizaciones_api"),
 
-    path("eventos/api/enviar-validacion/<int:id_evento>/",EventoAPI.enviar_evento_validacion,name="enviar_evento_validacion_api")
+    path("eventos/api/enviar-validacion/<int:id_evento>/",EventoAPI.enviar_evento_validacion,name="enviar_evento_validacion_api"),
+    path("eventos/api/listar-enviados/",EventoAPI.listar_eventos_enviados,name="listar_eventos_enviados_api"),
+    path("eventos/api/obtener-datos-organizador/<int:id_evento>/<int:id_organizador>/",EventoAPI.obtener_datos_organizador,name="obtener_datos_organizador_api"),
+    path("eventos/api/obtener-datos-organizacion-invitada/<int:id_evento>/<int:id_organizacion>/",EventoAPI.obtener_datos_organizacion_invitada,name="obtener_datos_orginvitada_api"),
 ]

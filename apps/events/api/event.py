@@ -4,6 +4,7 @@ from ..services.event import EventoService
 from ..serializers.eventoSerializer import EventoSerializer 
 from django.contrib.auth.decorators import login_required
 from sigeu.decorators import organizador_required
+from sigeu.decorators import secretaria_required
 import json
 
 class EventoAPI:
@@ -43,6 +44,7 @@ class EventoAPI:
 
         data = EventoSerializer.serialize_page(page_obj)
         return JsonResponse(data, safe=False)
+    
     @login_required()
     @organizador_required
     def actualizar(request, id):
@@ -86,11 +88,56 @@ class EventoAPI:
             if not evento.instalaciones_asignadas.exists():
                 return JsonResponse({"error": "El evento debe tener al menos una instalación asignada antes de enviarlo a validación."}, status=400)
             actualizado = EventoService.actualizar_estado(id_evento, "Enviado")
-            if actualizado:
+            fecha = EventoService.actualizar_fecha_envio(id_evento)
+            if actualizado and fecha:
                 return JsonResponse({"message": "El evento ha sido enviado a validación correctamente."}, status=200)
             else:
                 return JsonResponse({"error": "No se pudo actualizar el estado del evento."}, status=500)
             
+    login_required()
+    secretaria_required()
+    def listar_eventos_enviados(request):
+        if request.method == "GET":
+            page = request.GET.get('page', 1)
+
+            try:
+                page = int(page)
+            except (TypeError, ValueError):
+                page = 1
+
+            page_obj = EventoService.listar_eventos_enviados(             
+                page=page,
+                per_page=12,
+                facultad=request.user.secretaria.facultad
+            )
+
+            data = EventoService.serializar_eventos(page_obj, request=request)
+            return JsonResponse(data, safe=False)
+        
+    @login_required
+    @secretaria_required
+    def obtener_datos_organizador(request, id_evento, id_organizador):
+        if request.method == "GET":
+            try:
+                datos = EventoService.obtener_datos_organizador(id_evento, id_organizador)
+                if not datos:
+                    return JsonResponse({"error": "Datos no encontrados."}, status=404)
+                return JsonResponse({"error": False, "data": datos}, status=200)
+            except Exception as e:
+                return JsonResponse({"error": str(e)}, status=500)
+    
+    @login_required
+    @secretaria_required
+    def obtener_datos_organizacion_invitada(request, id_evento, id_organizacion):
+        if request.method == "GET":
+            try:
+                datos = EventoService.obtener_datos_organizacion_invitada(id_evento, id_organizacion)
+                if not datos:
+                    return JsonResponse({"error": "Datos no encontrados."}, status=404)
+                return JsonResponse({"error": False, "data": datos}, status=200)
+            except Exception as e:
+                return JsonResponse({"error": str(e)}, status=500)
+
     @login_required()
     @organizador_required
     def eliminar_evento(request, id_evento):

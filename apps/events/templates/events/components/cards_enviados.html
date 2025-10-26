@@ -1,0 +1,107 @@
+{% load static %}
+<div class="card {{ type|lower }}">
+    <div class="card__header">
+        <div class="card__header--left">
+            <div class="card__icon">
+                <i class="ri-send-plane-fill"></i>
+            </div>
+            <div class="card__info">
+                <h4 class="card__title">{{ event.nombre }}</h4>
+                <span class="card__type">{{ event.get_tipo_display }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card__date">
+        <div class="card__day">
+            <i class="ri-calendar-event-fill"></i>
+            <span>{{ event.fecha|date:"d/m/Y" }}</span>
+        </div>
+        <div class="card__time">
+            <i class="ri-time-fill"></i>
+            <span>{{ event.horaInicio|time:"H:i" }} - {{ event.horaFin|time:"H:i" }}</span>
+        </div>
+    </div>
+
+    <div class="card__main">
+        <p class="card__description">{{ event.descripcion|truncatechars:200 }}</p>
+
+        {% if event.instalaciones_asignadas.exists %}
+            <hr>
+            <details class="card__details card__installations">
+                <summary class="card__sub--label">Instalaciones:</summary>
+                <ul class="card__sub--list">
+                    {% for asign in event.instalaciones_asignadas.all %}
+                        <li class="card__sub--item">{{ asign.instalacion }}</li>
+                    {% endfor %}
+                </ul>
+            </details>
+        {% endif %}
+
+        {% if event.organizadores_asignados.exists %}
+            <hr>
+            <details class="card__details card__organizators">
+                <summary class="card__sub--label">Organizadores:</summary>
+                <ul class="card__sub--list">
+                    {% for o in event.organizadores_asignados.all %}
+                        <li class="card__sub--item card__sub--item--group">
+                            <div class="card__sub--item--info">
+                                <h6>{{ o.organizador.nombres }} {{ o.organizador.apellidos }}</h6>
+                                <span>ROL: {{ o.get_tipo_display }}</span>
+                            </div>
+                            <div class="card__sub--item--actions">
+                                <button type="button"
+                                    class="card__btn card__btn--infoOrg"
+                                    data-orgid="{{ o.organizador.idUsuario }}"
+                                    data-eventid="{{ event.idEvento }}"
+                                    title="Ver Más Información">
+                                    <i class="ri-more-fill"></i>
+                                </button>
+                                <a href="{{ o.aval.url }}" target="__blank"
+                                   class="card__sub--item--file" title="Abrir Aval">
+                                   <i class="ri-file-pdf-2-fill"></i>
+                                </a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </details>
+        {% endif %}
+
+        {% if event.organizaciones_invitadas.exists %}
+            <hr>
+            <details class="card__details card__organizations">
+                <summary class="card__sub--label">Organizaciones Externas:</summary>
+                <ul class="card__sub--list">
+                    {% for oi in event.organizaciones_invitadas.all %}
+                        <li class="card__sub--item card__sub--item--group">
+                            <div class="card__sub--item--info">
+                                <h6>{{ oi.organizacion.nombre }}</h6>
+                                <span>NIT: {{ oi.organizacion.nit }}</span>
+                            </div>
+                            <div class="card__sub--item--actions">
+                                <button type="button"
+                                    class="card__btn card__btn--infoOrgExt"
+                                    data-orgextid="{{ oi.organizacion.idOrganizacion }}"
+                                    data-eventoid="{{ event.idEvento }}"
+                                    title="Ver Más Información">
+                                    <i class="ri-more-fill"></i>
+                                </button>
+                                <a href="{{ oi.certificado_participacion.url }}" target="__blank"
+                                   class="card__sub--item--file" title="Abrir Certificado">
+                                   <i class="ri-file-pdf-2-fill"></i>
+                                </a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </details>
+        {% endif %}
+
+        <hr>
+
+        <div class="card__actions">
+            <button class="card__btn card__btn--accept">Evaluar evento</button>
+        </div>
+    </div>
+</div>
