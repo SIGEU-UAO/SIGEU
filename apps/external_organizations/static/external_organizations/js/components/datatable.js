@@ -56,7 +56,7 @@ export default class Datatable{
                     render: (data, type, row) => {
                         if (data) {
                             return `
-                                <a href="orgs/editar/${row.id}"><i class="ri-pencil-fill"></i></a>
+                                <a href="/orgs/editar/${row.id}"><i class="ri-pencil-fill"></i></a>
                                 <button data-id="${row.id}"><i class="ri-delete-bin-fill"></i></button>
                             `;
                         }

@@ -5,7 +5,7 @@ from .api import OrganizacionesExternasAPI
 urlpatterns = [
     # --- Views ---
     path("orgs/listado/", views.listado, name="listado_orgs"),
-    path("orgs/listado/orgs/editar/<int:pk>/", views.editar, name="editar_org"),
+    path("orgs/editar/<int:pk>/", views.editar, name="editar_org"),
 
     # --- API ---
     path("orgs/api/", OrganizacionesExternasAPI.listar, name="orgs_api_list"),
