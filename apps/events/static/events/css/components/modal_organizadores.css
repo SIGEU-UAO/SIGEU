@@ -1,0 +1,131 @@
+/* ===== Ocultar si no está abierto ===== */
+.modal:not([open]) {
+  display: none;
+}
+
+/* ===== Base del modal (centrado absoluto en pantalla) ===== */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    z-index: 1000;
+}
+
+/* ===== Fondo semitransparente ===== */
+.modal::backdrop {
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(2px);
+}
+
+/* ===== Contenedor principal del contenido ===== */
+.modal__content {
+    box-sizing: border-box;
+    width: 90%;
+    max-width: 520px;
+    background-color: #ffffff;
+    border-radius: 1rem;
+    padding: 2rem;
+    position: relative;
+    color: #1e293b;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    animation: modalFadeIn 0.3s ease;
+}
+
+/* ===== Animación de entrada ===== */
+@keyframes modalFadeIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* ===== Botón de cerrar (la “X”) ===== */
+.modal__close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    color: #64748b;
+    cursor: pointer;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.modal__close:hover {
+    color: #ef4444;
+    transform: scale(1.15);
+}
+
+/* ===== Encabezados ===== */
+#modal-organizadores-container h2 {
+    font-size: 1.2rem;
+    color: #0f172a;
+    margin-bottom: 0.3rem;
+    margin-top: 1rem;
+}
+
+/* ===== Texto base ===== */
+#modal-organizadores-container span {
+    display: block;
+    color: #334155;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+/* ===== Grupo de contacto ===== */
+.modal__info--group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-top: 0.8rem;
+}
+
+.modal__info--group strong {
+    color: #0f172a;
+}
+
+/* ===== Línea divisoria ===== */
+hr {
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    margin: 1rem 0;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 480px) {
+    .modal__content {
+        padding: 1.5rem;
+    }
+
+    #modal-organizadores-container h2 {
+        font-size: 1.1rem;
+    }
+}
+
+.cardEnviados__sub--item--file, .modal__aval-btn, .modal__cert-btn{
+    padding: 20px;
+    background-color: var(--red);
+    border-radius: 50%;
+    color: #fff;
+    text-decoration: none;
+    font-size: 2.5rem;
+    /*border:1px solid black;*/
+}
+
+.modal__certificado {
+    text-align: center;
+}
