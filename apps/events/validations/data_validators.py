@@ -15,8 +15,20 @@ def validate_collection(data, schema):
 
         keys = set(item.keys())
 
+        # Detect action if exists
+        accion = item.get("accion", "").strip().lower()
+
+        # Determine which required keys to validate
+        keys_required = required_keys.copy()
+        if accion == "eliminar" and schema == SCHEMAS["organizadores_evento"]:
+            keys_required.remove("aval")  # No need to validate aval when deleting
+
+        if accion == "eliminar" and schema == SCHEMAS["organizaciones_invitadas"]:
+            keys_required.remove("representante_asiste")
+            keys_required.remove("certificado_participacion")
+
         # It must have exactly the required keys.
-        if not set(required_keys).issubset(keys):
+        if not set(keys_required).issubset(keys):
             return False
         
         # There should be no keys other than those required or optional.
@@ -25,7 +37,7 @@ def validate_collection(data, schema):
             return False
 
         # 3 Validate required types
-        for k in required_keys:
+        for k in keys_required:
             expected_type = types[k]
             value = item.get(k)
             if not validate_type(value, expected_type):
@@ -43,7 +55,7 @@ def validate_collection(data, schema):
         if item.get("representante_asiste") and item.get("representante_alterno") and schema == SCHEMAS["organizaciones_invitadas"]:
             return False    
         
-        if not item.get("representante_asiste") and not item.get("representante_alterno") and schema == SCHEMAS["organizaciones_invitadas"]:
+        if not item.get("representante_asiste") and not item.get("representante_alterno") and accion != "eliminar" and schema == SCHEMAS["organizaciones_invitadas"]:
             return False
     
     return True
@@ -66,20 +78,23 @@ def validate_type(value, expected_type):
 SCHEMAS = {
     "instalaciones_asignadas": {
         "required_keys": ["id"],
-        "types": {"id": int}
+        "optional_keys": ["accion"],
+        "types": {"id": int, "accion": str}
     },
     "organizadores_evento": {
         "required_keys": ["id", "aval"],
-        "types": { "id": int, "aval": "file/pdf" }
+        "optional_keys": ["accion"],
+        "types": { "id": int, "aval": "file/pdf", "accion": str }
     },
     "organizaciones_invitadas": {
         "required_keys": ["id", "representante_asiste", "certificado_participacion"],
-        "optional_keys": ["representante_alterno"],
+        "optional_keys": ["representante_alterno", "accion"],
         "types": {
             "id": int,
             "representante_asiste": bool,
             "representante_alterno": str,
-            "certificado_participacion": "file/pdf"
+            "certificado_participacion": "file/pdf",
+            "accion": str
         }
     }
 }

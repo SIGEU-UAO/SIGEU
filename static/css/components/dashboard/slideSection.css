@@ -1,9 +1,9 @@
 .slide__section {
     position: fixed;
     top: 0;
+    left: 0;
     right: 0;
-    width: 100vw;
-    height: 100vh;
+    bottom: 0;
     background: linear-gradient(135deg, var(--primary), #8A4FFF);
     color: white;
     display: flex;
@@ -55,4 +55,24 @@
     color: var(--black);
     font-size: 20px;
     font-weight: 600;
+}
+
+@media screen and (max-width: 1000px) {
+    .slide__section {
+        padding: 48px;
+        overflow-y: auto;           
+        align-items: stretch;       
+        justify-content: flex-start;
+        max-height: 100vh;         
+    }
+
+    .slide__form{
+        width: 80%;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .slide__form{
+        width: 100%;
+    }
 }

@@ -100,11 +100,9 @@ class OrganizacionesExternasAPI:
                     "ubicacion": org.ubicacion,
                     "sectorEconomico": org.sectorEconomico,
                     "actividadPrincipal": org.actividadPrincipal,
-                    "esCreador": request.user.idUsuario == org.creador_id
+                    "esCreador": OrganizacionExternaService.es_creador(request.user, org.idOrganizacion)
                 })
             
-            
-
             return JsonResponse({
                 "draw": draw,
                 "recordsTotal": total_records,
@@ -182,11 +180,15 @@ class OrganizacionesExternasAPI:
 
         try:
             es_creador = OrganizacionExternaService.es_creador(request.user, pk)
+            esta_asociada_evento = OrganizacionExternaService.esta_asociada_evento(pk)
             if es_creador is None:
                 return JsonResponse({"error": "Organización no encontrada."}, status=404)
             if not es_creador:
                 return JsonResponse({"error": "No tienes permiso para eliminar esta organización."}, status=403)
-
+        
+            if esta_asociada_evento:
+                return JsonResponse({"error": "Organización asociada a un evento."}, status = 409)
+            
             resultado = OrganizacionExternaService.eliminar(pk)
             if resultado.get("error"):
                 return JsonResponse({"error": resultado.get("mensaje")}, status=400)

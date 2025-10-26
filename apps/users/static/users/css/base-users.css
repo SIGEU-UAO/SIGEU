@@ -14,3 +14,18 @@ body{
     top: 48px;
     left: 48px;
 }
+
+@media screen and (max-width: 1000px) {
+    body{
+        padding-right: 0;
+        justify-content: center;
+    }
+
+    .logo__figure{
+        position: absolute;
+    }
+
+    .logo__figure img{
+        width: 48px;
+    }
+}

@@ -1,7 +1,9 @@
 @import url("/static/css/components/forms/form.css");
 
 .filters{
+    max-width: 1000px;
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     padding-right: 32px;
     gap: 24px;
@@ -9,6 +11,7 @@
 
 .filters__buttons{
     display: flex;
+    flex-wrap: wrap;
     gap: 12px;
 }
 
@@ -42,13 +45,13 @@
     gap: 8px;
 }
 
-
 .search__title{
     font-size: 18px;
 }
 
 .filters__search form{
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
 }
 

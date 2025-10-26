@@ -1,7 +1,8 @@
 from django.db.models import Q
 from django.db import IntegrityError
-from .models import OrganizacionExterna
-from django.shortcuts import get_object_or_404
+
+from apps.events.models import Evento, OrganizacionExterna, OrganizacionInvitada
+from .serializer import ExternalOrganizationSerializer
 
 class OrganizacionExternaService:
     @staticmethod
@@ -34,19 +35,8 @@ class OrganizacionExternaService:
         return OrganizacionExterna.objects.all()
     
     @staticmethod
-    @staticmethod
     def listar_json():
-        return list(OrganizacionExterna.objects.values(
-            "idOrganizacion",
-            "nit",
-            "nombre",
-            "representanteLegal",
-            "telefono",
-            "ubicacion",
-            "sectorEconomico",
-            "actividadPrincipal",
-            "creador_id"
-        ))
+        return ExternalOrganizationSerializer.serialize_organizations(OrganizacionExterna.objects.all(), many=True)
     
     @staticmethod
     def buscar(termino):
@@ -126,3 +116,6 @@ class OrganizacionExternaService:
         except Exception as e:
             return {"error": True, "mensaje": f"Error interno: {str(e)}"}
     
+    @staticmethod
+    def esta_asociada_evento(org_id):
+        return OrganizacionInvitada.objects.filter(organizacion_id = org_id).exists()

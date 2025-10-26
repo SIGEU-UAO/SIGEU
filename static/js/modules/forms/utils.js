@@ -88,7 +88,7 @@ export function handleFileInputsInfo(input, existingFile = null) {
   // Function to update infoDiv
   const updateInfo = (file) => {
     if (file) {
-      infoDiv.innerHTML = `<i class="ri-file-check-fill"></i> ${file.name}`;
+      infoDiv.innerHTML = `<i class="ri-file-check-fill"></i> ${file instanceof File ? file.name : file}`;
     } else {
       infoDiv.textContent = '';
     }

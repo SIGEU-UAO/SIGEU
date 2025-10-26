@@ -2,6 +2,7 @@
 
 .form{
     max-width: 820px;
+    margin: 56px 0;
     background-color: #fff;
     padding: 48px;
     border-radius: 24px;
@@ -49,3 +50,49 @@
 }
 
 /* End Form Icons */
+
+/* Responsive */
+@media screen and (max-width: 1000px) {
+    .form{
+        margin-top: 120px;
+        width: 80%;
+    }
+}
+
+@media screen and (max-width: 800px) {
+    .form__title{
+        font-size: 32px;
+    }
+    
+    .icon__btn{
+        top: 35px;
+    }
+}
+
+@media screen and (max-width: 720px) {
+    .form{
+        padding: 36px;
+    }
+
+    .form__title{
+        font-size: 28px;
+    }
+}
+
+@media screen and (max-width: 660px) {
+    .form__title{
+        font-size: 20px;
+    }
+    
+    .icon__btn{
+        top: 35px;
+    }
+
+    .form__actions{
+        flex-direction: column;
+    }
+
+    .form__button{
+        width: 100%;
+    }
+}

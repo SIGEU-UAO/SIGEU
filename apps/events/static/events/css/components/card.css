@@ -1,5 +1,5 @@
 .cards{
-    width: 90%;
+    max-width: 1200px;
     margin-top: 32px;
     display: flex;
     gap: 48px;
@@ -173,6 +173,7 @@
 
 .card__btn--edit{
     background-color: var(--blue);
+    text-decoration: none;
 }
 
 .card__btn--delete{
