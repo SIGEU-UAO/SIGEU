@@ -30,5 +30,7 @@ urlpatterns = [
     path("eventos/api/actualizar-organizaciones/<int:eventoId>/", OrganizacionInvitadaAPI.actualizar_organizaciones, name="actualizar_organizaciones_api"),
 
     path("eventos/api/enviar-validacion/<int:id_evento>/",EventoAPI.enviar_evento_validacion,name="enviar_evento_validacion_api"),
-    path("eventos/api/listar-enviados/",EventoAPI.listar_eventos_enviados,name="listar_eventos_enviados_api")
+    path("eventos/api/listar-enviados/",EventoAPI.listar_eventos_enviados,name="listar_eventos_enviados_api"),
+    path("eventos/api/obtener-datos-aval/<int:id_evento>/<int:id_organizador>/",EventoAPI.obtener_datos_aval,name="obtener_datos_aval_api"),
+    path("eventos/api/obtener_datos_organizacion_invitada/<int:id_evento>/<int:id_organizacion>/",EventoAPI.obtener_datos_organizacion_invitada,name="obtener_datos_orginvitada_api"),
 ]

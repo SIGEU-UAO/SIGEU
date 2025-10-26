@@ -1,3 +1,4 @@
+from urllib import request
 from django.http import JsonResponse
 from ..forms.event import RegistroEventoForm
 from ..services.event import EventoService
@@ -106,9 +107,35 @@ class EventoAPI:
             except (TypeError, ValueError):
                 page = 1
 
-            page_obj = EventoService.listar_eventos_enviados(
-                page=page, per_page=12
+            page_obj = EventoService.listar_eventos_enviados(             
+                page=page,
+                per_page=12,
+                facultad=request.user.secretaria.facultad
             )
 
             data = EventoService.serializar_eventos(page_obj, request=request)
             return JsonResponse(data, safe=False)
+        
+    @login_required
+    @secretaria_required
+    def obtener_datos_aval(request, id_evento, id_organizador):
+        if request.method == "GET":
+            try:
+                datos = EventoService.obtener_datos_aval(id_evento, id_organizador)
+                if not datos:
+                    return JsonResponse({"error": "Datos no encontrados."}, status=404)
+                return JsonResponse({"error": False, "data": datos}, status=200)
+            except Exception as e:
+                return JsonResponse({"error": str(e)}, status=500)
+    
+    @login_required
+    @secretaria_required
+    def obtener_datos_organizacion_invitada(request, id_evento, id_organizacion):
+        if request.method == "GET":
+            try:
+                datos = EventoService.obtener_datos_organizacion_invitada(id_evento, id_organizacion)
+                if not datos:
+                    return JsonResponse({"error": "Datos no encontrados."}, status=404)
+                return JsonResponse({"error": False, "data": datos}, status=200)
+            except Exception as e:
+                return JsonResponse({"error": str(e)}, status=500)

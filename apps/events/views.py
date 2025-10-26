@@ -120,7 +120,7 @@ def eventos_enviados(request):
     except (TypeError, ValueError):
         page = 1
 
-    page_obj = EventoService.listar_eventos_enviados(page=page, per_page=12)
+    page_obj = EventoService.listar_eventos_enviados(page=page, per_page=12, facultad=request.user.secretaria.facultad)
 
 
     # --- cálculo de ventana de paginación ---

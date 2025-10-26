@@ -221,3 +221,32 @@ class UserService:
             return usuario
         except Usuario.DoesNotExist:
             return False
+        
+    @staticmethod
+    def obtener_usuario_por_id(id_usuario):
+        try:
+            usuario = (
+                Usuario.objects
+                .annotate(
+                    rol=Case(
+                        When(estudiante__isnull=False, then=Value('Estudiante')),
+                        When(docente__isnull=False, then=Value('Docente')),
+                        When(secretaria__isnull=False, then=Value('Secretaría')),
+                        default=Value('Usuario'),
+                        output_field=CharField()
+                    )
+                )
+                .values(
+                    "idUsuario",
+                    "numeroIdentificacion",
+                    "nombres",
+                    "apellidos",
+                    "email",
+                    "telefono",
+                    "rol" 
+                )
+                .get(idUsuario=id_usuario)
+            )
+            return usuario
+        except Usuario.DoesNotExist:
+            return False      

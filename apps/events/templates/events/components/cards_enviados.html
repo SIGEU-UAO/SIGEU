@@ -52,14 +52,8 @@
                             <div class="card__sub--item--actions">
                                 <button type="button"
                                     class="card__btn card__btn--infoOrg"
-                                    data-id="{{ o.organizador.idUsuario }}"
-                                    data-nombre="{{ o.organizador.nombres }} {{ o.organizador.apellidos }}"
-                                    data-rol="{{ o.organizador.rol }}"
-                                    data-correo="{{ o.organizador.email }}"
-                                    data-telefono="{{ o.organizador.telefono }}"
-                                    data-identificacion="{{ o.organizador.numeroIdentificacion }}"
-                                    data-tipoAval="{{ o.get_tipo_display }}"
-                                    data-aval-url="{{ o.aval.url }}"
+                                    data-orgid="{{ o.organizador.idUsuario }}"
+                                    data-eventid="{{ event.idEvento }}"
                                     title="Ver Más Información">
                                     <i class="ri-more-fill"></i>
                                 </button>
@@ -88,17 +82,8 @@
                             <div class="card__sub--item--actions">
                                 <button type="button"
                                     class="card__btn card__btn--infoOrgExt"
-                                    data-id="{{ oi.organizacion.id }}"
-                                    data-nombre="{{ oi.organizacion.nombre }}"
-                                    data-nit="{{ oi.organizacion.nit }}"
-                                    data-correo="{{ oi.organizacion.email }}"
-                                    data-telefono="{{ oi.organizacion.telefono }}"
-                                    data-sector="{{oi.organizacion.sectorEconomico}}"
-                                    data-actividad="{{oi.organizacion.actividadPrincipal}}"
-                                    data-representanteAlterno="{{ oi.representante_alterno}}"
-                                    data-representante="{{oi.organizacion.representanteLegal}}"
-                                    data-ubicacion="{{oi.organizacion.ubicacion}}"
-                                    data-certificado-url="{{ oi.certificado_participacion.url }}"
+                                    data-orgextid="{{ oi.organizacion.idOrganizacion }}"
+                                    data-eventoid="{{ event.idEvento }}"
                                     title="Ver Más Información">
                                     <i class="ri-more-fill"></i>
                                 </button>
@@ -116,8 +101,7 @@
         <hr>
 
         <div class="card__actions">
-            <button class="card__btn card__btn--accept">Aceptar</button>
-            <button class="card__btn card__btn--reject">Rechazar</button>
+            <button class="card__btn card__btn--accept">Evaluar evento</button>
         </div>
     </div>
 </div>

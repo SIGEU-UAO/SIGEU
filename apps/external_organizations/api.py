@@ -4,7 +4,7 @@ from .forms import RegistroForm
 from .service import OrganizacionExternaService
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
-from sigeu.decorators import organizador_required
+from sigeu.decorators import organizador_required, no_superuser_required
 import json
 
 class OrganizacionesExternasAPI:
@@ -111,7 +111,7 @@ class OrganizacionesExternasAPI:
         return JsonResponse({"error": "Método no permitido"}, status=405)
 
     @login_required()
-    @organizador_required
+    @no_superuser_required
     def obtener_por_id(request, id):
         if request.method == "GET":
             org = OrganizacionExternaService.obtener_por_id(id)
