@@ -89,7 +89,7 @@ class EventoAPI:
             if not evento.instalaciones_asignadas.exists():
                 return JsonResponse({"error": "El evento debe tener al menos una instalación asignada antes de enviarlo a validación."}, status=400)
             if evento.fecha < date.today():
-                return JsonResponse({"error": "La fecha del evento no puede ser anterior a la fecha actual."}, status=400)       
+                return JsonResponse({"error": "El evento debe tener una fecha posterior a la actual para poder ser enviado a validación."}, status=400)
             actualizado = EventoService.actualizar_estado(id_evento, "Enviado")
             fecha = EventoService.actualizar_fecha_envio(id_evento)
             if actualizado and fecha:
