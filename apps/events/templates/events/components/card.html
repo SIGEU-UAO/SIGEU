@@ -17,7 +17,7 @@
                 <span class="card__type">{{ event.get_tipo_display }}</span>
             </div>
         </div>
-        {% if type == "Borrador" or type == "Rechazado" %}
+        {% if type == "Borrador" %}
             <div class="card__header--right">
                 <button class="card__btn card__btn--send" data-id="{{ event.idEvento }}">Enviar</button>
             </div>
