@@ -7,6 +7,11 @@ const infoOrgExtBtns = document.querySelectorAll(".card__btn--infoOrgExt");
 const modalOrg = document.getElementById("modal-organizador");
 const modalOrgExt = document.getElementById("modal-organizacion-externa");
 
+const cardsContainer = document.querySelector('.cards');
+const cards = cardsContainer ? cardsContainer.querySelectorAll('.card') : [];
+const noResultsContainer = document.querySelector('.no-results-container');
+noResultsContainer.style.display = cards.length === 0 ? 'flex' : 'none';
+
 // ===== References ModalOrganizador ===== //
 const nombreOrg = modalOrg?.querySelector(".nombreOrg");
 const rolOrg = modalOrg?.querySelector(".rolOrg");
