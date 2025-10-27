@@ -145,12 +145,11 @@ class EventoAPI:
         if request.method != "DELETE":
             return JsonResponse({"error": "Método no permitido"}, status=405)
 
-        try:
-            evento = Evento.objects.get(idEvento=id_evento)
-        except Evento.DoesNotExist:
+        evento = EventoService.obtener_por_id(id_evento)
+        if not evento:
             return JsonResponse({"error": "Evento no encontrado."}, status=400)
-
-        if evento.creador != request.user:
+            
+        if not EventoService.es_creador(request.user, id_evento):
             return JsonResponse({"error": "No tienes permiso para eliminar este evento."}, status=403)
 
         if evento.estado not in ("Borrador", "Rechazado"):
