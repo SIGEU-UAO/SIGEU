@@ -90,7 +90,7 @@ class EventoAPI:
                 return JsonResponse({"error": "El evento debe tener al menos una instalación asignada antes de enviarlo a validación."}, status=400)
             if not evento.organizadores_asignados.exists():
                 return JsonResponse({"error": "El evento debe tener al menos un organizador asignado."}, status=400)
-            if evento.organizadores_asignados.filter(organizador=evento.creador).count() == 0:
+            if not evento.organizadores_asignados.filter(organizador=evento.creador).exists():
                 return JsonResponse({"error": "El creador del evento debe pertenecer a los organizadores del evento."}, status=400)
             if evento.fecha < date.today():
                 return JsonResponse({"error": "El evento debe tener una fecha posterior a la actual para poder ser enviado a validación."}, status=400)
