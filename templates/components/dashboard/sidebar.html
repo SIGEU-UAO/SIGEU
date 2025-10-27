@@ -49,6 +49,17 @@
                                 </div>
                             </li>
                         </a>
+                    {% elif request.user.rol == "Secretaria" %}
+                        <a href="{% url 'eventos_enviados' %}">
+                            <li class="sidebar__item {% if active_page == 'eventos-enviados' %}sidebar__item--active{% endif %}">
+                                <div class="item__group">
+                                    <div class="item__info">
+                                        <i class="ri-file-edit-fill"></i>
+                                        <h4>Revisión</h4>
+                                    </div>
+                                </div>
+                            </li>
+                        </a>
                     {% endif %}
                 </ul>
             </details>

@@ -154,7 +154,7 @@ def eventos_enviados(request):
 
     context = {
         "header_title": "Eventos Pendientes de Validación",
-        "header_paragraph": "Administra y lleva el control de todos tus eventos en un solo lugar.",
+        "header_paragraph": "Gestiona la revisión de los eventos enviados a validación en tu facultad.",
         "active_page": "eventos-enviados",
         "page_obj": page_obj,
         "status": status or "",
