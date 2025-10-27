@@ -1,0 +1,61 @@
+@import url("./components/card.css");
+@import url("./components/pagination.css");
+@import url("./components/modal_enviados.css");
+
+.no-results-container{
+    display:none; 
+    align-items:center; 
+    justify-content:center; 
+    flex-direction:column; 
+    padding:24px;
+}
+
+.no-results-container img{
+    max-width:240px; 
+    margin-bottom:16px;
+}
+
+/* Cards */
+.card__sub--item--actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.card__btn--infoOrg,
+.card__btn--infoOrgExt {
+    border: none;
+    background-color: transparent;
+    padding: 6px;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    color: #000000; 
+}
+
+.card__btn--infoOrg i,
+.card__btn--infoOrgExt i {
+    font-size: 22px;
+    line-height: 1;
+    color: #000000; 
+}
+
+.card__btn--infoOrg:hover,
+.card__btn--infoOrgExt:hover {
+    background-color: #e9f0ff;
+    color: #000000; 
+    transform: scale(1.08);
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+}
+
+.card__btn--infoOrg:active,
+.card__btn--infoOrgExt:active {
+    transform: scale(0.96);
+}

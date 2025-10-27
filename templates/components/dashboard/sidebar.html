@@ -39,12 +39,23 @@
                                 </div>
                             </li>
                         </a>
-                        <a href="">
+                        <a href="{% url 'mis_eventos' %}">
                             <li class="sidebar__item {% if active_page == 'mis-eventos' %}sidebar__item--active{% endif %}">
                                 <div class="item__group">
                                     <div class="item__info">
                                         <i class="ri-table-fill"></i>
                                         <h4>Mis Eventos</h4>
+                                    </div>
+                                </div>
+                            </li>
+                        </a>
+                    {% elif request.user.rol == "Secretaria" %}
+                        <a href="{% url 'eventos_enviados' %}">
+                            <li class="sidebar__item {% if active_page == 'eventos-enviados' %}sidebar__item--active{% endif %}">
+                                <div class="item__group">
+                                    <div class="item__info">
+                                        <i class="ri-file-edit-fill"></i>
+                                        <h4>Revisión</h4>
                                     </div>
                                 </div>
                             </li>
@@ -65,22 +76,12 @@
                     </summary>
 
                     <ul class="item__sublist">
-                        <a href="{% url 'registrar_org' %}">
-                            <li class="sidebar__item {% if active_page == 'registrar-org' %}sidebar__item--active{% endif %}">
-                                <div class="item__group">
-                                    <div class="item__info">
-                                        <i class="ri-add-box-fill"></i>
-                                        <h4>Registrar Org.</h4>
-                                    </div>
-                                </div>
-                            </li>
-                        </a>
                         <a href="{% url 'listado_orgs' %}">
                             <li class="sidebar__item {% if active_page == 'listar-org' %}sidebar__item--active{% endif %}">
                                 <div class="item__group">
                                     <div class="item__info">
                                         <i class="ri-table-fill"></i>
-                                        <h4>Listar Org.</h4>
+                                        <h4>Listado Org.</h4>
                                     </div>
                                 </div>
                             </li>
@@ -89,7 +90,6 @@
                 </details>
             </li>
         {% endif %}
-        {% comment %} COLOCAR URL {% endcomment %}
         <a href="{% url 'perfil' %}">
             <li class="sidebar__item {% if active_page == 'perfil' %}sidebar__item--active{% endif %}">
                 <div class="item__group">

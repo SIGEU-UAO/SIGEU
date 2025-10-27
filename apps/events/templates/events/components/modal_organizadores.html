@@ -1,0 +1,33 @@
+{% load static %}
+<dialog id="modal-organizador" class="modal">
+  <div class="modal__content">
+    <button type="button" class="modal__close" title="Cerrar Modal"
+            onclick="this.closest('dialog').close()">&times;</button>
+
+    <div class="modal__container" id="modal-organizadores-container">
+      <h2>Organizador</h2>
+      <span class="nombreOrg"></span>
+      <hr>
+
+      <h2>Rol</h2>
+      <span class="rolOrg"></span>
+      <hr>
+
+      <h2>Información de Contacto</h2>
+      <div class="modal__container">
+          <span><strong>Correo Electrónico:</strong> <span class="correoOrg"></span></span>
+          <span><strong>Teléfono:</strong> <span class="telefonoOrg"></span></span>
+          <span><strong>Numero Identificación:</strong> <span class="identificacionOrg"></span></span>
+      </div>
+      
+      <hr>
+      <div class="modal__aval">
+        <h2>AVAL</h2>
+        <li class="card__sub--item card__sub--item--group">
+          <span><strong>Tipo De AVAL:</strong> </span><span class="tipoAvalOrg"></span>
+          <a href="#" target="__blank" class="modal__aval-btn" title="Abrir Aval"><i class="ri-file-pdf-2-fill"></i></a>
+        </li>
+      </div>
+    </div>
+  </div>
+</dialog>

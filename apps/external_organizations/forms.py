@@ -35,7 +35,29 @@ class RegistroForm(forms.Form):
         })
     )
     ubicacion = forms.CharField(label="Ubicacion", required=True, max_length=100)
-    sector_economico = forms.CharField(label="Sector economico", required=True, max_length=100)
+
+    # select sector_economico
+    SECTORES_ECONOMICOS_CHOICES = [
+        ('Educacion y Ciencia', 'Educación y Ciencia'),
+        ('Tecnologia y Comunicaciones', 'Tecnología y Comunicaciones'),
+        ('Salud y Bienestar', 'Salud y Bienestar'),
+        ('Empresarial e Industrial', 'Empresarial e Industrial'),
+        ('Finanzas y Servicios profesionales', 'Finanzas y Servicios Profesionales'),
+        ('Cultura y Medios', 'Cultura y Medios'),
+        ('Medio Ambiente y Sostenibilidad', 'Medio Ambiente y Sostenibilidad'),
+        ('Gobierno y Organismos publicos', 'Gobierno y Organismos Públicos'),
+        ('Organizaciones sociales y ONGs', 'Organizaciones Sociales y ONGs'),
+        ('Turismo, Hoteleria y Gastronomia', 'Turismo, Hotelería y Gastronomía'),
+        ('Comercio y Consumo', 'Comercio y Consumo'),
+        ('Otro', 'Otro'),
+    ]
+
+    sector_economico = forms.ChoiceField(
+        label="Sector economico",
+        required=True,
+        choices=SECTORES_ECONOMICOS_CHOICES
+    )
+
     actividad_principal = forms.CharField(label="Actividad principal", required=True, max_length=200)
     
     def __init__(self, *args, **kwargs):

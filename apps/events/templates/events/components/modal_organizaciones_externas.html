@@ -1,0 +1,33 @@
+{% load static %}
+
+<dialog id="modal-organizacion-externa" class="modal">
+  <div class="modal__content">
+    <button type="button" class="modal__close" title="Cerrar Modal"
+            onclick="this.closest('dialog').close()">&times;</button>
+
+    <div class="modal__container" id="modal-organizaciones-externas-container">
+      <h2>Organización Externa</h2>
+      <span class="nombreOrgExt"></span>
+      <hr>
+      <h2>Detalles</h2> <br>
+        <span><strong>NIT:</strong> <span class="nitOrgExt"></span></span>
+        <span><strong>Sector Económico:</strong> <span class="sectorOrgExt"></span></span>
+        <span><strong>Actividad Principal:</strong> <span class="actividadOrgExt"></span></span>
+        <span><strong>Representante:</strong> <span class="representanteOrgExt"></span></span>
+      <hr>
+      <li class="card__sub--item card__sub--item--group">
+        <div class="informacion">
+          <h2>Información de Contacto</h2>
+          <div class="modal__info--group">
+            <span><strong>Teléfono:</strong> <span class="telefonoOrgExt"></span></span>
+            <span><strong>Ubicación:</strong> <span class="ubicacionOrgExt"></span></span>
+          </div>
+        </div>
+        <div class="modal__certificado"> 
+            <h2>Certificado:</h2>  
+            <a href="#" target="__blank" class="modal__cert-btn" title="Abrir Aval"><i class="ri-file-pdf-2-fill"></i></a>
+        </div>
+      </li>
+    </div>
+  </div>
+</dialog>

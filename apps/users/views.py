@@ -76,25 +76,28 @@ class CustomPasswordResetView(PasswordResetView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        """Valida existencia de email y envía correo"""
         email = form.cleaned_data['email']
-        
-        # Verify if the user exists
+
         User = get_user_model()
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            if self.request.headers.get("Content-Type") == "application/json" or self.request.accepts("application/json"):
+            if self.request.headers.get("Content-Type") == "application/json":
                 return JsonResponse({"success": False, "message": "Correo no registrado"}, status=404)
             messages.error(self.request, 'Correo no registrado')
             return self.render_to_response(self.get_context_data(form=form))
-        
+
         try:
             self.request.session['password_reset_email'] = email
             response = super().form_valid(form)
             if self.request.headers.get("Content-Type") == "application/json":
-                return JsonResponse({"success": True, "message": f"Se ha enviado un correo de recuperación a {email}"}, status=200)
-            return response
+                return JsonResponse({
+                    "success": True,
+                    "message": f"Se ha enviado un correo de recuperación a {email}"
+                }, status=200)
+
+            return response 
+
         except Exception as e:
             if self.request.headers.get("Content-Type") == "application/json":
                 return JsonResponse({"success": False, "message": f"Error al enviar correo: {str(e)}"}, status=500)

@@ -9,8 +9,9 @@
 
 {% block content %}
     <section class="cards">
-        {% include 'components/dashboard/card.html' with img="users/assets/img/eventos.webp" title="Gestión de Eventos Universitarios" paragraph="Organiza, actualiza y lleva el control de todos tus eventos en un solo lugar. Haz que cada actividad académica sea un éxito." url="/eventos/listado/" %}
-        {% include 'components/dashboard/card.html' with img="users/assets/img/organizaciones-externas.webp" title="Gestión de Organizaciones Externas" paragraph="Administra las entidades que participan en tus eventos. Facilita la vinculación y potencia el alcance de cada evento." url="/orgs/listado/" %}
+        {% if request.user.rol != "Secretaria" %} {% include 'components/dashboard/card.html' with img="users/assets/img/eventos.webp" title="Gestión de Eventos Universitarios" paragraph="Organiza, actualiza y lleva el control de todos tus eventos en un solo lugar. Haz que cada actividad académica sea un éxito." url="/eventos/mis-eventos/" %} {% endif %}
+        {% if request.user.rol == "Secretaria" %} {% include 'components/dashboard/card.html' with img="users/assets/img/revision-eventos.webp" title="Revisión de Eventos" paragraph="Accede al listado completo de eventos enviados por tu facultad y evalúalos de forma eficiente. Revisa cada propuesta con detalle para aprobarla o rechazarla según corresponda." url="/eventos/enviados/" %} {% endif %}
+        {% if request.user.rol != "Secretaria" %} {% include 'components/dashboard/card.html' with img="users/assets/img/organizaciones-externas.webp" title="Gestión de Organizaciones Externas" paragraph="Administra las entidades que participan en tus eventos. Facilita la vinculación y potencia el alcance de cada evento." url="/orgs/listado/" %} {% endif %}
         {% include 'components/dashboard/card.html' with img="users/assets/img/perfil.webp" title="Información de Perfil" paragraph="Accede y edita tu información personal de manera rápida y segura. Mantén siempre tu perfil actualizado." url="/perfil/" %}
     </section>
 {% endblock content %}

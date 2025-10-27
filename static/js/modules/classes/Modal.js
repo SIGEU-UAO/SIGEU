@@ -100,6 +100,17 @@ export default class Modal{
             const input = form.querySelector(`[name="${key}"]`);
             if (!input) continue;
 
+            const id = record instanceof FormData ? record.get("id") : record.id;
+
+            // Helpers
+            const getChangeId = (c) => c instanceof FormData ? Number(c.get("id")) : Number(c.id);
+            const getChangeAction = (c) => c instanceof FormData ? (c.get("accion") || c.get("action")) : (c.accion || c.action);
+
+            // If there is a pending change, use that instead of the original.
+            const changes = dataStore[`${type}_cambios`] || [];
+            const changeIdx = changes.findIndex(c => getChangeId(c) === Number(id) && getChangeAction(c) === "actualizar");
+            if (changeIdx !== -1) record = changes[changeIdx]
+
             if (input.type === "file") {
                 // Display file name in file info
                 const fileObj = record instanceof FormData ? record.get(key) : null;
@@ -352,6 +363,7 @@ export default class Modal{
         const recordUI = {};
         if (modalConfig.fieldsRecordUI) modalConfig.fieldsRecordUI.forEach(field => recordUI[field] = item[field]);
         if (item.nombres && item.apellidos) recordUI.nombreCompleto = `${item.nombres} ${item.apellidos}`;
+        if (modalConfig.fileField) recordUI[modalConfig.fileField] = formData.get(modalConfig.fileField);
 
         const containerSelector = modalConfig.assignedRecordsContainerSelector;
         AssociatedRecords.addRecord(formData, type, containerSelector, recordUI);
@@ -367,7 +379,18 @@ export default class Modal{
         const modal = Modal.openEditModal(modalConfig.modalId);
         const form = modal.querySelector(modalConfig.associateFormSelector);
     
+        // Search the original data first
         let record = dataStore.getByID(type, id);
+
+        // If it is not there, look in the changes (FormData)
+        if (!record) {
+            const changes = dataStore[`${type}_cambios`] || [];
+            record = changes.find(c => {
+                const cid = c instanceof FormData ? Number(c.get("id")) : Number(c.id);
+                return cid === Number(id);
+            });
+        }
+    
         const isCurrentUser = window.currentUser && window.currentUser.id == id;
     
         if (!record && isCurrentUser) {
@@ -383,7 +406,7 @@ export default class Modal{
     
         // Load the form and assign the submit function
         Modal.loadEditModalForm(record, form, modalConfig.type, Modal.prepareFormDataForEdit, modalConfig, isCurrentUser);
-    }    
+    }
 
     static prepareFormDataForEdit(e, record, type, form, modalConfig, isCurrentUser = false) {
         e.preventDefault();

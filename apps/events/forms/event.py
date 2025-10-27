@@ -1,4 +1,5 @@
 from django import forms
+from datetime import date
 from ..models import *
 
 class RegistroEventoForm(forms.Form):
@@ -14,3 +15,19 @@ class RegistroEventoForm(forms.Form):
         # Force autocomplete=off on all fields
         for field in self.fields.values():
             field.widget.attrs["autocomplete"] = "off"
+
+    def clean(self):
+        cleaned_data = super().clean()
+        fecha = cleaned_data.get("fecha")
+        hora_inicio = cleaned_data.get("horaInicio")
+        hora_fin = cleaned_data.get("horaFin")
+
+        # Validate that the date is not earlier than today
+        if fecha and fecha < date.today():
+            self.add_error("fecha", "La fecha del evento debe ser igual o posterior a la fecha actual.")
+
+        # Validate that the end time is greater than the start time.
+        if hora_inicio and hora_fin and hora_fin <= hora_inicio:
+            self.add_error("horaFin", "La hora de fin debe ser mayor que la hora de inicio.")
+
+        return cleaned_data

@@ -1,7 +1,8 @@
 from django.db.models import Q
 from django.db import IntegrityError
-from .models import OrganizacionExterna
-from django.shortcuts import get_object_or_404
+
+from apps.events.models import Evento, OrganizacionExterna, OrganizacionInvitada
+from .serializer import ExternalOrganizationSerializer
 
 class OrganizacionExternaService:
     @staticmethod
@@ -34,19 +35,8 @@ class OrganizacionExternaService:
         return OrganizacionExterna.objects.all()
     
     @staticmethod
-    @staticmethod
     def listar_json():
-        return list(OrganizacionExterna.objects.values(
-            "idOrganizacion",
-            "nit",
-            "nombre",
-            "representanteLegal",
-            "telefono",
-            "ubicacion",
-            "sectorEconomico",
-            "actividadPrincipal",
-            "creador_id"
-        ))
+        return ExternalOrganizationSerializer.serialize_organizations(OrganizacionExterna.objects.all(), many=True)
     
     @staticmethod
     def buscar(termino):
@@ -89,6 +79,7 @@ class OrganizacionExternaService:
         except OrganizacionExterna.DoesNotExist:
             return False
     
+    @staticmethod
     def actualizar(id, data):
         #Validate integrity errors for unique fields
         try:
@@ -112,4 +103,19 @@ class OrganizacionExternaService:
             raise ValueError("Error de integridad al actualizar la organización.") from e
         return org
     
+    @staticmethod
+    def eliminar(pk):
+        try:
+            organizacion = OrganizacionExterna.objects.get(pk=pk)
+            organizacion.delete()
+            return {"error": False, "mensaje": "Organización eliminada correctamente."}
+        except OrganizacionExterna.DoesNotExist:
+            return {"error": True, "mensaje": "La organización no existe."}
+        except IntegrityError as e:
+            return {"error": True, "mensaje": f"No se puede eliminar la organización: {str(e)}"}
+        except Exception as e:
+            return {"error": True, "mensaje": f"Error interno: {str(e)}"}
     
+    @staticmethod
+    def esta_asociada_evento(org_id):
+        return OrganizacionInvitada.objects.filter(organizacion_id = org_id).exists()

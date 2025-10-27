@@ -27,9 +27,19 @@ class Evento(models.Model):
     horaInicio = models.TimeField()
     horaFin = models.TimeField()
     creador = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="eventos_creados")
+    fecha_ultimo_cambio = models.DateTimeField(auto_now=True)
+    fechaEnvio = models.DateTimeField(default=None, null=True, blank=True)
 
     def __str__(self):
         return f"{self.nombre} - {self.tipo} ({ self.estado })"
+    
+    @property
+    def organizadores_ordenados(self):
+        organizadores = list(self.organizadores_asignados.all())
+        organizadores.sort(
+            key=lambda o: 0 if o.organizador == self.creador else 1
+        )
+        return organizadores
     
     class Meta:
         db_table = "eventos"

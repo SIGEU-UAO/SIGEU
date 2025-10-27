@@ -70,6 +70,7 @@
 
 /* Estilos para campos editables */
 .form__group input:not([disabled]):not([readonly]) {
+    width: 100%;
     background-color: #fff;
     border-color: var(--primary);
     cursor: text;
@@ -78,6 +79,7 @@
 
 .form__group input[disabled], 
 .form__group input[readonly] {
+    width: 100%;
     background-color: #f8f9fa;
     color: #6c757d;
     cursor: not-allowed;
@@ -109,22 +111,7 @@
 
 /* Estilos para los botones */
 .form__button{
-    padding: 0 32px;
-    height: 54px;
-    background-color: var(--primary);
     border-radius: 12px;
-    color: #fff;
-    font-size: 18px;
-    font-weight: 600;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.form__button:hover{
-    background-color: var(--pale-primary, #FF9EBB);
-    transform: translateY(-2px);
 }
 
 .form__button--secondary{
@@ -177,4 +164,35 @@
 .form__error p {
     margin: 0;
     padding: 0;
+}
+
+@media screen and (max-width: 768px) {
+    .form__wrapper{
+        padding: 28px;
+    }
+
+    .form__title{
+        font-size: 20px;
+        text-align: left;
+    }
+
+    .form__edit{
+        width: 36px;
+        height: 36px;
+        top: 20px;
+        right: 20px;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .form__title{
+        font-size: 16px;
+        text-align: left;
+    }
+
+    .form__edit{
+        width: 32px;
+        height: 32px;
+        font-size: 18px;
+    }
 }

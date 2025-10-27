@@ -1,0 +1,76 @@
+@import url("/static/css/components/forms/form.css");
+
+.filters{
+    max-width: 1000px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding-right: 32px;
+    gap: 24px;
+}
+
+.filters__buttons{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.filter__btn{
+    padding: 10px 20px;
+    max-height: 50px;
+    background-color: #fff;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    border-radius: 4px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .3s ease-in-out background-color, .3s ease-in-out color;
+}
+
+.filters__reset .filter__btn{
+    background-color: var(--red);
+    color: #fff;
+}
+
+.filters__buttons .filter__btn--active, .filters__buttons .filter__btn:hover{
+    background-color: var(--primary);
+    color: #fff;
+}
+
+/* Search */
+.filters__search{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.search__title{
+    font-size: 18px;
+}
+
+.filters__search form{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.search__input{
+    padding: 12px 16px;
+    color: var(--black);
+    border-radius: 8px;
+    border: 1px solid rgba(102, 102, 102, 0.35);
+    font-size: 16px;
+}
+
+.filter__btn--search{
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  font-size: 22px;
+  background-color: var(--primary);
+  color: #fff;
+  cursor: pointer;
+  border: none;
+  outline: none;
+}

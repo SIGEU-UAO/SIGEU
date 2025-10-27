@@ -1,0 +1,27 @@
+{% load static %}
+<section class="filters">
+  <div class="filters__buttons">
+    <button class="filter__btn filter__btn--active" type="button" data-filter="all">Todos</button>
+    <button class="filter__btn" type="button" data-filter="borradores">Borradores</button>
+    <button class="filter__btn" type="button" data-filter="enviados">Enviados</button>
+    <button class="filter__btn" type="button" data-filter="aprobados">Aprobados</button>
+    <button class="filter__btn" type="button" data-filter="rechazados">Rechazados</button>
+  </div>
+
+  <div class="filters__search">
+    <form id="events-search-form" role="search">
+      <input id="events-search-input" type="text" class="search__input" placeholder="Buscar..." aria-label="Buscar">
+      <select id="events-search-by" name="search_by" class="search__input">
+        <option value="nombre" selected>Buscar por Nombre</option>
+        <option value="fecha">Buscar por Fecha</option>
+      </select>
+      <button type="submit" class="filter__btn--search"><i class="ri-search-2-line"></i></button>
+    </form>
+  </div>
+</section>
+
+{% if hay_filtros %}
+  <section class="filters__reset">
+    <button id="reset-filters-btn" class="filter__btn" type="button">Restablecer filtros <i class="ri-filter-off-fill"></i></button>
+  </section>
+{% endif %}

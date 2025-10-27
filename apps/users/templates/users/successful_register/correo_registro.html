@@ -1,0 +1,115 @@
+{# templates/users/emails/welcome_email.html #}
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Bienvenido a SIGEU</title>
+    <style>
+    /* Estas reglas son de soporte; la mayoría del estilo está inline. */
+    body { margin:0; padding:0; -webkit-text-size-adjust:none; -ms-text-size-adjust:none; }
+    img { border:0; display:block; }
+    a { color: #1a73e8; text-decoration: none; }
+    @media only screen and (max-width:600px) {
+        .container { width:100% !important; }
+        .stack{ display:block !important; width:100% !important; }
+    }
+    </style>
+</head>
+<body style="background-color:#f5f7fb; margin:0; padding:20px;">
+    <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td align="center">
+        <!-- Contenedor -->
+        <table class="container" width="600" cellpadding="0" cellspacing="0" role="presentation" style="width:600px; max-width:600px; background:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 2px 8px rgba(10,15,30,0.08);">
+            
+            <!-- Header con logo -->
+            <tr>
+            <td style="padding:18px 24px; background: linear-gradient(90deg,#ffffff,#fafafa);">
+                <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                <tr>
+                    <td align="left" style="vertical-align:middle;">
+                    {% if logo_url %}
+                        <img src="{{ logo_url }}" alt="SIGEU" width="140" style="display:block; height:auto;">
+                    {% else %}
+                        <div style="font-weight:700; color:#0f1724; font-size:18px;">SIGEU</div>
+                    {% endif %}
+                    </td>
+                    <td align="right" style="vertical-align:middle; color:#8892a8; font-size:13px;">
+                    Universidad Autónoma de Occidente
+                    </td>
+                </tr>
+                </table>
+            </td>
+            </tr>
+
+            <!-- Hero / título -->
+            <tr>
+            <td style="padding:28px 32px 16px 32px;">
+                <h1 style="margin:0; font-family: 'Helvetica Neue', Arial, sans-serif; font-size:22px; color:#0f1724;">
+                ¡Registro completado con éxito! 🎉
+                </h1>
+            </td>
+            </tr>
+
+            <!-- Mensaje principal -->
+            <tr>
+            <td style="padding:0 32px 24px 32px; color:#475569; font-family: 'Helvetica Neue', Arial, sans-serif; font-size:15px; line-height:1.5;">
+                <p style="margin:0 0 12px 0;">
+                    Hola <strong>{{ nombre }}</strong>,
+                </p>
+
+                <p style="margin:0 0 12px 0;">
+                    Tu cuenta en <strong>SIGEU</strong> ha sido creada correctamente. Ya puedes acceder para comenzar a ver y gestionar eventos.
+                </p>
+
+                <p style="margin:0 0 18px 0;">
+                Haz clic en el siguiente botón para iniciar sesión:
+                </p>
+
+                <!-- Botón (usar URL absoluta) -->
+                <p style="margin:0 0 24px 0;">
+                    <a href="{{ login_url }}" target="_blank" rel="noopener" style="display:inline-block; padding:12px 20px; background:#0f62fe; color:#ffffff; border-radius:8px; font-weight:600; font-size:15px; text-decoration:none;">
+                        Iniciar sesión
+                    </a>
+                </p>
+
+                <p style="margin:0 0 0 0; color:#94a3b8; font-size:13px;">
+                    Si el botón no funciona, copia y pega este enlace en tu navegador:
+                <br>
+                <a href="{{ login_url }}" target="_blank" rel="noopener" style="color:#1a73e8; word-break:break-all;">{{ login_url }}</a>
+                </p>
+            </td>
+            </tr>
+
+            <!-- Info / tips -->
+            <tr>
+            <td style="padding:20px 32px 24px 32px; border-top:1px solid #eef2f7; color:#475569; font-size:13px; font-family: 'Helvetica Neue', Arial, sans-serif;">
+                <strong>Próximos pasos</strong>
+                    <ul style="margin:8px 0 0 16px; padding:0; color:#475569;">
+                    <li style="margin:6px 0;">Asegúrate de que tu información esté completa y actualizada.</li>
+                    <li style="margin:6px 0;">Consulta los eventos disponibles en la plataforma.</li>
+                </ul>
+            </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+            <td style="padding:18px 24px; background:#f8fafc; color:#94a3b8; font-size:12px; font-family: 'Helvetica Neue', Arial, sans-serif;">
+                <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                <tr>
+                    <td align="left">
+                    © {{ now|date:"Y" }} SIGEU — Universidad Autónoma de Occidente
+                    </td>
+                </tr>
+                </table>
+                </td>
+            </tr>
+
+        </table>
+        <!-- /Contenedor -->
+        </td>
+    </tr>
+    </table>
+</body>
+</html>

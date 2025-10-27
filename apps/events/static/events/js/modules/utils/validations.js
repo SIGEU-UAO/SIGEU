@@ -17,11 +17,14 @@ const validationSchemas = {
     }
 };
 
+const allowedActions = ["agregar", "eliminar", "actualizar"];
+
 // * Generic validation function
-export function validateCollection(type, arr) {
+export function validateCollection(type, arr, mainFormAction = "add") {
     const schema = validationSchemas[type];
     if (!schema) throw new Error(`No hay esquema para el tipo: ${type}`);
-    if (!Array.isArray(arr) || arr.length === 0) return false;
+    if (!Array.isArray(arr)) return false;
+    if (mainFormAction === "add" && arr.length === 0) return false;
     
     return arr.every(item => {
         let getValue, keys;
@@ -36,7 +39,16 @@ export function validateCollection(type, arr) {
             return false;
         }
 
-        // * Validate keys
+        const accion = keys.includes("accion") ? getValue("accion") : null;
+
+        //* Special validation for the delete action
+        if (accion === "eliminar") {
+            if (!keys.includes("id")) return false;
+            const value = getValue("id");
+            return !isNaN(Number(value)) && Number(value) > 0;
+        }
+
+        // * Only enforce required keys for 'agregar' and "actualizar" (or if no accion)
         if (!schema.requiredKeys.every(k => keys.includes(k))) return false;
 
         // * Validate required fields types
@@ -74,7 +86,8 @@ export function validateCollection(type, arr) {
 
         const allowedKeys = [
             ...schema.requiredKeys,
-            ...(schema.optionalExclusiveKeys || [])
+            ...(schema.optionalExclusiveKeys || []),
+            'accion'
         ];
         const invalidKeys = keys.filter(k => !allowedKeys.includes(k));
         if (invalidKeys.length > 0) return false;

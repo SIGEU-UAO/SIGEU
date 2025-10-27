@@ -32,12 +32,13 @@
 }
 
 .step__cards{
-    display: grid;
-    grid-template-columns: 350px 350px 350px;
+    display: flex;
+    flex-wrap: wrap;
     gap: 24px;
 }
 
 .step__card{
+    min-width: 320px;
     padding: 16px 24px;
     display: flex;
     justify-content: space-between;
@@ -49,7 +50,7 @@
 .step__card .card__content{
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 16px;
 }
 
 .step__card .card__header{
@@ -74,6 +75,7 @@
 }
 
 .card__buttons{
+    position: relative;
     display: flex;
     gap: 8px;
     align-items: center;
@@ -95,6 +97,15 @@
     background-color: transparent;
     border: 1px solid var(--red);
     color: var(--red);
+}
+
+.card__button--file{
+    aspect-ratio: 1/1;
+    font-size: 14px;
+    display: grid;
+    place-items: center;
+    text-decoration: none;
+    background-color: var(--red);
 }
 
 .card__icon{
@@ -119,4 +130,27 @@
     background-color: var(--primary);
     color: #fff;
     border: none;
+}
+
+@media screen and (max-width: 968px) {
+    .step__title{
+        font-size: 20px;
+    }
+
+    .step__subtitle{
+        font-size: 18px;
+    }
+
+    .step__row{
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .step__button{
+        order: -1;
+        height: 40px;
+        padding: 0 12px;
+        font-size: 16px;
+    }
 }

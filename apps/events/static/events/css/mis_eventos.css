@@ -1,0 +1,16 @@
+@import url("./components/filters.css");
+@import url("./components/card.css");
+@import url("./components/pagination.css");
+
+.no-results-container{
+    display:none; 
+    align-items:center; 
+    justify-content:center; 
+    flex-direction:column; 
+    padding:24px;
+}
+
+.no-results-container img{
+    max-width:240px; 
+    margin-bottom:16px;
+}

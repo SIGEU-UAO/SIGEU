@@ -4,10 +4,8 @@ from .api import OrganizacionesExternasAPI
 
 urlpatterns = [
     # --- Views ---
-    path("orgs/registro/", views.formulario_registro, name="registrar_org"),
     path("orgs/listado/", views.listado, name="listado_orgs"),
-    path("orgs/listado/orgs/editar/<int:pk>/", views.editar, name="editar_org"),
-    path("orgs/listado/error/no-encontrada/", views.org_no_encontrada, name="org_no_encontrada"),
+    path("orgs/editar/<int:pk>/", views.editar, name="editar_org"),
 
     # --- API ---
     path("orgs/api/", OrganizacionesExternasAPI.listar, name="orgs_api_list"),
@@ -15,4 +13,5 @@ urlpatterns = [
     path("orgs/api/datatables/", OrganizacionesExternasAPI.datatables_rendering, name="orgs_api_datatables"),
     path("orgs/api/registro/", OrganizacionesExternasAPI.registro, name="orgs_registro_api"),
     path("orgs/api/<int:id>/update/", OrganizacionesExternasAPI.actualizar, name="orgs_api_update"),
+    path("orgs/api/delete/<int:pk>/", OrganizacionesExternasAPI.eliminar, name="orgs_api_delete"),
 ]

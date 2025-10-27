@@ -1,7 +1,13 @@
 .sidebar{
+    width: 250px;
     grid-area: sidebar;
     border-right: 1px solid var(--pale-gray);
     padding: 30px 0;
+    transition: width .3s ease-in-out;
+    overflow: hidden;
+    position: fixed;
+    inset: 0;
+    background-color: #fff;
 }
 
 .sidebar__logo{
@@ -11,6 +17,12 @@
     gap: 6px;
     font-size: 21px;
     color: var(--black);
+    transition: .3s ease-in-out padding;
+}
+
+.sidebar__name,
+.item__info h4 {
+    transition: opacity 0.3s ease;
 }
 
 .sidebar__icon{
@@ -35,6 +47,8 @@
 .item__group{
     display: flex;
     flex-direction: column;
+    transition: .3s ease-in-out width;
+    height: min-content;
 }
 
 .sidebar__item--active .item__group{
@@ -84,4 +98,54 @@
 .item__info i{
     color: var(--light-gray);
     font-size: 20px;
+}
+
+@media screen and (max-width: 1060px) {
+    .sidebar {
+        width: 70px; 
+    }
+
+    .sidebar__logo{
+        padding: 0 32px 30px 20px;
+    }
+
+    .item__group{
+        width: 32px;
+    }
+
+    .sidebar__name,
+    .item__info h4 {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .sidebar:hover, .sidebar:active {
+        width: 250px;
+        z-index: 999;
+    }
+
+    .sidebar:hover .sidebar__logo, .sidebar:active .sidebar__logo{
+        padding: 0 32px 30px 32px;
+    }
+
+    .sidebar:hover .sidebar__name,
+    .sidebar:hover .item__info h4,
+    .sidebar:active .sidebar__name,
+    .sidebar:active .item__info h4 {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .sidebar:hover .item__group, .sidebar:active .item__group{
+        width: 205px;
+    }
+
+    .sidebar .item__sublist {
+        display: none;
+    }
+
+    .sidebar:hover .item__sublist,
+    .sidebar:active .item__sublist {
+        display: block;
+    }
 }

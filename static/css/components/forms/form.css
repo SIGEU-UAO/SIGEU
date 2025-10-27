@@ -197,7 +197,6 @@ input.input-file {
     justify-content: center;
     align-items: center;
     text-decoration:none;
-
 }
 
 .form__button--norounded{
@@ -219,4 +218,37 @@ input.input-file {
 
 .form__secondary a{
     color: var(--black);
+}
+
+@media screen and (max-width: 800px) {
+  .form__group label{
+    font-size: 14px;
+  }
+
+  .form__group input, .form__group select{
+      height: 42px;
+      font-size: 16px;
+  }
+
+  .form__button{
+      padding: 0 36px;
+      height: 48px;
+      border-radius: 24px;
+      font-size: 18px;
+  }
+
+  .form__secondary{
+      font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 660px) {
+  .form__row{
+      flex-direction: column;
+      gap: 18px
+  }
+
+  .form__row .form__group{
+      width: 100%;
+  }
 }

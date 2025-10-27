@@ -1,0 +1,98 @@
+<div class="card {{ type|lower }}">
+    <div class="card__header">
+        <div class="card__header--left">
+            <div class="card__icon">
+                {% if type == "Borrador" %}
+                    <i class="ri-file-edit-fill"></i>
+                {% elif type == "Enviado" %}
+                    <i class="ri-send-plane-fill"></i>
+                {% elif type == "Aprobado" %}
+                    <i class="ri-file-check-fill"></i>
+                {% elif type == "Rechazado" %}
+                    <i class="ri-file-close-fill"></i>
+                {% endif %}
+            </div>
+            <div class="card__info">
+                <h4 class="card__title">{{ event.nombre }}</h4>
+                <span class="card__type">{{ event.get_tipo_display }}</span>
+            </div>
+        </div>
+        {% if type == "Borrador" %}
+            <div class="card__header--right">
+                <button class="card__btn card__btn--send" data-id="{{ event.idEvento }}">Enviar</button>
+            </div>
+        {% endif %}
+    </div>
+    <div class="card__date">
+        <div class="card__day">
+            <i class="ri-calendar-event-fill"></i>
+            <span>{{ event.fecha|date:"d/m/Y" }}</span>
+        </div>
+        <div class="card__time">
+            <i class="ri-time-fill"></i>
+            <span>{{ event.horaInicio|time:"H:i" }} - {{ event.horaFin|time:"H:i" }}</span>
+        </div>
+    </div>
+    <div class="card__main">
+        <p class="card__description">{{ event.descripcion|truncatechars:200 }}</p>
+
+        {% if event.instalaciones_asignadas.exists %}
+            <hr>
+            <details class="card__details card__installations">
+                <summary class="card__sub--label">Instalaciones:</summary>
+                <ul class="card__sub--list">
+                    {% for asign in event.instalaciones_asignadas.all %}
+                        <li class="card__sub--item">{{ asign.instalacion }}</li>
+                    {% endfor %}
+                </ul>
+            </details>
+        {% endif %}
+        
+        {% if event.organizadores_asignados.exists %}
+            <hr>
+            <details class="card__details card__organizators">
+                <summary class="card__sub--label">Organizadores:</summary>
+                <ul class="card__sub--list">
+                    {% for o in event.organizadores_ordenados %}
+                    <li class="card__sub--item card__sub--item--group">
+                        <div class="card__sub--item--info">
+                            <h6>{{ o.organizador.nombres }} {{ o.organizador.apellidos }}</h6>
+                            <span>ROL: {{ o.get_tipo_display }}</span>
+                        </div>
+                        <a href="{{ o.aval.url }}" target="__blank" class="card__sub--item--file" title="Abrir Aval"><i class="ri-file-pdf-2-fill"></i></a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </details>
+        {% endif %}
+            
+        {% if event.organizaciones_invitadas.exists %}
+            <hr>
+            <details class="card__details card__organizations">
+                <summary class="card__sub--label">Organizaciones Externas:</summary>
+                <ul class="card__sub--list">
+                    {% for oi in event.organizaciones_invitadas.all %}
+                    <li class="card__sub--item card__sub--item--group">
+                        <div class="card__sub--item--info">
+                            <h6>{{ oi.organizacion.nombre }}</h6>
+                            <span>NIT: {{ oi.organizacion.nit }}</span>
+                        </div>
+                        <a href="{{ oi.certificado_participacion.url }}" target="__blank" class="card__sub--item--file" title="Abrir Certificado"><i class="ri-file-pdf-2-fill"></i></a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </details>
+        {% endif %}
+
+        {% if type == "Borrador" or type == "Rechazado" %}
+            <hr>
+        
+            <div class="card__actions">
+                <a href="{% url 'editar_evento' event.idEvento %}" class="card__btn card__btn--edit">Editar</a>
+                <button class="card__btn card__btn--delete" data-id="{{ event.idEvento }}">Eliminar</button>
+            </div>    
+        {% endif %}
+
+        
+    </div>
+</div>
