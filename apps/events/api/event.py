@@ -1,7 +1,8 @@
 from django.http import JsonResponse
 from ..forms.event import RegistroEventoForm
 from ..services.event import EventoService
-from ..serializers.eventoSerializer import EventoSerializer 
+from ..serializers.eventoSerializer import EventoSerializer
+from ..models import Evento
 from django.contrib.auth.decorators import login_required
 from sigeu.decorators import organizador_required
 from sigeu.decorators import secretaria_required
@@ -143,6 +144,17 @@ class EventoAPI:
     def eliminar_evento(request, id_evento):
         if request.method != "DELETE":
             return JsonResponse({"error": "Método no permitido"}, status=405)
+
+        try:
+            evento = Evento.objects.get(idEvento=id_evento)
+        except Evento.DoesNotExist:
+            return JsonResponse({"error": "Evento no encontrado."}, status=400)
+
+        if evento.creador != request.user:
+            return JsonResponse({"error": "No tienes permiso para eliminar este evento."}, status=403)
+
+        if evento.estado not in ("Borrador", "Rechazado"):
+            return JsonResponse({"error": "Solo se pueden eliminar eventos en estado 'Borrador' o 'Rechazado'."}, status=400)
 
         try:
             result = EventoService.eliminar_evento(id_evento)
