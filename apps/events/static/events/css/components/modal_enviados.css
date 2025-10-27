@@ -6,18 +6,18 @@
 /* ===== Base del modal (centrado absoluto en pantalla) ===== */
 .modal {
     position: fixed;
-    top: 0;
-    left: 0;
+    inset: 0;
     width: 100%;
     height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: grid;
+    place-items: center;
     border: none;
     background: transparent;
     padding: 0;
     margin: 0;
-    z-index: 1000;
+    outline: none;
+    overflow: hidden;
+    z-index: 99;
 }
 
 /* ===== Fondo semitransparente ===== */
@@ -70,42 +70,40 @@
     transform: scale(1.15);
 }
 
-/* ===== Encabezados ===== */
-#modal-organizadores-container h2 {
-    font-size: 1.2rem;
+.modal h2 {
+    font-size: 1.1rem;
     color: #0f172a;
     margin-bottom: 0.3rem;
     margin-top: 1rem;
 }
 
-/* ===== Texto base ===== */
-#modal-organizadores-container span {
+.modal__container > span, .modal__info--group > span{
     display: block;
-    color: #334155;
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
-}
-
-/* ===== Grupo de contacto ===== */
-.modal__info--group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    margin-top: 0.8rem;
 }
 
 .modal__info--group strong {
     color: #0f172a;
 }
 
-/* ===== Línea divisoria ===== */
-hr {
+.modal hr {
     border: none;
     border-top: 1px solid #e2e8f0;
     margin: 1rem 0;
 }
 
-/* ===== Responsive ===== */
+.cardEnviados__sub--item--file, .modal__aval-btn, .modal__cert-btn{
+    padding: 10px;
+    background-color: var(--red);
+    border-radius: 50%;
+    color: #fff;
+    text-decoration: none;
+    font-size: 2rem;
+}
+
+.modal__certificado {
+    text-align: center;
+}
+
 @media (max-width: 480px) {
     .modal__content {
         padding: 1.5rem;
@@ -114,18 +112,4 @@ hr {
     #modal-organizadores-container h2 {
         font-size: 1.1rem;
     }
-}
-
-.cardEnviados__sub--item--file, .modal__aval-btn, .modal__cert-btn{
-    padding: 20px;
-    background-color: var(--red);
-    border-radius: 50%;
-    color: #fff;
-    text-decoration: none;
-    font-size: 2.5rem;
-    /*border:1px solid black;*/
-}
-
-.modal__certificado {
-    text-align: center;
 }

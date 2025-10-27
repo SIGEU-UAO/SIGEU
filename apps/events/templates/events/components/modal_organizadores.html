@@ -4,7 +4,7 @@
     <button type="button" class="modal__close" title="Cerrar Modal"
             onclick="this.closest('dialog').close()">&times;</button>
 
-    <div id="modal-organizadores-container">
+    <div class="modal__container" id="modal-organizadores-container">
       <h2>Organizador</h2>
       <span class="nombreOrg"></span>
       <hr>
@@ -14,11 +14,13 @@
       <hr>
 
       <h2>Información de Contacto</h2>
-      <div class="modal__info--group">
-        <span><strong>Correo Electrónico:</strong></span> <span class="correoOrg"></span>
-        <span><strong>Teléfono:</strong> </span><span class="telefonoOrg"></span>
-        <span><strong>Numero Identificación: </strong></span><span class="identificacionOrg"></span>
+      <div class="modal__container">
+          <span><strong>Correo Electrónico:</strong> <span class="correoOrg"></span></span>
+          <span><strong>Teléfono:</strong> <span class="telefonoOrg"></span></span>
+          <span><strong>Numero Identificación:</strong> <span class="identificacionOrg"></span></span>
       </div>
+      
+      <hr>
       <div class="modal__aval">
         <h2>AVAL</h2>
         <li class="card__sub--item card__sub--item--group">
