@@ -1,6 +1,7 @@
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.urls import reverse
 from sigeu.decorators import no_superuser_required, organizador_required, secretaria_required
 from .forms.event import RegistroEventoForm
 from .forms.associations.OrganizadorEvento import OrganizadorEventoForm
@@ -181,6 +182,10 @@ def formulario_edicion(request, pk):
         return redirect("not_found")
     elif not EventoService.es_creador(current_user, pk):
         return redirect("forbidden")
+
+    # Only render if it has the status "Borrador" or "Rechazado"
+    if event.estado != "Borrador" and event.estado != "Rechazado":
+        return redirect("mis_eventos")
     
     # Load initial data for event form
     initial_data = {
