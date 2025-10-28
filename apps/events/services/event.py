@@ -180,6 +180,12 @@ class EventoService:
             return False
 
     @staticmethod
+    def reestablecer_a_borrador(evento):
+        if evento.estado == "Rechazado":
+            evento.estado = "Borrador"
+            evento.save(update_fields=["estado", "fecha_ultimo_cambio"])
+
+    @staticmethod
     def listar_eventos_enviados(facultad, page=1, per_page=12):
         qs = Evento.objects.filter(
             estado__iexact="Enviado"

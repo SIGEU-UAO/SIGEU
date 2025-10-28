@@ -3,7 +3,6 @@ from django.http import JsonResponse
 from ..forms.event import RegistroEventoForm
 from ..services.event import EventoService
 from ..serializers.eventoSerializer import EventoSerializer
-from ..models import Evento
 from django.contrib.auth.decorators import login_required
 from sigeu.decorators import organizador_required
 from sigeu.decorators import secretaria_required
@@ -69,6 +68,7 @@ class EventoAPI:
                     if result is None:
                         return JsonResponse({"message": "Tu información está al día."}, status=200)
                     
+                    EventoService.reestablecer_a_borrador(evento)
                     return JsonResponse({"message": "Información básica del evento actualizada correctamente."}, status=200)
                 except ValueError as e:
                     return JsonResponse({"error": str(e)}, status=400)

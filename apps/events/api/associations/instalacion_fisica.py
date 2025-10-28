@@ -149,6 +149,7 @@ class InstalacionesAsignadasAPI:
                 }, status=207)
             
             if agregadas or eliminadas:
+                EventoService.reestablecer_a_borrador(evento)
                 EventoService.actualizar_fecha_ultimo_cambio(evento)
 
             return JsonResponse({
