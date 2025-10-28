@@ -375,7 +375,7 @@ export default class AssociatedRecords{
         stepCard.appendChild(cardIcon)
 
         container.appendChild(stepCard)
-
+        
         this.updateStepBtn(type, buttonStep, container)
     }
 
@@ -455,7 +455,7 @@ export default class AssociatedRecords{
         const isEnabledToSkip = recordsLength === 0 && dataStore[`${type}_cambios`].length === 0;
 
         if (buttonStep.classList.contains("step__button--finish")) {
-            finishStepHandler(buttonStep, recordsLength, stepDataKeys[type].saveHandler(container), "/eventos/mis-eventos/");
+            finishStepHandler(buttonStep, isEnabledToSkip, stepDataKeys[type].saveHandler(container), "/eventos/mis-eventos/");
         } else {
             toggleSkip(buttonStep, isEnabledToSkip, stepDataKeys[type].saveHandler(container));
         }
