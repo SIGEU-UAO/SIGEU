@@ -45,7 +45,7 @@ export function toggleSkip(button, enable, saveHandler) {
     }
 }
 
-export function finishStepHandler(button, recordsLength, callback, url) {
+export function finishStepHandler(button, isSkippable, callback, url) {
     button.onclick = null;
-    button.onclick = recordsLength > 0 ? callback : goToListHandler.bind(null, url);
+    button.onclick = !isSkippable ? callback : goToListHandler.bind(null, url);
 }

@@ -193,6 +193,7 @@ class OrganizadorEventoAPI:
                 }, status=207)
             
             if agregados or actualizados or eliminados:
+                EventoService.reestablecer_a_borrador(evento)
                 EventoService.actualizar_fecha_ultimo_cambio(evento)
 
             return JsonResponse({
