@@ -119,37 +119,79 @@ class InstalacionesAsignadasAPI:
             eliminadas = []
             errores = []
 
-            # * Try to assign all facilities
-            for item in instalaciones:
-                inst_id = item.get("id")
-                accion = (item.get("accion") or "").strip().lower()
-
-                if not inst_id or accion not in ("agregar", "eliminar"):
-                    errores.append({"id": inst_id, "error": "Formato inválido o acción no reconocida."})
-                    continue
-
+            # Prepare actions and validate inputs
+            acciones = []  # list of dicts { instalacion, accion }
+            for item in (instalaciones or []):
                 try:
-                    instalacion = InstalacionesFisicasService.obtener_por_id(inst_id)
-                    if not instalacion:
-                        errores.append({"id": inst_id, "error": "Instalación no encontrada."})
+                    id_inst = item.get("id")
+                    accion = (item.get("accion") or "agregar").strip().lower()
+                    if accion not in ("agregar", "eliminar"):
+                        errores.append({"id": id_inst, "error": "Formato inválido o acción no reconocida."})
                         continue
 
-                    # Handle the actions
+                    instalacion = InstalacionesFisicasService.obtener_por_id(id_inst)
+                    if not instalacion:
+                        errores.append({"id": id_inst, "error": "Instalación no encontrada."})
+                        continue
+
+                    acciones.append({"instalacion": instalacion, "accion": accion})
+                except Exception as e:
+                    errores.append({"id": item.get("id"), "error": str(e)})
+
+            # If there are input errors, return them before making changes
+            if errores:
+                return JsonResponse({
+                    "error": "Error al actualizar alguna instalación física",
+                    "agregadas": agregadas,
+                    "eliminadas": eliminadas,
+                    "errores": errores
+                }, status=207)
+
+            # * Calculate final set of installations (existing - removed + added)
+            
+            # Get the ids of the current installations in the db
+            actuales_ids = set(evento.instalaciones_asignadas.values_list("instalacion_id", flat=True))
+            to_add = set()
+            to_remove = set()
+            for a in acciones:
+                inst_id = a["instalacion"].idInstalacion
+                if a["accion"] == "agregar":
+                    to_add.add(inst_id)
+                elif a["accion"] == "eliminar":
+                    to_remove.add(inst_id)
+
+            # Calculate the final set of installations (existing - removed + added), | means union
+            ids_finales = (actuales_ids - to_remove) | to_add
+
+            # Calculate total capacity of the final set of installations
+            total_capacity = 0
+            for idf in ids_finales:
+                inst = InstalacionesFisicasService.obtener_por_id(idf)
+                if inst:
+                    total_capacity += inst.capacidad
+
+            if total_capacity < evento.capacidad:
+                return JsonResponse({ "error": "La suma de las capacidades de las instalaciones no abarca la capacidad del evento" }, status=400)
+
+            # * Execute actions (add / remove)
+            for a in acciones:
+                instalacion = a["instalacion"]
+                accion = a["accion"]
+                try:
                     if accion == "agregar":
                         try:
                             InstalacionesAsignadasService.crearInstalacionAsignada({ "evento": evento, "instalacion": instalacion})
                             agregadas.append(instalacion.idInstalacion)
                         except Exception as e:
-                            errores.append({"id": inst_id, "error": str(e)})
+                            errores.append({"id": instalacion.idInstalacion, "error": str(e)})
                     elif accion == "eliminar":
                         try:
                             InstalacionesAsignadasService.eliminarInstalacionAsignada({ "evento": evento, "instalacion": instalacion})
                             eliminadas.append(instalacion.idInstalacion)
                         except Exception as e:
-                            errores.append({"id": inst_id, "error": str(e)})
-
+                            errores.append({"id": instalacion.idInstalacion, "error": str(e)})
                 except Exception as e:
-                    errores.append({"id": inst_id, "error": str(e)})
+                    errores.append({"id": instalacion.idInstalacion, "error": str(e)})
 
             if errores:
                 return JsonResponse({

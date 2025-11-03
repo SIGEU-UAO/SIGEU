@@ -192,6 +192,7 @@ def formulario_edicion(request, pk):
         "nombre": event.nombre,
         "tipo": event.tipo,
         "descripcion": event.descripcion,
+        "capacidad": event.capacidad,
         "fecha": event.fecha,
         "horaInicio": event.horaInicio,
         "horaFin": event.horaFin,

@@ -7,6 +7,7 @@ class InstalacionSerializer:
             "idInstalacion": getattr(instalacion_instance, "idInstalacion", None),
             "ubicacion": getattr(instalacion_instance, "ubicacion", ""),
             "tipo": getattr(instalacion_instance, "tipo", ""),
+            "capacidad": getattr(instalacion_instance, "capacidad", None)
         }
 
     def serialize_instalaciones(instalaciones, many=False):
