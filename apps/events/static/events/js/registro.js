@@ -91,7 +91,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     AssociatedRecords.addRecordToUI(currentUser.id, recordUI, "organizadores", assignedOrganizatorsContainer, true)
 
-    // TODO: If it's editing
     if (mainFormAction === "edit" && dataStore.eventoId) {
         await loadInstalacionesEvento(dataStore.eventoId)
         await loadOrganizadoresEvento(dataStore.eventoId)
@@ -165,7 +164,7 @@ async function loadInstalacionesEvento(eventoId) {
     instalaciones.forEach(inst => {
         AssociatedRecords.addRecordToUI(
             inst.idInstalacion,
-            { ubicacion: inst.ubicacion, tipo: inst.tipo },
+            { ubicacion: inst.ubicacion, tipo: inst.tipo, capacidad: inst.capacidad },
             "instalaciones",
             container
         );

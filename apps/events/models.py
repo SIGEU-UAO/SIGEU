@@ -23,6 +23,7 @@ class Evento(models.Model):
     descripcion = models.TextField()
     estado = models.CharField(max_length=10, choices=ESTADOS, default="Borrador")
     tipo = models.CharField(max_length=100, choices=TIPOS)
+    capacidad = models.IntegerField()
     fecha = models.DateField()
     horaInicio = models.TimeField()
     horaFin = models.TimeField()

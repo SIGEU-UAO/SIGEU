@@ -18,6 +18,7 @@ class EventoService:
                 nombre=data["nombre"],
                 descripcion=data["descripcion"],
                 tipo=data["tipo"],
+                capacidad=data["capacidad"],
                 fecha=data["fecha"],
                 horaInicio=data["horaInicio"],
                 horaFin=data["horaFin"],
@@ -79,7 +80,7 @@ class EventoService:
     def actualizar(event, data):
         #Validate integrity errors for unique fields
         try:
-            campos = ["nombre", "tipo", "descripcion", "fecha", "horaInicio", "horaFin"]
+            campos = ["nombre", "tipo", "descripcion", "capacidad", "fecha", "horaInicio", "horaFin"]
             cambios = {}
 
             for campo in campos:
