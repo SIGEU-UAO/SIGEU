@@ -311,6 +311,13 @@ export default class AssociatedRecords{
         cardHeader.appendChild(cardAnnotation);
         cardHeader.appendChild(cardTitle);
 
+        if (type === "instalaciones"){
+            const cardCapacity = document.createElement("P");
+            cardCapacity.classList.add("card__paragraph")
+            cardCapacity.textContent = `Capacidad: ${data["capacidad"]} personas`;
+            cardHeader.appendChild(cardCapacity)
+        }
+
         if (type === "organizaciones") {
             const cardList = document.createElement("UL");
             cardList.classList.add("card__list")

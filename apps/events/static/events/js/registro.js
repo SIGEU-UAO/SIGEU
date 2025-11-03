@@ -91,7 +91,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     AssociatedRecords.addRecordToUI(currentUser.id, recordUI, "organizadores", assignedOrganizatorsContainer, true)
 
-    // TODO: If it's editing
     if (mainFormAction === "edit" && dataStore.eventoId) {
         await loadInstalacionesEvento(dataStore.eventoId)
         await loadOrganizadoresEvento(dataStore.eventoId)

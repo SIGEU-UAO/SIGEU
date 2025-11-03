@@ -35,24 +35,35 @@ class InstalacionesAsignadasAPI:
 
             errores = []
             guardadas = []
+            
+            # * Verify if the sum of the capacities of the physical facilities is greater than the event capacity
+            total_capacity = 0
+            instalaciones_instances = []
+
+            for item in instalaciones:
+                instalacion = InstalacionesFisicasService.obtener_por_id(item["id"])
+
+                # If the installation was not found, add an error.
+                if not instalacion:
+                    errores.append({ "id": item["id"], "error": "Instalación no encontrada."})
+                    continue
+
+                instalaciones_instances.append(instalacion)
+                total_capacity += instalacion.capacidad
+            
+            if total_capacity < evento.capacidad:
+                return JsonResponse({ "error": "La suma de las capacidades de las instalaciones no abarca la capacidad del evento" }, status=400)
 
             # * Try to assign all facilities
-            for item in instalaciones:
+            for instalacion in instalaciones_instances:
                 try:
-                    instalacion = InstalacionesFisicasService.obtener_por_id(item["id"])
-                    
-                    # If the installation was not found, add an error.
-                    if not instalacion:
-                        errores.append({ "id": item["id"], "error": "Instalación no encontrada."})
-                        continue
-
                     InstalacionesAsignadasService.crearInstalacionAsignada({ "evento": evento, "instalacion": instalacion })
                     guardadas.append(instalacion.idInstalacion)
 
                 except Exception as e:
                     # Catch any other errors
                     errores.append({
-                        "id": item.get("id"),
+                        "id": instalacion.idInstalacion,
                         "error": str(e)
                     })
                     continue

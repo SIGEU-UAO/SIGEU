@@ -18,6 +18,7 @@ class EventoService:
                 nombre=data["nombre"],
                 descripcion=data["descripcion"],
                 tipo=data["tipo"],
+                capacidad=data["capacidad"],
                 fecha=data["fecha"],
                 horaInicio=data["horaInicio"],
                 horaFin=data["horaFin"],
