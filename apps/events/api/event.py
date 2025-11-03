@@ -89,6 +89,14 @@ class EventoAPI:
                 return JsonResponse({"error": "No tienes permiso para enviar este evento a validación."}, status=403)
             if not evento.instalaciones_asignadas.exists():
                 return JsonResponse({"error": "El evento debe tener al menos una instalación asignada antes de enviarlo a validación."}, status=400)
+            
+            # Validate the total capacity of the facilities
+            total_capacity = 0
+            for instalacion in evento.instalaciones_asignadas.all():
+                total_capacity += instalacion.capacidad
+            if total_capacity < evento.capacidad:
+                return JsonResponse({"error": "La suma de las capacidades de las instalaciones no abarca la capacidad del evento"}, status=400)
+
             if not evento.organizadores_asignados.exists():
                 return JsonResponse({"error": "El evento debe tener al menos un organizador asignado."}, status=400)
             if not evento.organizadores_asignados.filter(organizador=evento.creador).exists():
