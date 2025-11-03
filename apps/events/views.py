@@ -108,7 +108,6 @@ def mis_eventos(request):
 
     return render(request, "events/mis_eventos.html", context)
 
-
 @no_superuser_required
 @login_required()
 @secretaria_required

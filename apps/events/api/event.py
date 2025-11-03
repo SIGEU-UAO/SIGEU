@@ -92,8 +92,8 @@ class EventoAPI:
             
             # Validate the total capacity of the facilities
             total_capacity = 0
-            for instalacion in evento.instalaciones_asignadas.all():
-                total_capacity += instalacion.capacidad
+            for instalacionAsignada in evento.instalaciones_asignadas.all():
+                total_capacity += instalacionAsignada.instalacion.capacidad
             if total_capacity < evento.capacidad:
                 return JsonResponse({"error": "La suma de las capacidades de las instalaciones no abarca la capacidad del evento"}, status=400)
 
