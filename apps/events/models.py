@@ -2,7 +2,9 @@ from django.db import models
 from apps.core.models import InstalacionFisica
 from apps.users.models import Usuario
 from apps.external_organizations.models import OrganizacionExterna
-from .utils import path_coordinador_aval, path_organizacion_certificado
+from .utils import *
+from django.core.validators import MinLengthValidator
+
 class Evento(models.Model):
     # Enumerations
     ESTADOS = [ 
@@ -105,3 +107,18 @@ class OrganizacionInvitada(models.Model):
                 name='unique_evento_organizacion'
             )
         ]
+
+class EvaluacionEvento(models.Model):
+    # Enumerations
+    TIPOS_EVALUACION = [
+        ("aprobacion", "Aprobación"),
+        ("rechazo", "Rechazo")
+    ]
+    
+    idEvaluacion = models.BigAutoField(auto_created=True, primary_key=True, serialize=False)
+    evento = models.ForeignKey(Evento, on_delete=models.CASCADE, related_name="evaluaciones")
+    evaluador = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="evaluaciones")
+    fechaEvaluacion = models.DateField(auto_now_add=True)
+    tipoEvaluacion = models.CharField(max_length=10, choices=TIPOS_EVALUACION)
+    justificacion = models.TextField(validators=[MinLengthValidator(10)])
+    acta = models.FileField(upload_to=path_acta)
