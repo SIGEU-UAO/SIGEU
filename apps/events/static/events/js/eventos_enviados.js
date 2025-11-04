@@ -185,7 +185,7 @@ async function sendEvaluation(e) {
     };
 
     // Validate act approval extension (must be .pdf)
-    if (data.get("acta-aprobacion") && !data.get("acta-aprobacion").name.endsWith(".pdf")) {
+    if (data.get("acta") && !data.get("acta").name.endsWith(".pdf")) {
       Alert.error("El archivo de la acta de aprobación debe ser un PDF");
       modalEval.close();
       return;

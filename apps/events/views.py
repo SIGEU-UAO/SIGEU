@@ -8,6 +8,7 @@ from apps.core.forms import ModalBuscarInstalacionForm
 from apps.users.forms import ModalBuscarOrganizadorForm
 from apps.external_organizations.forms import RegistroForm, ModalBuscarOrganizacionForm
 from .services.event import EventoService
+from .forms.event import EvaluacionEventoForm
 
 @no_superuser_required
 @login_required()
@@ -164,6 +165,8 @@ def eventos_enviados(request):
         "last_page": last_page,
         "left_has_more": left_has_more,
         "right_has_more": right_has_more,
+        # formularios
+        "evaluacion_form": EvaluacionEventoForm(),
     }
 
     return render(request, "events/eventos_enviados.html", context)

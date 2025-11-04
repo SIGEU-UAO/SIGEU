@@ -1,6 +1,6 @@
 from django import forms
 from datetime import date
-from ..models import *
+from ..models import Evento, EvaluacionEvento
 
 class RegistroEventoForm(forms.Form):
     nombre = forms.CharField(label="Nombre", required=True, max_length=100)
@@ -37,3 +37,8 @@ class RegistroEventoForm(forms.Form):
             self.add_error("capacidad", "La capacidad debe ser mayor a 0.")
 
         return cleaned_data
+
+class EvaluacionEventoForm(forms.Form):
+    tipo = forms.ChoiceField(label="Tipo", choices=EvaluacionEvento.TIPOS_EVALUACION, required=True, widget=forms.Select(attrs={"id": "tipo-evaluacion"}))
+    acta = forms.FileField(label="Acta de Aprobación", widget=forms.FileInput(attrs={"accept": ".pdf", "id": "acta-aprobacion", "class": "input-file"}))
+    justificacion = forms.CharField(label="Justificación", disabled=True, widget=forms.Textarea(attrs={"id": "justificacion", "minlength": '10'}))
