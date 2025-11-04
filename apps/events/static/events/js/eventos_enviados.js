@@ -1,12 +1,26 @@
+import { handleFileInputsInfo, validarFormData } from "/static/js/modules/forms/utils.js";
 import API from "/static/js/modules/classes/API.js"; 
+import Alert from "/static/js/modules/classes/Alert.js";
 
 // ===== Selects ===== //
 const infoOrgBtns = document.querySelectorAll(".card__btn--infoOrg");
 const infoOrgExtBtns = document.querySelectorAll(".card__btn--infoOrgExt");
+const evalBtns = document.querySelectorAll(".card__btn--eval");
 
+// ===== Modals ===== //
 const modalOrg = document.getElementById("modal-organizador");
 const modalOrgExt = document.getElementById("modal-organizacion-externa");
 
+// ===== Modal Evaluation ===== //
+const modalEval = document.getElementById("modal-evaluacion");
+const evalForm = document.getElementById("modal-evaluacion-form")
+const evalSelectForm = document.getElementById("tipo-evaluacion");
+const evalApproveFormSection = document.getElementById("form__approve");
+const evalRejectFormSection = document.getElementById("form__reject");
+const evalActaInput = document.getElementById("acta-aprobacion");
+const evalJustificationInput = document.getElementById("justificacion");
+
+// ===== Cards ===== //
 const cardsContainer = document.querySelector('.cards');
 const cards = cardsContainer ? cardsContainer.querySelectorAll('.card') : [];
 const noResultsContainer = document.querySelector('.no-results-container');
@@ -33,9 +47,18 @@ const telefonoExt = modalOrgExt?.querySelector(".telefonoOrgExt");
 const ubicacionExt = modalOrgExt?.querySelector(".ubicacionOrgExt");
 const certBtnExt = modalOrgExt?.querySelector(".modal__cert-btn");
 
-// ==== ORGANIZADOR ==== //
-infoOrgBtns.forEach(btn => {
-  btn.addEventListener("click", async () => {
+// ===== Events Listeners ===== //
+infoOrgBtns.forEach(btn => btn.addEventListener("click", () => openOrganizerModal(modalOrg, btn)));
+infoOrgExtBtns.forEach(btn => btn.addEventListener("click", () => openExternalOrganizationModal(modalOrgExt, btn)));
+
+// Evaluation
+evalBtns.forEach(btn => btn.addEventListener("click", () => openEvaluationModal(modalEval, btn)));
+evalSelectForm.addEventListener("change", () => changeEvalFormSection());
+evalForm.addEventListener("submit", e => sendEvaluation(e));
+handleFileInputsInfo(evalActaInput);
+
+// === Functions === //
+async function openOrganizerModal(modal, btn){
     const data = btn.dataset;
     const orgId = data.orgid;
     const eventId = data.eventid;
@@ -76,13 +99,10 @@ infoOrgBtns.forEach(btn => {
     } catch (error) {
       console.error("Error al cargar el organizador:", error);
     }
-  });
-});
+}
 
-// ==== ORGANIZACIONES EXTERNAS ==== //
-infoOrgExtBtns.forEach(btn => {
-  btn.addEventListener("click", async () => {
-    const data = btn.dataset;
+async function openExternalOrganizationModal(modal, btn){
+  const data = btn.dataset;
     const orgIdExt = data.orgextid;
     const eventId = data.eventoid;
 
@@ -125,5 +145,54 @@ infoOrgExtBtns.forEach(btn => {
       console.error("Error al cargar la organización externa:", error);
       alert("No se pudo cargar la información de la organización externa.");
     }
-  });
-});
+}
+
+// === Evaluation Modal === //
+function openEvaluationModal(modal, btn){
+    const data = btn.dataset;
+    const eventId = data.eventoid;
+    evalForm.dataset.eventId = eventId;
+    modal.showModal();
+}
+
+// Change eval form section
+function changeEvalFormSection() {
+    if (evalSelectForm.value === "aprobacion") {
+        evalApproveFormSection.style.display = "flex";
+        evalRejectFormSection.style.display = "none";
+        
+        // Disable justification and enable acta
+        evalJustificationInput.disabled = true;
+        evalActaInput.disabled = false;
+    } else {
+        evalApproveFormSection.style.display = "none";
+        evalRejectFormSection.style.display = "flex";
+        
+        // Enable justification and disable acta
+        evalJustificationInput.disabled = false;
+        evalActaInput.disabled = true;
+    }
+}
+
+// TODO: Send evaluation
+async function sendEvaluation(e) {
+    e.preventDefault();
+    const eventId = evalForm.dataset.eventId;
+    const data = new FormData(evalForm);
+    if (!validarFormData(data)) {
+      modalEval.close();
+      return;
+    };
+
+    // Validate act approval extension (must be .pdf)
+    if (data.get("acta-aprobacion") && !data.get("acta-aprobacion").name.endsWith(".pdf")) {
+      Alert.error("El archivo de la acta de aprobación debe ser un PDF");
+      modalEval.close();
+      return;
+    }
+
+    // List form data
+    for (const [key, value] of data.entries()) {
+      console.log(`${key}: ${value}`);
+    }
+}

@@ -1,7 +1,5 @@
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from django.urls import reverse
 from sigeu.decorators import no_superuser_required, organizador_required, secretaria_required
 from .forms.event import RegistroEventoForm
 from .forms.associations.OrganizadorEvento import OrganizadorEventoForm
