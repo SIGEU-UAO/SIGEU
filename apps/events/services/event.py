@@ -29,19 +29,6 @@ class EventoService:
 
         return evento.idEvento
     
-    @staticmethod
-    def registrar_evaluacion(evento, evaluacion_data):
-        try:
-            evaluacionEvento = EvaluacionEvento.objects.create(
-                evento=evento,
-                evaluador=evaluacion_data["evaluador"],
-                tipoEvaluacion=evaluacion_data["tipoEvaluacion"],
-                justificacion=evaluacion_data.get("justificacion", ""),
-                acta=evaluacion_data.get("acta")
-            )
-            return evaluacionEvento
-        except IntegrityError as e:
-            raise ValueError("Error al registrar la evaluación del evento.") from e
 
     @staticmethod
     def obtener_por_id(id_evento):
@@ -308,3 +295,20 @@ class EventoService:
                 failed_paths.append(path)
 
         return {"deleted": True, "failed_paths": failed_paths}
+    
+    
+    # --------- EVALUATIONS -----------
+    
+    @staticmethod
+    def registrar_evaluacion(evento, evaluacion_data):
+        try:
+            evaluacionEvento = EvaluacionEvento.objects.create(
+                evento=evento,
+                evaluador=evaluacion_data["evaluador"],
+                tipoEvaluacion=evaluacion_data["tipoEvaluacion"],
+                justificacion=evaluacion_data.get("justificacion", ""),
+                acta=evaluacion_data.get("acta")
+            )
+            return evaluacionEvento
+        except IntegrityError as e:
+            raise ValueError("Error al registrar la evaluación del evento.") from e
