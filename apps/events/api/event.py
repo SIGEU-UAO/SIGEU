@@ -128,6 +128,12 @@ class EventoAPI:
             if not acta:
                 return JsonResponse({"error": "Debe adjuntar el acta de aprobación."}, status=400)
 
+            if acta.content_type != "application/pdf":
+                return JsonResponse({"error": "El archivo adjunto debe ser un PDF válido."}, status=400)
+
+            if not acta.name.lower().endswith(".pdf"):
+                return JsonResponse({"error": "El nombre del archivo debe terminar en .pdf."}, status=400)
+
             with transaction.atomic():
                 evaluacion = EventoService.registrar_evaluacion(evento, {
                     "evaluador": request.user,
