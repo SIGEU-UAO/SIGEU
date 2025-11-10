@@ -110,25 +110,42 @@ class EventoAPI:
             else:
                 return JsonResponse({"error": "No se pudo actualizar el estado del evento."}, status=500)
             
-    @login_required
+    @login_required()
     @secretaria_required
     def aprobar_evento(request, id_evento):
-        if request.method == "PATCH":
-            evento = EventoService.obtener_por_id(id_evento)
-            if not evento:
-                return JsonResponse({"error": "Evento no encontrado."}, status=404)
-            if evento.estado != "Enviado":
-                return JsonResponse({"error": "Solo los eventos en estado 'Enviado' pueden ser aprobados."}, status=400)
-            
+        if request.method != "POST":
+            return JsonResponse({"error": "Método no permitido"}, status=405)
+
+        evento = EventoService.obtener_por_id(id_evento)
+        if not evento:
+            return JsonResponse({"error": "Evento no encontrado."}, status=404)
+        if evento.estado != "Enviado":
+            return JsonResponse({"error": "Solo los eventos en estado 'Enviado' pueden ser aprobados."}, status=400)
+
+        try:
+            acta = request.FILES.get("acta")
+            if not acta:
+                return JsonResponse({"error": "Debe adjuntar el acta de aprobación."}, status=400)
+
+            EventoService.registrar_evaluacion(evento, {
+                "evaluador": request.user,
+                "tipoEvaluacion": "aprobacion",
+                "justificacion": "Evento aprobado por la secretaría académica.",
+                "acta": acta
+            })
+
             aprobado = EventoService.actualizar_estado(id_evento, "Aprobado")
             if aprobado:
-                return JsonResponse({"message": "El evento ha sido aprobado correctamente."}, status=200)
+                return JsonResponse({"message": "El evento con id ha sido aprobado correctamente y se ha registrado la evaluación correctamente."}, status=200)
             else:
                 return JsonResponse({"error": "No se pudo actualizar el estado del evento."}, status=500)
-    
-            
-    login_required()
-    secretaria_required()
+
+        except ValueError as e:
+            return JsonResponse({"error": str(e)}, status=400)
+
+
+    @login_required()
+    @secretaria_required()
     def listar_eventos_enviados(request):
         if request.method == "GET":
             page = request.GET.get('page', 1)
