@@ -178,6 +178,7 @@ function changeEvalFormSection() {
 async function sendEvaluation(e) {
     e.preventDefault();
     const eventId = evalForm.dataset.eventId;
+    const tipoEvaluacion = evalSelectForm.value;
     const data = new FormData(evalForm);
     if (!validarFormData(data)) {
       modalEval.close();
@@ -185,14 +186,47 @@ async function sendEvaluation(e) {
     };
 
     // Validate act approval extension (must be .pdf)
-    if (data.get("acta") && !data.get("acta").name.endsWith(".pdf")) {
-      Alert.error("El archivo de la acta de aprobación debe ser un PDF");
-      modalEval.close();
-      return;
+    if (tipoEvaluacion === "aprobacion") {
+      if (data.get("acta") && !data.get("acta").name.endsWith(".pdf")) {
+        Alert.error("El archivo de la acta de aprobación debe ser un PDF");
+        modalEval.close();
+        return;
+      }
     }
 
-    // List form data
-    for (const [key, value] of data.entries()) {
-      console.log(`${key}: ${value}`);
+    try {
+      let url = "";
+      let successMsg = "";
+      
+      // Validates the type of evaluation and sets the URL and success message accordingly
+      if (tipoEvaluacion === "aprobacion") {
+        url = `/eventos/api/aprobar-evento/${eventId}/`;
+        successMsg = "El evento fue aprobado correctamente.";
+
+        // In here there can be the reject event validation 
+
+      } else {
+        Alert.error("Tipo de evaluación no válido."); // Extra validation
+        modalEval.close();
+        return;
+      }
+
+      const response = await API.patchFormData(url, data);
+
+      if (response.ok || response.status === 200) {
+        Alert.success(successMsg);
+        modalEval.close();
+        setTimeout(() => {
+        location.reload();}, 1500);
+      } else {
+        const resData = await response.json();
+        modalEval.close();
+        
+        Alert.error(resData.error || "Ocurrió un error al procesar la evaluación.");
+      }
+    } catch (error) {
+      modalEval.close();
+      console.error("Error al enviar la evaluación:", error);
+      Alert.error("Error al conectar con el servidor.");
     }
 }
