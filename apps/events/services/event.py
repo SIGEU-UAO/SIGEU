@@ -307,7 +307,7 @@ class EventoService:
                 evaluador=evaluacion_data["evaluador"],
                 tipoEvaluacion=evaluacion_data["tipoEvaluacion"],
                 justificacion=evaluacion_data.get("justificacion", ""),
-                acta=evaluacion_data.get("acta")
+                acta=evaluacion_data.get("acta", None)
             )
             return evaluacionEvento
         except IntegrityError as e:
