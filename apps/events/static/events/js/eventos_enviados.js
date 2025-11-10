@@ -211,17 +211,16 @@ async function sendEvaluation(e) {
         return;
       }
 
-      const response = await API.patchFormData(url, data);
+      const response = await API.postFormData(url, data);
 
-      if (response.ok || response.status === 200) {
+      if (!response.error) {
         Alert.success(successMsg);
         modalEval.close();
         setTimeout(() => {
         location.reload();}, 1500);
       } else {
-        const resData = await response.json();
+        const resData = response.data;
         modalEval.close();
-        
         Alert.error(resData.error || "Ocurrió un error al procesar la evaluación.");
       }
     } catch (error) {
