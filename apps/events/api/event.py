@@ -132,7 +132,6 @@ class EventoAPI:
                 evaluacion = EventoService.registrar_evaluacion(evento, {
                     "evaluador": request.user,
                     "tipoEvaluacion": "aprobacion",
-                    "justificacion": "Evento aprobado por la secretaría académica.",
                     "acta": acta
                 })
 
