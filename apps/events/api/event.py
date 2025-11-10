@@ -1,5 +1,6 @@
 from datetime import date
 from django.http import JsonResponse
+from django.db import transaction
 from ..forms.event import RegistroEventoForm
 from ..services.event import EventoService
 from ..serializers.eventoSerializer import EventoSerializer
@@ -127,18 +128,23 @@ class EventoAPI:
             if not acta:
                 return JsonResponse({"error": "Debe adjuntar el acta de aprobación."}, status=400)
 
-            EventoService.registrar_evaluacion(evento, {
-                "evaluador": request.user,
-                "tipoEvaluacion": "aprobacion",
-                "justificacion": "Evento aprobado por la secretaría académica.",
-                "acta": acta
-            })
+            with transaction.atomic():
+                evaluacion = EventoService.registrar_evaluacion(evento, {
+                    "evaluador": request.user,
+                    "tipoEvaluacion": "aprobacion",
+                    "justificacion": "Evento aprobado por la secretaría académica.",
+                    "acta": acta
+                })
 
-            aprobado = EventoService.actualizar_estado(id_evento, "Aprobado")
-            if aprobado:
-                return JsonResponse({"message": "El evento con id ha sido aprobado correctamente y se ha registrado la evaluación correctamente."}, status=200)
-            else:
-                return JsonResponse({"error": "No se pudo actualizar el estado del evento."}, status=500)
+                aprobado = EventoService.actualizar_estado(id_evento, "Aprobado")
+
+                if not aprobado:
+                    raise ValueError("Error al actualizar el estado del evento.")
+
+            return JsonResponse({
+                "message": "El evento y su he evaluación han sido aprobadas y registradas correctamente.",
+                "evaluacion_id": evaluacion.idEvaluacion
+            }, status=200)
 
         except ValueError as e:
             return JsonResponse({"error": str(e)}, status=400)
