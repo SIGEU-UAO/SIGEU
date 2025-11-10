@@ -242,21 +242,4 @@ export default class API {
             return { error: true };
         }
     }
-
-    static async patchFormData(url, formData) {
-        try {
-            const csrf = getCookie("csrftoken"); 
-            const response = await fetch(url, {
-                method: "PATCH",
-                headers: {
-                    "X-CSRFToken": csrf,
-                },
-                body: formData
-            });
-            return response;
-        } catch (error) {
-            console.error("Error en patchFormData:", error);
-            throw error;
-        }
-    }
 }
