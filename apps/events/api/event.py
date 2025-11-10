@@ -110,6 +110,23 @@ class EventoAPI:
             else:
                 return JsonResponse({"error": "No se pudo actualizar el estado del evento."}, status=500)
             
+    @login_required
+    @secretaria_required
+    def aprobar_evento(request, id_evento):
+        if request.method == "PATCH":
+            evento = EventoService.obtener_por_id(id_evento)
+            if not evento:
+                return JsonResponse({"error": "Evento no encontrado."}, status=404)
+            if evento.estado != "Enviado":
+                return JsonResponse({"error": "Solo los eventos en estado 'Enviado' pueden ser aprobados."}, status=400)
+            
+            aprobado = EventoService.actualizar_estado(id_evento, "Aprobado")
+            if aprobado:
+                return JsonResponse({"message": "El evento ha sido aprobado correctamente."}, status=200)
+            else:
+                return JsonResponse({"error": "No se pudo actualizar el estado del evento."}, status=500)
+    
+            
     login_required()
     secretaria_required()
     def listar_eventos_enviados(request):
