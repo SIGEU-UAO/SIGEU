@@ -36,4 +36,5 @@ urlpatterns = [
     path("eventos/api/obtener-datos-organizacion-invitada/<int:id_evento>/<int:id_organizacion>/",EventoAPI.obtener_datos_organizacion_invitada,name="obtener_datos_orginvitada_api"),
     
     path("eventos/api/aprobar-evento/<int:id_evento>/",EventoAPI.aprobar_evento,name="aprobar_evento_api"),
+    path("eventos/api/rechazar-evento/<int:id_evento>/",EventoAPI.rechazar_evento,name="rechazar_evento_api"),
 ]
