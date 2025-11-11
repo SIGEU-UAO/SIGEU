@@ -5,7 +5,7 @@
 
     <div class="notifications__content">
         {% for notificacion in notificaciones %}
-            <div class="notifications__card {% if notificacion.tipoEvaluacion == "aprobacion" %}notifications__card--approve{% else %}notifications__card--reject{% endif %}" data-id="{{ notificacion.idEvaluacion }}">
+            <div class="notifications__card {% if notificacion.tipoEvaluacion == "aprobacion" %}notifications__card--approve{% else %}notifications__card--reject{% endif %}">
                 <div class="notifcation__card__left">
                     <i class="{% if notificacion.tipoEvaluacion == "aprobacion" %}ri-checkbox-circle-fill{% else %}ri-close-circle-fill{% endif %}"></i>
                 </div>
@@ -17,7 +17,7 @@
                 <div class="notifcation__card__right">
                     <span class="notification__card__date">{{ notificacion.fechaEvaluacion|date:"d M Y" }}</span>
                     <span class="notification__card__date">{{ notificacion.fechaEvaluacion|date:"H:i" }}</span>
-                    <button type="button" class="notification__card__read" aria-label="Marcar como leído" title="Marcar como leído"><i class="ri-check-double-line"></i></button>
+                    <button type="button" class="notification__card__read" aria-label="Marcar como leído" title="Marcar como leído" data-id="{{ notificacion.idEvaluacion }}"><i class="ri-check-double-line"></i></button>
                 </div>
             </div>
         {% endfor %}

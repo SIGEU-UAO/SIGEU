@@ -277,6 +277,14 @@ class EventoService:
             raise ValueError("Error al registrar la evaluación del evento.") from e
 
     @staticmethod
+    def obtener_evaluacion_por_id(id_evaluacion):
+        try:
+            evaluacion = EvaluacionEvento.objects.get(idEvaluacion=id_evaluacion)
+            return evaluacion
+        except EvaluacionEvento.DoesNotExist:
+            return None
+
+    @staticmethod
     def obtener_notificaciones(user):
         notificaciones = (
             EvaluacionEvento.objects
@@ -286,3 +294,14 @@ class EventoService:
             .order_by('-fechaEvaluacion')[:10]
         )
         return notificaciones
+
+    @staticmethod
+    def marcar_como_leida(id_evaluacion):
+        try:
+            evaluacion = EvaluacionEvento.objects.get(idEvaluacion=id_evaluacion)
+            evaluacion.notificacionLeida = True
+            evaluacion.save()
+            return evaluacion
+        except EvaluacionEvento.DoesNotExist:
+            return None
+    

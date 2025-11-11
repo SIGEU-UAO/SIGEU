@@ -1,6 +1,10 @@
+import API from "../classes/API.js";
+import Alert from "../classes/Alert.js";
+
 //* Selectors
 const notification = document.querySelector('.notifications');
 const notificationButton = document.querySelector('.nav__notification');
+const notificationsReadButtons = document.querySelectorAll('.notification__card__read');
 
 //* Events listeners
 
@@ -13,3 +17,19 @@ document.addEventListener('click', (e) => {
         notification.classList.remove('active');
     }
 });
+
+// Mark as read a notification
+notificationsReadButtons.forEach(button => {
+    button.addEventListener('click', (e) => markAsRead(e));
+});
+
+//* Functions
+async function markAsRead(e) {
+    const markAsReadBtn = e.target.nodeName !== "I" ? e.target : e.target.parentElement;
+    const notificationCard = markAsReadBtn.parentElement.parentElement;
+    const evaluationId = markAsReadBtn.dataset.id;
+    const response = await API.patch(`/eventos/api/marcar-notificacion-como-leida/${evaluationId}/`);
+    if(response.error) return;
+    notificationCard.remove();
+    Alert.success("Notificación marcada como leída");
+}
