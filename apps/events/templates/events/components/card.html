@@ -84,6 +84,14 @@
             </details>
         {% endif %}
 
+        {% if type == "Rechazado" %}
+            <hr>
+            <details class="card__details">
+                <summary class="card__sub--label">Motivo del rechazo:</summary>
+                <p class="card__justification">{{ event.evaluaciones.first.justificacion }}</p>
+            </details>
+        {% endif %}
+
         {% if type == "Borrador" or type == "Rechazado" %}
             <hr>
         

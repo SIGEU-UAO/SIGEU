@@ -8,8 +8,6 @@ const notificationCards = document.querySelector('.notifications__content');
 const notificationsReadButtons = document.querySelectorAll('.notification__card__read');
 const notificationEmpty = document.querySelector('.notifications__empty');
 
-//* Events listeners
-
 // Add active class to notifications
 notificationButton.addEventListener('click', () => notification.classList.add('active'));
 

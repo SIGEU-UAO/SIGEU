@@ -303,4 +303,3 @@ class EventoService:
             return evaluacion
         except EvaluacionEvento.DoesNotExist:
             return None
-    
