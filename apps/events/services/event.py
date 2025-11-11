@@ -273,7 +273,6 @@ class EventoService:
             )
             return evaluacionEvento
         except IntegrityError as e:
-            print(e)
             raise ValueError("Error al registrar la evaluación del evento.") from e
 
     @staticmethod

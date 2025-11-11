@@ -12,7 +12,7 @@
                 <div class="notifcation__card__middle">
                     <h4 class="notification__card__title">{% if notificacion.tipoEvaluacion == "aprobacion" %}¡Evento aprobado!{% else %}¡Evento rechazado!{% endif %}</h4>
                     <p class="notification__card__description">Tu evento <strong>"{{ notificacion.evento__nombre }}"</strong> ha sido {% if notificacion.tipoEvaluacion == "aprobacion" %}aprobado y publicado correctamente{% else %}rechazado. Puedes ver el motivo en la sección de eventos{% endif %} </p>
-                    <a href="#" class="notification__card__button">Ver evento</a>
+                    <a href="{% url 'mis_eventos' %}?search={{ notificacion.evento__nombre }}&search_by=nombre&page=1" target="_blank" class="notification__card__button">Ver evento</a>
                 </div>
                 <div class="notifcation__card__right">
                     <span class="notification__card__date">{{ notificacion.fechaEvaluacion|date:"d M Y" }}</span>
