@@ -39,9 +39,7 @@ class Evento(models.Model):
     @property
     def organizadores_ordenados(self):
         organizadores = list(self.organizadores_asignados.all())
-        organizadores.sort(
-            key=lambda o: 0 if o.organizador == self.creador else 1
-        )
+        organizadores.sort(key=lambda o: 0 if o.organizador == self.creador else 1)
         return organizadores
     
     class Meta:
@@ -123,3 +121,11 @@ class EvaluacionEvento(models.Model):
     justificacion = models.TextField(validators=[MinLengthValidator(10)])
     acta = models.FileField(upload_to=path_acta)
     notificacionLeida = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.evento} - {self.tipoEvaluacion}"
+
+    class Meta:
+        db_table = "evaluaciones_eventos"
+        verbose_name = "evaluacion_evento"
+        verbose_name_plural = "evaluaciones_eventos"

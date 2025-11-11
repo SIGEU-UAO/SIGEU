@@ -1,0 +1,132 @@
+.notifications {
+    display: flex;
+    flex-direction: column;
+    width: 375px;
+    height: 500px;
+    padding: 25px;
+    overflow-y: auto;
+    position: absolute;
+    top: 60px;
+    right: 100px;
+    z-index: 999;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transform: translateY(8px);
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 180ms ease, transform 180ms ease, visibility 0s linear 180ms;
+}
+
+.notifications.active {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+    pointer-events: auto;
+    transition-delay: 0s, 0s, 0s;
+}
+
+.notifications__title{
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.notifications__content{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.notifications__card{
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 10px;
+}
+
+.notifcation__card__left i{
+    font-size: 20px;
+}
+
+.notifications__card--approve .notifcation__card__left i{
+    color: var(--green);
+}
+
+.notifications__card--reject .notifcation__card__left i{
+    color: var(--red);
+}
+
+.notifcation__card__middle{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.notification__card__description{
+    font-size: 12px;
+    color: var(--light-gray);
+}
+
+.notifcation__card__right{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.notification__card__date{
+    font-size: 12px;
+    color: var(--light-gray);
+}
+
+.notification__card__read{
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    font-size: 18px;
+    color: var(--blue);
+}
+
+.notification__card__button{
+    width: fit-content;
+    padding: 5px 10px;
+    background-color: transparent;
+    border: 1px solid var(--blue);
+    border-radius: 5px;
+    color: var(--blue);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Notifications empty */
+.notifications__empty{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.notifications__empty img{
+    width: 128px;
+    height: 128px;
+}
+
+.notifications__empty__description{
+    font-size: 16px;
+    color: var(--light-gray);
+    font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+    .notifications {
+        width: 300px;
+        padding: 10px;
+        right: 20px;
+    }
+}

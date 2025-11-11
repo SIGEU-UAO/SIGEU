@@ -83,6 +83,7 @@ class EventoAPI:
         if request.method == "PATCH":
             evento = EventoService.obtener_por_id(id_evento)
             if not evento:
+                print(evento)
                 return JsonResponse({"error": "Evento no encontrado."}, status=404)
             if evento.estado != "Borrador":
                 return JsonResponse({"error": "Solo los eventos en estado 'borrador' pueden ser enviados a validación."}, status=400)

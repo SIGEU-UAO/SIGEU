@@ -23,7 +23,6 @@
 /* ===== Fondo semitransparente ===== */
 .modal::backdrop {
     background: rgba(15, 23, 42, 0.55);
-    backdrop-filter: blur(2px);
 }
 
 /* ===== Contenedor principal del contenido ===== */
