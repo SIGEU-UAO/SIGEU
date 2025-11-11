@@ -306,7 +306,7 @@ class EventoService:
                 evento=evento,
                 evaluador=evaluacion_data["evaluador"],
                 tipoEvaluacion=evaluacion_data["tipoEvaluacion"],
-                justificacion=evaluacion_data.get("justificacion", ""),
+                justificacion=evaluacion_data.get("justificacion", None),
                 acta=evaluacion_data.get("acta", None)
             )
             return evaluacionEvento
