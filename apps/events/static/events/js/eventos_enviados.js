@@ -174,7 +174,6 @@ function changeEvalFormSection() {
     }
 }
 
-// TODO: Send evaluation
 async function sendEvaluation(e) {
     e.preventDefault();
     const eventId = evalForm.dataset.eventId;
@@ -217,17 +216,11 @@ async function sendEvaluation(e) {
 
       if (!response.error) {
         Alert.success(successMsg);
-        modalEval.close();
-        setTimeout(() => {
-        location.reload();}, 1500);
-      } else {
-        const resData = response.data;
-        modalEval.close();
-        Alert.error(resData.error || "Ocurrió un error al procesar la evaluación.");
+        setTimeout(() => location.reload(), 1500);
       }
+
+      modalEval.close();
     } catch (error) {
       modalEval.close();
-      console.error("Error al enviar la evaluación:", error);
-      Alert.error("Error al conectar con el servidor.");
     }
 }

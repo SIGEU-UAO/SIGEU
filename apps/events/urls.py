@@ -37,4 +37,5 @@ urlpatterns = [
     
     path("eventos/api/aprobar-evento/<int:id_evento>/",EventoAPI.aprobar_evento,name="aprobar_evento_api"),
     path("eventos/api/rechazar-evento/<int:id_evento>/",EventoAPI.rechazar_evento,name="rechazar_evento_api"),
+    path("eventos/api/marcar-notificacion-como-leida/<int:id_evaluacion>/",EventoAPI.marcar_como_leida,name="marcar_notificacion_como_leida_api"),
 ]

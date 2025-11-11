@@ -122,44 +122,6 @@ class EventoService:
     def actualizar_fecha_ultimo_cambio(evento):
         evento.fecha_ultimo_cambio = timezone.now()
         evento.save(update_fields=["fecha_ultimo_cambio"])
-        
-    def serializar_eventos(page_obj, request=None):
-        results = []
-        for e in page_obj.object_list:
-            # organizadores asignados (resumido)
-            organizadores = []
-            for o in e.organizadores_asignados.all():
-                u = o.organizador
-                organizadores.append({
-                    "nombre": ((getattr(u, "nombres", "") or "") + " " + (getattr(u, "apellidos", "") or "")).strip(),
-                    "rol_organizador": o.get_tipo_display() if hasattr(o, "get_tipo_display") else o.tipo
-                })
-
-            # organizaciones invitadas (resumido)
-            organizaciones = []
-            for oi in e.organizaciones_invitadas.all():
-                org = oi.organizacion
-                organizaciones.append({"nombre": getattr(org, "nombre", None),"nit": getattr(org, "nit", None)})
-
-            item = {
-                "idEvento": e.idEvento,
-                "nombre": e.nombre,
-                "fecha": e.fecha.isoformat() if e.fecha else None,
-                "horaInicio": e.horaInicio.isoformat() if e.horaInicio else None,
-                "estado": e.estado,
-                "instalaciones": [ getattr(a.instalacion, "nombre", str(a.instalacion)) for a in e.instalaciones_asignadas.all() ],
-                "organizadores": organizadores,
-                "organizaciones_invitadas": organizaciones
-            }
-            
-            results.append(item)
-
-        return {
-            "count": page_obj.paginator.count,
-            "num_pages": page_obj.paginator.num_pages,
-            "current_page": page_obj.number,
-            "results": results,
-        }
     
     @staticmethod
     def actualizar_estado(id_evento, nuevo_estado):
@@ -306,9 +268,38 @@ class EventoService:
                 evento=evento,
                 evaluador=evaluacion_data["evaluador"],
                 tipoEvaluacion=evaluacion_data["tipoEvaluacion"],
-                justificacion=evaluacion_data.get("justificacion", None),
+                justificacion=evaluacion_data.get("justificacion", ""),
                 acta=evaluacion_data.get("acta", None)
             )
             return evaluacionEvento
         except IntegrityError as e:
             raise ValueError("Error al registrar la evaluación del evento.") from e
+
+    @staticmethod
+    def obtener_evaluacion_por_id(id_evaluacion):
+        try:
+            evaluacion = EvaluacionEvento.objects.get(idEvaluacion=id_evaluacion)
+            return evaluacion
+        except EvaluacionEvento.DoesNotExist:
+            return None
+
+    @staticmethod
+    def obtener_notificaciones(user):
+        notificaciones = (
+            EvaluacionEvento.objects
+            .select_related('evento')
+            .filter(evento__creador=user, notificacionLeida=False)
+            .values("idEvaluacion", "evento__nombre", "tipoEvaluacion", "fechaEvaluacion")
+            .order_by('-fechaEvaluacion')[:10]
+        )
+        return notificaciones
+
+    @staticmethod
+    def marcar_como_leida(id_evaluacion):
+        try:
+            evaluacion = EvaluacionEvento.objects.get(idEvaluacion=id_evaluacion)
+            evaluacion.notificacionLeida = True
+            evaluacion.save()
+            return evaluacion
+        except EvaluacionEvento.DoesNotExist:
+            return None

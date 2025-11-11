@@ -110,7 +110,83 @@ class EventoAPI:
                 return JsonResponse({"message": "El evento ha sido enviado a validación correctamente."}, status=200)
             else:
                 return JsonResponse({"error": "No se pudo actualizar el estado del evento."}, status=500)
+
+    @login_required()
+    @secretaria_required()
+    def listar_eventos_enviados(request):
+        if request.method == "GET":
+            page = request.GET.get('page', 1)
+
+            try:
+                page = int(page)
+            except (TypeError, ValueError):
+                page = 1
+
+            page_obj = EventoService.listar_eventos_enviados(             
+                page=page,
+                per_page=12,
+                facultad=request.user.secretaria.facultad
+            )
+
+            data = EventoService.serializar_eventos(page_obj, request=request)
+            return JsonResponse(data, safe=False)
+        
+    @login_required
+    @secretaria_required
+    def obtener_datos_organizador(request, id_evento, id_organizador):
+        if request.method == "GET":
+            try:
+                datos = EventoService.obtener_datos_organizador(id_evento, id_organizador)
+                if not datos:
+                    return JsonResponse({"error": "Datos no encontrados."}, status=404)
+                return JsonResponse({"error": False, "data": datos}, status=200)
+            except Exception as e:
+                return JsonResponse({"error": str(e)}, status=500)
+    
+    @login_required
+    @secretaria_required
+    def obtener_datos_organizacion_invitada(request, id_evento, id_organizacion):
+        if request.method == "GET":
+            try:
+                datos = EventoService.obtener_datos_organizacion_invitada(id_evento, id_organizacion)
+                if not datos:
+                    return JsonResponse({"error": "Datos no encontrados."}, status=404)
+                return JsonResponse({"error": False, "data": datos}, status=200)
+            except Exception as e:
+                return JsonResponse({"error": str(e)}, status=500)
+
+    @login_required()
+    @organizador_required
+    def eliminar_evento(request, id_evento):
+        if request.method != "DELETE":
+            return JsonResponse({"error": "Método no permitido"}, status=405)
+
+        evento = EventoService.obtener_por_id(id_evento)
+        if not evento:
+            return JsonResponse({"error": "Evento no encontrado."}, status=400)
             
+        if not EventoService.es_creador(request.user, id_evento):
+            return JsonResponse({"error": "No tienes permiso para eliminar este evento."}, status=403)
+
+        if evento.estado not in ("Borrador", "Rechazado"):
+            return JsonResponse({"error": "Solo se pueden eliminar eventos en estado 'Borrador' o 'Rechazado'."}, status=400)
+
+        try:
+            result = EventoService.eliminar_evento(id_evento)
+        except ValueError as ve:
+            return JsonResponse({"error": str(ve)}, status=400)
+        except Exception:
+            return JsonResponse({"error": "Error interno al eliminar el evento."}, status=500)
+        
+        if result.get("failed_paths"):
+            return JsonResponse({
+                "message": "Evento eliminado en base de datos, pero algunos archivos no pudieron eliminarse.",
+                "failed_paths": result["failed_paths"]
+            }, status=200)
+        else:
+            return JsonResponse({"message": "Evento eliminado correctamente."}, status=200)
+
+    # --- Evaluaciones ---
     @login_required()
     @secretaria_required
     def aprobar_evento(request, id_evento):
@@ -195,78 +271,22 @@ class EventoAPI:
         except ValueError as e:
             return JsonResponse({"error": str(e)}, status=400)
 
-
-    @login_required()
-    @secretaria_required()
-    def listar_eventos_enviados(request):
-        if request.method == "GET":
-            page = request.GET.get('page', 1)
-
-            try:
-                page = int(page)
-            except (TypeError, ValueError):
-                page = 1
-
-            page_obj = EventoService.listar_eventos_enviados(             
-                page=page,
-                per_page=12,
-                facultad=request.user.secretaria.facultad
-            )
-
-            data = EventoService.serializar_eventos(page_obj, request=request)
-            return JsonResponse(data, safe=False)
-        
-    @login_required
-    @secretaria_required
-    def obtener_datos_organizador(request, id_evento, id_organizador):
-        if request.method == "GET":
-            try:
-                datos = EventoService.obtener_datos_organizador(id_evento, id_organizador)
-                if not datos:
-                    return JsonResponse({"error": "Datos no encontrados."}, status=404)
-                return JsonResponse({"error": False, "data": datos}, status=200)
-            except Exception as e:
-                return JsonResponse({"error": str(e)}, status=500)
-    
-    @login_required
-    @secretaria_required
-    def obtener_datos_organizacion_invitada(request, id_evento, id_organizacion):
-        if request.method == "GET":
-            try:
-                datos = EventoService.obtener_datos_organizacion_invitada(id_evento, id_organizacion)
-                if not datos:
-                    return JsonResponse({"error": "Datos no encontrados."}, status=404)
-                return JsonResponse({"error": False, "data": datos}, status=200)
-            except Exception as e:
-                return JsonResponse({"error": str(e)}, status=500)
-
     @login_required()
     @organizador_required
-    def eliminar_evento(request, id_evento):
-        if request.method != "DELETE":
+    def marcar_como_leida(request, id_evaluacion):
+        if request.method != "PATCH":
             return JsonResponse({"error": "Método no permitido"}, status=405)
 
-        evento = EventoService.obtener_por_id(id_evento)
-        if not evento:
-            return JsonResponse({"error": "Evento no encontrado."}, status=400)
-            
-        if not EventoService.es_creador(request.user, id_evento):
-            return JsonResponse({"error": "No tienes permiso para eliminar este evento."}, status=403)
-
-        if evento.estado not in ("Borrador", "Rechazado"):
-            return JsonResponse({"error": "Solo se pueden eliminar eventos en estado 'Borrador' o 'Rechazado'."}, status=400)
-
-        try:
-            result = EventoService.eliminar_evento(id_evento)
-        except ValueError as ve:
-            return JsonResponse({"error": str(ve)}, status=400)
-        except Exception:
-            return JsonResponse({"error": "Error interno al eliminar el evento."}, status=500)
+        evaluacion = EventoService.obtener_evaluacion_por_id(id_evaluacion)
+        if not evaluacion:
+            return JsonResponse({"error": "Evaluación no encontrada."}, status=404)
         
-        if result.get("failed_paths"):
-            return JsonResponse({
-                "message": "Evento eliminado en base de datos, pero algunos archivos no pudieron eliminarse.",
-                "failed_paths": result["failed_paths"]
-            }, status=200)
-        else:
-            return JsonResponse({"message": "Evento eliminado correctamente."}, status=200)
+        try:
+            evaluacion = EventoService.marcar_como_leida(id_evaluacion)
+            if not evaluacion:
+                raise ValueError("Error al marcar la evaluación como leida.")
+
+            return JsonResponse({"message": "Evaluación marcada como leida."}, status=200)
+
+        except ValueError as e:
+            return JsonResponse({"error": str(e)}, status=400)

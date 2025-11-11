@@ -120,6 +120,12 @@
     font-size: 15px;
 }
 
+.card__justification{
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--light-gray);
+}
+
 .card__sub--list{
     margin: 8px 0 0 16px;
     display: flex;

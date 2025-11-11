@@ -29,6 +29,8 @@ def formulario_registro(request):
     # External organization creation form
     registroOrganizacionForm = RegistroForm()
 
+    notificaciones = EventoService.obtener_notificaciones(request.user)
+
     return render(request, "events/registro_evento.html", {
         "page__title": "SIGEU | Registro Evento",
         "header_title": "Registrar Evento Universitario", 
@@ -41,7 +43,8 @@ def formulario_registro(request):
         "modal_asociar_organizacion_form": modalAsociarOrganizacionForm,
         "registro_organizacion_form": registroOrganizacionForm,
         "current_user_data": { "id": current_user.idUsuario, "nombreCompleto": f"{current_user.nombres} {current_user.apellidos}", "rol": current_user.rol },
-        "active_page": "registrar-evento"
+        "active_page": "registrar-evento",
+        "notificaciones": notificaciones,
     })
 
 @no_superuser_required
@@ -85,10 +88,13 @@ def mis_eventos(request):
     left_has_more = start > 2   # there is a gap between 1 and start
     right_has_more = end < total - 1
 
+    notificaciones = EventoService.obtener_notificaciones(request.user)
+
     context = {
         "header_title": "Mis Eventos",
         "header_paragraph": "Administra y lleva el control de todos tus eventos en un solo lugar.",
         "active_page": "mis-eventos",
+        "notificaciones": notificaciones,
         "page_obj": page_obj,
         "status": status or "",
         # data for pagination
@@ -212,10 +218,13 @@ def formulario_edicion(request, pk):
     # External organization creation form
     registroOrganizacionForm = RegistroForm()
 
+    notificaciones = EventoService.obtener_notificaciones(request.user)
+
     return render(request, "events/registro_evento.html", {
         "page__title": "SIGEU | Edición Evento",
         "header_title": "Editar Evento Universitario", 
         "header_paragraph": "Administra las entidades que participan en tus eventos. Organiza y lleva el control de todos tus eventos en un solo lugar",
+        "notificaciones": notificaciones,
         "is_editing": True,
         "form": mainForm,
         "modal_buscar_instalaciones_form": modalBuscarInstalacionesForm,
@@ -225,5 +234,5 @@ def formulario_edicion(request, pk):
         "modal_asociar_organizacion_form": modalAsociarOrganizacionForm,
         "registro_organizacion_form": registroOrganizacionForm,
         "current_user_data": { "id": current_user.idUsuario, "nombreCompleto": f"{current_user.nombres} {current_user.apellidos}", "rol": current_user.rol },
-        "active_page": "mis-eventos"
+        "active_page": "mis-eventos",
     })

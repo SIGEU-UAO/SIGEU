@@ -93,3 +93,6 @@ class Secretaria(models.Model):
     
     class Meta:
         db_table = "secretarias"
+        constraints = [
+            models.UniqueConstraint(fields=["facultad"], name="unique_secretaria_por_facultad")
+        ]
