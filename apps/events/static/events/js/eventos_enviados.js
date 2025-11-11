@@ -203,7 +203,9 @@ async function sendEvaluation(e) {
         url = `/eventos/api/aprobar-evento/${eventId}/`;
         successMsg = "El evento fue aprobado correctamente.";
 
-        // In here there can be the reject event validation 
+      } else if (tipoEvaluacion === "rechazo") {
+        url = `/eventos/api/rechazar-evento/${eventId}/`;
+        successMsg = "El evento fue rechazado correctamente.";
 
       } else {
         Alert.error("Tipo de evaluación no válido."); // Extra validation
