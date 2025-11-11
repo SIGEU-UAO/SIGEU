@@ -104,6 +104,10 @@
 
 /* Notifications empty */
 .notifications__empty{
+    display: none;
+}
+
+.notifications__empty.show{
     display: flex;
     flex-direction: column;
     align-items: center;

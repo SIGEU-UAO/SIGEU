@@ -4,7 +4,9 @@ import Alert from "../classes/Alert.js";
 //* Selectors
 const notification = document.querySelector('.notifications');
 const notificationButton = document.querySelector('.nav__notification');
+const notificationCards = document.querySelector('.notifications__content');
 const notificationsReadButtons = document.querySelectorAll('.notification__card__read');
+const notificationEmpty = document.querySelector('.notifications__empty');
 
 //* Events listeners
 
@@ -32,4 +34,11 @@ async function markAsRead(e) {
     if(response.error) return;
     notificationCard.remove();
     Alert.success("Notificación marcada como leída");
+    // It's 1 because the empty message is also a child element
+    if (notificationCards.childElementCount === 1) changeBellStatus();
+}
+
+function changeBellStatus() {
+    notificationButton.classList.toggle('new');
+    notificationEmpty.classList.toggle('show');
 }

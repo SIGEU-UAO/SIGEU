@@ -23,11 +23,9 @@
         {% endfor %}
 
         <!--Mostrar mensaje si no hay notificaciones-->
-        {% if notificaciones.count == 0 %}
-            <div class="notifications__empty">
-                <img src="{% static 'assets/img/no-notifications.webp' %}" alt="No hay notificaciones">
-                <p class="notifications__empty__description">No hay notificaciones</p>
-            </div>
-        {% endif %}
+        <div class="notifications__empty {% if notificaciones.count == 0 %}show{% endif %}">
+            <img src="{% static 'assets/img/no-notifications.webp' %}" alt="No hay notificaciones">
+            <p class="notifications__empty__description">No hay notificaciones</p>
+        </div>
     </div>
 </div>
