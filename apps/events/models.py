@@ -122,3 +122,4 @@ class EvaluacionEvento(models.Model):
     tipoEvaluacion = models.CharField(max_length=10, choices=TIPOS_EVALUACION)
     justificacion = models.TextField(validators=[MinLengthValidator(10)])
     acta = models.FileField(upload_to=path_acta)
+    notificacionLeida = models.BooleanField(default=False)
