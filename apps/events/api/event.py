@@ -147,7 +147,48 @@ class EventoAPI:
                     raise ValueError("Error al actualizar el estado del evento.")
 
             return JsonResponse({
-                "message": "El evento y su he evaluación han sido aprobadas y registradas correctamente.",
+                "message": "El evento ha sido aprobado correctamente. Evaluación registrada.",
+                "evaluacion_id": evaluacion.idEvaluacion
+            }, status=200)
+
+        except ValueError as e:
+            return JsonResponse({"error": str(e)}, status=400)
+        
+    
+    @login_required()
+    @secretaria_required
+    def rechazar_evento(request, id_evento):
+        if request.method != "POST":
+            return JsonResponse({"error": "Método no permitido"}, status=405)
+
+        evento = EventoService.obtener_por_id(id_evento)
+        if not evento:
+            return JsonResponse({"error": "Evento no encontrado."}, status=404)
+        if evento.estado != "Enviado":
+            return JsonResponse({"error": "Solo los eventos en estado 'Enviado' pueden ser rechazados."}, status=400)
+        
+        if not request.POST.get("justificacion"):
+            return JsonResponse({"error": "Debe proporcionar una justificación para el rechazo."}, status=400)
+        
+        if request.POST.get("justificacion") and len(request.POST.get("justificacion")) < 10:
+            return JsonResponse({"error": "La justificación debe tener al menos 10 caracteres."}, status=400)
+
+        try:
+
+            with transaction.atomic():
+                evaluacion = EventoService.registrar_evaluacion(evento, {
+                    "evaluador": request.user,
+                    "tipoEvaluacion": "rechazo",
+                    "justificacion": request.POST.get("justificacion")
+                })
+
+                aprobado = EventoService.actualizar_estado(id_evento, "Rechazado")
+
+                if not aprobado:
+                    raise ValueError("Error al actualizar el estado del evento.")
+
+            return JsonResponse({
+                "message": "El evento ha sido rechazado correctamente. Evaluación registrada.",
                 "evaluacion_id": evaluacion.idEvaluacion
             }, status=200)
 
