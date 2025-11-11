@@ -118,7 +118,7 @@ class EvaluacionEvento(models.Model):
     idEvaluacion = models.BigAutoField(auto_created=True, primary_key=True, serialize=False)
     evento = models.ForeignKey(Evento, on_delete=models.CASCADE, related_name="evaluaciones")
     evaluador = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="evaluaciones")
-    fechaEvaluacion = models.DateField(auto_now_add=True)
+    fechaEvaluacion = models.DateTimeField(auto_now_add=True)
     tipoEvaluacion = models.CharField(max_length=10, choices=TIPOS_EVALUACION)
     justificacion = models.TextField(validators=[MinLengthValidator(10)])
     acta = models.FileField(upload_to=path_acta)
