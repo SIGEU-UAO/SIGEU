@@ -1,0 +1,28 @@
+<dialog id="modal-evaluacion" class="modal modal__evaluation">
+  <div class="modal__content">
+    <button type="button" class="modal__close" title="Cerrar Modal" onclick="this.closest('dialog').close()">&times;</button>
+    <h2>Evaluación de Evento</h2>
+
+    <form id="modal-evaluacion-form" class="form evaluation__form">
+        {% csrf_token %}
+
+        <div class="form__group">
+           {% include 'components/form/input.html' with field=evaluacion_form.tipo %}
+        </div>
+
+        <div id="form__approve">
+            <div class="form__group">
+                {% include 'components/form/input.html' with field=evaluacion_form.acta %}
+            </div>
+        </div>
+
+        <div id="form__reject">
+            <div class="form__group">
+                {% include 'components/form/input.html' with field=evaluacion_form.justificacion %}
+            </div>
+        </div>
+
+        <button type="submit" class="form__button form__button--norounded">Evaluar Evento</button>
+    </form>
+  </div>
+</dialog>

@@ -104,6 +104,26 @@
     text-align: center;
 }
 
+/* ===== Eval Modal ===== */
+.modal__evaluation h2{
+    margin-bottom: 16px;
+}
+
+.evaluation__form{
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+#form__reject{
+    display: none;
+}
+
+.evaluation__form .form__group{
+    width: 100%;
+}
+
+/* ===== Responsive ===== */
 @media (max-width: 480px) {
     .modal__content {
         padding: 1.5rem;

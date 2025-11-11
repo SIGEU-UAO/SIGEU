@@ -8,3 +8,8 @@ def path_organizacion_certificado(instance, filename):
     ext = filename.split('.')[-1]
     filename = f"{instance.organizacion.idOrganizacion}.{ext}"
     return f"events/{instance.evento.idEvento}/organizaciones-invitadas/{filename}"
+
+def path_acta(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = f"{instance.evento.idEvento}.{ext}"
+    return f"events/{instance.evento.idEvento}/Acta-Evento.{ext}"
