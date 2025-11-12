@@ -10,6 +10,10 @@ def get_csrf_token(request):
     response.set_cookie('csrftoken', get_token(request))
     return response
 
+def index(request):
+    # TODO: Aquí se deben obtener los eventos publicados y que no se hayan pasado de la fecha actual (paginación)
+    return render(request, "core/index.html")
+
 @no_superuser_required
 @login_required()
 def not_found(request):
