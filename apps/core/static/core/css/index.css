@@ -1,0 +1,18 @@
+@import url('components/navbar.css');
+@import url('components/hero.css');
+@import url('components/about.css');
+@import url('components/features.css');
+@import url('components/team.css');
+@import url('components/footer.css');
+
+html{
+    scroll-behavior: smooth;
+}
+
+section{
+    padding-top: 120px;
+}
+
+footer{
+    margin-top: 120px;
+}

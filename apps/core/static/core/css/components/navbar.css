@@ -1,0 +1,58 @@
+.nav{
+    background-color: #fff;
+    position: fixed;
+    z-index: 100;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 80px;
+}
+
+.nav__logo{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav__icon{
+    width: 32px;
+    height: 32px;
+}
+
+.nav__title{
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--black);
+}
+
+.nav__list{
+    display: flex;
+    list-style: none;
+    align-items: center;
+    gap: 32px;
+}
+
+.nav__link{
+    text-decoration: none;
+    color: var(--black);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.nav__cta{
+    text-decoration: none;
+    color: #fff;
+    background-color: var(--primary);
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    transition: scale 0.3s ease;
+}
+
+.nav__cta:hover{
+    scale: 1.05;
+}

@@ -1,0 +1,84 @@
+.team{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 64px;
+}
+
+.team__title{
+    font-size: 56px;
+    line-height: 64px;
+}
+
+.team__grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 64px;
+}
+
+.team__person{
+    width: 265px;
+    height: 305px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 16px;
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+.team__person:hover{
+    transform: translateY(-10px);
+}
+
+.team__person:nth-child(1){
+    background-image: url('../../assets/img/team/eddie.webp');
+}
+
+.team__person:nth-child(2){
+    background-image: url('../../assets/img/team/leiton.webp');
+}
+
+.team__person:nth-child(3){
+    background-image: url('../../assets/img/team/laura.webp');
+}
+
+.team__person:nth-child(4){
+    background-image: url('../../assets/img/team/betancurt.webp');
+}
+
+.team__person:nth-child(5){
+    background-image: url('../../assets/img/team/lucas.webp');
+}
+
+.team__person:nth-child(6){
+    background-image: url('../../assets/img/team/alex.webp');
+}
+
+.person__info{
+    position: absolute;
+    bottom: -32px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 220px;
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.person__name{
+    font-size: 16px;
+    line-height: 20px;
+    color: var(--black);
+}
+
+.person__role{
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--light-gray);
+}

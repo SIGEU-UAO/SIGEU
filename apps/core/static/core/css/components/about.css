@@ -1,0 +1,25 @@
+.about{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    align-items: center;
+    gap: 24px;
+    padding: 120px 80px;
+}
+
+.about__img img{
+    width: 100%;
+}
+
+.about__title{
+    font-size: 44px;
+    font-weight: 600;
+    line-height: 56px;
+    margin-bottom: 14px;
+    color: var(--black);
+}
+
+.about__paragraph{
+    font-size: 18px;
+    line-height: 28px;
+    color: var(--gray);
+}

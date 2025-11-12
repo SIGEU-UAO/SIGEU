@@ -1,0 +1,23 @@
+{% load static %}
+
+<nav class="nav">
+    <div class="nav__logo">
+        <img src="{% static 'assets/icons/logo.svg' %}" alt="SIGEU Logo" class="nav__icon">
+        <h3 class="nav__title">SIGEU</h3>
+    </div>
+    <ul class="nav__list">
+        <li class="nav__item">
+            <a href="#hero" class="nav__link">Inicio</a>
+        </li>
+        <li class="nav__item">
+            <a href="#about" class="nav__link">Nuestro Sistema</a>
+        </li>
+        <li class="nav__item">
+            <a href="#features" class="nav__link">Funcionalidades</a>
+        </li>
+        <li class="nav__item">
+            <a href="#team" class="nav__link">Equipo de Desarrollo</a>
+        </li>
+    </ul>
+    <a href="{% url 'inicio_sesion' %}" class="nav__cta">Iniciar Sesión</a>
+</nav>
