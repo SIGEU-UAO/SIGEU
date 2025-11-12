@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from sigeu.decorators import organizador_required
     
 class OrganizacionInvitadaAPI:
-    @login_required()
+    @login_required
     @organizador_required
     def asignar_organizaciones_invitadas(request):
         if request.method == "POST":
@@ -83,7 +83,7 @@ class OrganizacionInvitadaAPI:
 
         return JsonResponse({"error": "Método no permitido"}, status=405)
     
-    @login_required()
+    @login_required
     @organizador_required
     def listar_organizaciones_invitadas(request, eventoId):
         if request.method == "GET":
@@ -95,7 +95,7 @@ class OrganizacionInvitadaAPI:
             return JsonResponse({ "organizaciones": OrganizacionesInvitadasService.listarOrganizacionesInvitadas(eventoId) })
         return JsonResponse({"error": "Método no permitido"}, status=405)
     
-    @login_required()
+    @login_required
     @organizador_required
     def actualizar_organizaciones(request, eventoId):
         if request.method == "POST":            

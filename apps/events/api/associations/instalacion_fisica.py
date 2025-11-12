@@ -8,7 +8,7 @@ from sigeu.decorators import organizador_required
 import json
 
 class InstalacionesAsignadasAPI:
-    @login_required()
+    @login_required
     @organizador_required
     def asignar_instalaciones_fisicas(request):
         if request.method == "POST":
@@ -82,7 +82,7 @@ class InstalacionesAsignadasAPI:
 
         return JsonResponse({"error": "Método no permitido"}, status=405)
     
-    @login_required()
+    @login_required
     @organizador_required
     def listar_instalaciones_asignadas(request, eventoId):
         if request.method == "GET":
@@ -94,7 +94,7 @@ class InstalacionesAsignadasAPI:
             return JsonResponse({ "instalaciones": InstalacionesAsignadasService.listarInstalacionesAsignadas(eventoId) })
         return JsonResponse({"error": "Método no permitido"}, status=405)
     
-    @login_required()
+    @login_required
     @organizador_required
     def actualizar_instalaciones_fisicas(request, eventoId):
         if request.method == "PUT":

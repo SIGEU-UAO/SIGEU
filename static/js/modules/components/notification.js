@@ -27,8 +27,8 @@ notificationsReadButtons.forEach(button => {
 async function markAsRead(e) {
     const markAsReadBtn = e.target.nodeName !== "I" ? e.target : e.target.parentElement;
     const notificationCard = markAsReadBtn.parentElement.parentElement;
-    const evaluationId = markAsReadBtn.dataset.id;
-    const response = await API.patch(`/eventos/api/marcar-notificacion-como-leida/${evaluationId}/`);
+    const notificationId = markAsReadBtn.dataset.id;
+    const response = await API.patch(`/eventos/api/marcar-notificacion-como-leida/${notificationId}/`);
     if(response.error) return;
     notificationCard.remove();
     Alert.success("Notificación marcada como leída");

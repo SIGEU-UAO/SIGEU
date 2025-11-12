@@ -6,7 +6,7 @@ from apps.events.services.event import EventoService
 from sigeu.decorators import no_superuser_required, organizador_required
 
 @no_superuser_required
-@login_required()
+@login_required
 @organizador_required
 def listado(request):
     notificaciones = EventoService.obtener_notificaciones(request.user)
@@ -19,7 +19,7 @@ def listado(request):
     })    
 
 @no_superuser_required
-@login_required()
+@login_required
 @organizador_required
 def editar(request, pk):
     org = OrganizacionExternaService.obtener_por_id(pk)

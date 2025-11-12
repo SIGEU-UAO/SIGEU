@@ -10,7 +10,7 @@ from sigeu.decorators import secretaria_required
 import json
 
 class EventoAPI:
-    @login_required()
+    @login_required
     @organizador_required
     def registro(request):
         if request.method == "POST":
@@ -27,7 +27,7 @@ class EventoAPI:
         return JsonResponse({"error": "Método no permitido"}, status=405)
     
 
-    @login_required()
+    @login_required
     @organizador_required
     def mis_eventos(request):
         status = request.GET.get('status')
@@ -47,7 +47,7 @@ class EventoAPI:
         data = EventoSerializer.serialize_page(page_obj)
         return JsonResponse(data, safe=False)
     
-    @login_required()
+    @login_required
     @organizador_required
     def actualizar(request, id):
         if request.method == "PUT":
@@ -77,7 +77,7 @@ class EventoAPI:
                 return JsonResponse({"error": form.errors}, status=400)
         return JsonResponse({"error": "Método no permitido"}, status=405)
     
-    @login_required()
+    @login_required
     @organizador_required
     def enviar_evento_validacion(request, id_evento):
         if request.method == "PATCH":
@@ -111,8 +111,8 @@ class EventoAPI:
             else:
                 return JsonResponse({"error": "No se pudo actualizar el estado del evento."}, status=500)
 
-    @login_required()
-    @secretaria_required()
+    @login_required
+    @secretaria_required
     def listar_eventos_enviados(request):
         if request.method == "GET":
             page = request.GET.get('page', 1)
@@ -155,7 +155,7 @@ class EventoAPI:
             except Exception as e:
                 return JsonResponse({"error": str(e)}, status=500)
 
-    @login_required()
+    @login_required
     @organizador_required
     def eliminar_evento(request, id_evento):
         if request.method != "DELETE":
@@ -187,7 +187,7 @@ class EventoAPI:
             return JsonResponse({"message": "Evento eliminado correctamente."}, status=200)
 
     # --- Evaluaciones ---
-    @login_required()
+    @login_required
     @secretaria_required
     def aprobar_evento(request, id_evento):
         if request.method != "POST":
@@ -231,7 +231,7 @@ class EventoAPI:
             return JsonResponse({"error": str(e)}, status=400)
         
     
-    @login_required()
+    @login_required
     @secretaria_required
     def rechazar_evento(request, id_evento):
         if request.method != "POST":
@@ -271,22 +271,25 @@ class EventoAPI:
         except ValueError as e:
             return JsonResponse({"error": str(e)}, status=400)
 
-    @login_required()
-    @organizador_required
-    def marcar_como_leida(request, id_evaluacion):
+    @login_required
+    def marcar_como_leida(request, id_registro):
         if request.method != "PATCH":
             return JsonResponse({"error": "Método no permitido"}, status=405)
 
-        evaluacion = EventoService.obtener_evaluacion_por_id(id_evaluacion)
-        if not evaluacion:
-            return JsonResponse({"error": "Evaluación no encontrada."}, status=404)
+        if request.user.rol == "Estudiante" or request.user.rol == "Docente":
+            registro = EventoService.obtener_evaluacion_por_id(id_registro)
+        else:
+            registro = EventoService.obtener_por_id(id_registro)
+
+        if not registro:
+            return JsonResponse({"error": "Registro no encontrado."}, status=404)
         
         try:
-            evaluacion = EventoService.marcar_como_leida(id_evaluacion)
-            if not evaluacion:
-                raise ValueError("Error al marcar la evaluación como leida.")
+            marcado_como_leida = EventoService.marcar_como_leida(registro)
+            if not marcado_como_leida:
+                raise ValueError("Error al marcar la notificación como leida.")
 
-            return JsonResponse({"message": "Evaluación marcada como leida."}, status=200)
+            return JsonResponse({"message": "Notificación marcada como leida."}, status=200)
 
         except ValueError as e:
             return JsonResponse({"error": str(e)}, status=400)

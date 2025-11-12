@@ -1,9 +1,7 @@
 <nav class="nav">
     <div class="nav__content">
         <div class="nav__user">
-            {% if request.user.rol == "Estudiante" or request.user.rol == "Docente" %}
-                <i class="ri-notification-fill nav__notification {% if notificaciones %}new{% endif %}"></i>
-            {% endif %}
+            <i class="ri-notification-fill nav__notification {% if notificaciones %}new{% endif %}"></i>
             <div class="nav__info">
                 <h5>{{ request.user.nombres }} {{ request.user.apellidos }}</h5>
                 <p>{{ request.user.rol }}</p>
@@ -14,8 +12,5 @@
         </button>
     </div>
 
-    <!-- Mostrar notificaciones solo si el rol es Estudiante o Docente -->
-    {% if request.user.rol == "Estudiante" or request.user.rol == "Docente" %}
-        {% include 'components/dashboard/notification.html' %}
-    {% endif %}
+    {% include 'components/dashboard/notification.html' %}
 </nav>

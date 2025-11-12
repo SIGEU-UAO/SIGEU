@@ -58,6 +58,10 @@
     color: var(--red);
 }
 
+.notifications__card--sent .notifcation__card__left i{
+    color: var(--blue);
+}
+
 .notifcation__card__middle{
     display: flex;
     flex-direction: column;

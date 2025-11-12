@@ -80,7 +80,7 @@ class UsersAPI():
             return JsonResponse({"error": "No se encontró ningun usuario."}, status=401)
         return JsonResponse({"error": "Método no permitido"}, status=405)
     
-    @login_required()
+    @login_required
     def logout(request):
         if request.method == "POST":
             logout(request)
@@ -88,7 +88,7 @@ class UsersAPI():
         return JsonResponse({"error": "Método no permitido"}, status=405)
     
     
-    @login_required()
+    @login_required
     def editar_perfil(request):
         # Profile update via API (PUT JSON)
         if request.method == "PUT":
@@ -147,7 +147,7 @@ class UsersAPI():
 
 
     # * Método para listar organizadores
-    @login_required()
+    @login_required
     def listar_organizadores(request):
         # Check for query parameters
         if request.method == "GET":
@@ -177,7 +177,7 @@ class UsersAPI():
 
         return JsonResponse({"error": "Método no permitido"}, status=405)
 
-    @login_required()
+    @login_required
     def obtener_organizador_por_id(request, id):
         if request.method == "GET":
             user = UserService.obtener_organizador_por_id(id)

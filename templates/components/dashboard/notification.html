@@ -4,23 +4,44 @@
     <h3 class="notifications__title">Notificaciones</h3>
 
     <div class="notifications__content">
-        {% for notificacion in notificaciones %}
-            <div class="notifications__card {% if notificacion.tipoEvaluacion == "aprobacion" %}notifications__card--approve{% else %}notifications__card--reject{% endif %}">
-                <div class="notifcation__card__left">
-                    <i class="{% if notificacion.tipoEvaluacion == "aprobacion" %}ri-checkbox-circle-fill{% else %}ri-close-circle-fill{% endif %}"></i>
+        {% if request.user.rol == "Estudiante" or request.user.rol == "Docente" %}
+            {% for notificacion in notificaciones %}
+                <div class="notifications__card {% if notificacion.tipoEvaluacion == "aprobacion" %}notifications__card--approve{% else %}notifications__card--reject{% endif %}">
+                    <div class="notifcation__card__left">
+                        <i class="{% if notificacion.tipoEvaluacion == "aprobacion" %}ri-checkbox-circle-fill{% else %}ri-close-circle-fill{% endif %}"></i>
+                    </div>
+                    <div class="notifcation__card__middle">
+                        <h4 class="notification__card__title">{% if notificacion.tipoEvaluacion == "aprobacion" %}¡Evento aprobado!{% else %}¡Evento rechazado!{% endif %}</h4>
+                        <p class="notification__card__description">Tu evento <strong>"{{ notificacion.evento__nombre }}"</strong> ha sido {% if notificacion.tipoEvaluacion == "aprobacion" %}aprobado y publicado correctamente{% else %}rechazado. Puedes ver el motivo en la sección de eventos{% endif %} </p>
+                        <a href="{% url 'mis_eventos' %}?search={{ notificacion.evento__nombre }}&search_by=nombre&page=1" target="_blank" class="notification__card__button">Ver evento</a>
+                    </div>
+                    <div class="notifcation__card__right">
+                        <span class="notification__card__date">{{ notificacion.fechaEvaluacion|date:"d M Y" }}</span>
+                        <span class="notification__card__date">{{ notificacion.fechaEvaluacion|date:"H:i" }}</span>
+                        <button type="button" class="notification__card__read" aria-label="Marcar como leído" title="Marcar como leído" data-id="{{ notificacion.idEvaluacion }}"><i class="ri-check-double-line"></i></button>
+                    </div>
                 </div>
-                <div class="notifcation__card__middle">
-                    <h4 class="notification__card__title">{% if notificacion.tipoEvaluacion == "aprobacion" %}¡Evento aprobado!{% else %}¡Evento rechazado!{% endif %}</h4>
-                    <p class="notification__card__description">Tu evento <strong>"{{ notificacion.evento__nombre }}"</strong> ha sido {% if notificacion.tipoEvaluacion == "aprobacion" %}aprobado y publicado correctamente{% else %}rechazado. Puedes ver el motivo en la sección de eventos{% endif %} </p>
-                    <a href="{% url 'mis_eventos' %}?search={{ notificacion.evento__nombre }}&search_by=nombre&page=1" target="_blank" class="notification__card__button">Ver evento</a>
+            {% endfor %}
+        {% endif %}
+
+        {% if request.user.rol == "Secretaria" %}
+            {% for notificacion in notificaciones %}
+                <div class="notifications__card notifications__card--sent">
+                    <div class="notifcation__card__left">
+                        <i class="ri-send-plane-fill"></i>
+                    </div>
+                    <div class="notifcation__card__middle">
+                        <h4 class="notification__card__title">¡Evento Enviado!</h4>
+                        <p class="notification__card__description">El evento <strong>{{ notificacion.nombre }}</strong> ha sido enviado a validación. Revisa la sección de revisiones para más información.</p>
+                    </div>
+                    <div class="notifcation__card__right">
+                        <span class="notification__card__date">{{ notificacion.fechaEnvio|date:"d M Y" }}</span>
+                        <span class="notification__card__date">{{ notificacion.fechaEnvio|date:"H:i" }}</span>
+                        <button type="button" class="notification__card__read" aria-label="Marcar como leído" title="Marcar como leído" data-id="{{ notificacion.idEvento }}"><i class="ri-check-double-line"></i></button>
+                    </div>
                 </div>
-                <div class="notifcation__card__right">
-                    <span class="notification__card__date">{{ notificacion.fechaEvaluacion|date:"d M Y" }}</span>
-                    <span class="notification__card__date">{{ notificacion.fechaEvaluacion|date:"H:i" }}</span>
-                    <button type="button" class="notification__card__read" aria-label="Marcar como leído" title="Marcar como leído" data-id="{{ notificacion.idEvaluacion }}"><i class="ri-check-double-line"></i></button>
-                </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        {% endif %}
 
         <!--Mostrar mensaje si no hay notificaciones-->
         <div class="notifications__empty {% if notificaciones.count == 0 %}show{% endif %}">

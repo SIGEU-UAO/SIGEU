@@ -285,21 +285,34 @@ class EventoService:
 
     @staticmethod
     def obtener_notificaciones(user):
-        notificaciones = (
-            EvaluacionEvento.objects
-            .select_related('evento')
-            .filter(evento__creador=user, notificacionLeida=False)
-            .values("idEvaluacion", "evento__nombre", "tipoEvaluacion", "fechaEvaluacion")
+        if user.rol == "Estudiante" or user.rol == "Docente":
+            notificaciones = (
+                EvaluacionEvento.objects
+                .filter(evento__creador=user, notificacionLeida=False)
+                .values("idEvaluacion", "evento__nombre", "tipoEvaluacion", "fechaEvaluacion")
             .order_by('-fechaEvaluacion')[:10]
         )
+        elif user.rol == "Secretaria":
+            facultad = user.secretaria.facultad
+            notificaciones = (
+                Evento.objects
+                .filter(
+                    Q(creador__estudiante__programa__facultad=facultad) |
+                    Q(creador__docente__unidadAcademica__facultad=facultad),
+                    estado="Enviado",
+                    notificacionLeida=False
+                )
+                .values("idEvento", "nombre", "fechaEnvio")
+                .order_by('-fechaEnvio')[:10]
+            )
+
         return notificaciones
 
     @staticmethod
-    def marcar_como_leida(id_evaluacion):
+    def marcar_como_leida(registro):
         try:
-            evaluacion = EvaluacionEvento.objects.get(idEvaluacion=id_evaluacion)
-            evaluacion.notificacionLeida = True
-            evaluacion.save()
-            return evaluacion
-        except EvaluacionEvento.DoesNotExist:
-            return None
+            registro.notificacionLeida = True
+            registro.save()
+            return True
+        except Exception:
+            return False

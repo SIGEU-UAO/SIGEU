@@ -11,7 +11,7 @@ from .services.event import EventoService
 from .forms.event import EvaluacionEventoForm
 
 @no_superuser_required
-@login_required()
+@login_required
 @organizador_required
 def formulario_registro(request):
     current_user = request.user
@@ -48,7 +48,7 @@ def formulario_registro(request):
     })
 
 @no_superuser_required
-@login_required()
+@login_required
 @organizador_required
 def mis_eventos(request):
     status = request.GET.get('status', None)   # e.g. "Aprobado"
@@ -114,7 +114,7 @@ def mis_eventos(request):
     return render(request, "events/mis_eventos.html", context)
 
 @no_superuser_required
-@login_required()
+@login_required
 @secretaria_required
 def eventos_enviados(request):
     status = request.GET.get('status', None)   # e.g. "Aprobado"
@@ -157,10 +157,13 @@ def eventos_enviados(request):
     left_has_more = start > 2   # hay hueco entre 1 y start
     right_has_more = end < total - 1
 
+    notificaciones = EventoService.obtener_notificaciones(request.user)
+
     context = {
         "header_title": "Eventos Pendientes de Validación",
         "header_paragraph": "Gestiona la revisión de los eventos enviados a validación en tu facultad.",
         "active_page": "eventos-enviados",
+        "notificaciones": notificaciones,
         "page_obj": page_obj,
         "status": status or "",
         # datos para paginación
@@ -178,7 +181,7 @@ def eventos_enviados(request):
     return render(request, "events/eventos_enviados.html", context)
 
 @no_superuser_required
-@login_required()
+@login_required
 @organizador_required
 def formulario_edicion(request, pk):
     # Get event by pk

@@ -27,7 +27,7 @@ def inicio_sesion(request):
     return render(request, "users/inicio_sesion.html", {"form": form, "password_icons": ["ri-eye-fill"]})
 
 @no_superuser_required
-@login_required()
+@login_required
 def dashboard(request):
     notificaciones = EventoService.obtener_notificaciones(request.user)
 
@@ -39,7 +39,7 @@ def dashboard(request):
     })
 
 @no_superuser_required
-@login_required()
+@login_required
 def editar_perfil(request):
     initial_data = {
         "numeroIdentificacion": request.user.numeroIdentificacion,

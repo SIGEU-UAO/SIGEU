@@ -11,7 +11,7 @@ def get_csrf_token(request):
     return response
 
 @no_superuser_required
-@login_required()
+@login_required
 def not_found(request):
     notificaciones = EventoService.obtener_notificaciones(request.user)
 
@@ -25,7 +25,7 @@ def not_found(request):
     })
 
 @no_superuser_required
-@login_required()
+@login_required
 def forbidden(request):
     notificaciones = EventoService.obtener_notificaciones(request.user)
     
