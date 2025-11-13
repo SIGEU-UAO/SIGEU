@@ -128,6 +128,8 @@ class EventoService:
         try:
             evento = Evento.objects.get(idEvento=id_evento)
             evento.estado = nuevo_estado
+            if nuevo_estado == "Enviado":
+                evento.notificacionEnvioLeida = False
             evento.save()
             return True
         except Evento.DoesNotExist:
@@ -300,7 +302,7 @@ class EventoService:
                     Q(creador__estudiante__programa__facultad=facultad) |
                     Q(creador__docente__unidadAcademica__facultad=facultad),
                     estado="Enviado",
-                    notificacionLeida=False
+                    notificacionEnvioLeida=False
                 )
                 .values("idEvento", "nombre", "fechaEnvio")
                 .order_by('-fechaEnvio')[:10]
@@ -311,7 +313,10 @@ class EventoService:
     @staticmethod
     def marcar_como_leida(registro):
         try:
-            registro.notificacionLeida = True
+            if isinstance(registro, EvaluacionEvento):
+                registro.notificacionLeida = True
+            elif isinstance(registro, Evento):
+                registro.notificacionEnvioLeida = True
             registro.save()
             return True
         except Exception:
