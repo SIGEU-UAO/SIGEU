@@ -103,7 +103,7 @@ class EventoAPI:
                 return JsonResponse({"error": "El evento debe tener al menos un organizador asignado."}, status=400)
             if not evento.organizadores_asignados.filter(organizador=evento.creador).exists():
                 return JsonResponse({"error": "El creador del evento debe pertenecer a los organizadores del evento."}, status=400)
-            if evento.fecha < date.today():
+            if evento.fechaInicio < date.today():
                 return JsonResponse({"error": "El evento debe tener una fecha posterior a la actual para poder ser enviado a validación."}, status=400)
             actualizado = EventoService.actualizar_estado(id_evento, "Enviado")
             fecha = EventoService.actualizar_fecha_envio(id_evento)

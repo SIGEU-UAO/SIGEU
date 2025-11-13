@@ -102,7 +102,7 @@ class EventoService:
     def actualizar(event, data):
         #Validate integrity errors for unique fields
         try:
-            campos = ["nombre", "tipo", "descripcion", "capacidad", "fecha", "horaInicio", "horaFin"]
+            campos = ["nombre", "tipo", "descripcion", "capacidad", "fechaInicio", "fechaFin", "horaInicio", "horaFin"]
             cambios = {}
 
             for campo in campos:
@@ -113,7 +113,7 @@ class EventoService:
                     cambios[campo] = valor_nuevo
                     
                 # Normalize types
-                if campo == "fecha" and isinstance(valor_nuevo, str):
+                if campo in ["fechaInicio", "fechaFin"] and isinstance(valor_nuevo, str):
                     valor_nuevo = datetime.strptime(valor_nuevo, "%Y-%m-%d").date()
 
                 if campo in ["horaInicio", "horaFin"] and isinstance(valor_nuevo, str):
