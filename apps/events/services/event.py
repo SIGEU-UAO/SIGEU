@@ -8,7 +8,6 @@ from datetime import datetime
 from django.utils import timezone
 from ..models import EvaluacionEvento, Evento, OrganizadorEvento, OrganizacionInvitada
 from django.db.models import Q
-from datetime import timedelta
 
 class EventoService:
     @staticmethod
@@ -49,14 +48,15 @@ class EventoService:
             if search_by == "nombre":
                 qs = qs.filter(nombre__icontains=search)
             elif search_by == "fecha":
-                # Parse start date
+                # Parse start date if provided
                 start_date = None
-                for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y"):
-                    try:
-                        start_date = datetime.strptime(search, fmt).date()
-                        break
-                    except Exception:
-                        continue
+                if search:
+                    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y"):
+                        try:
+                            start_date = datetime.strptime(search, fmt).date()
+                            break
+                        except Exception:
+                            continue
                 
                 # Parse end date if provided
                 end_date = None
@@ -68,22 +68,16 @@ class EventoService:
                         except Exception:
                             continue
                 
-                if start_date:
-                    if end_date:
-                        # Filter events that overlap with the date range
-                        qs = qs.filter(
-                            Q(fechaInicio__range=(start_date, end_date)) |
-                            Q(fechaFin__range=(start_date, end_date)) |
-                            Q(fechaInicio__lte=start_date, fechaFin__gte=end_date)
-                        )
-                    else:
-                        # If only start date is provided, filter events on that specific date
-                        next_day = start_date + timedelta(days=1)
-                        qs = qs.filter(
-                            Q(fechaInicio__lt=next_day, fechaFin__gte=start_date) |
-                            Q(fechaInicio=start_date) |
-                            Q(fechaFin=start_date)
-                        )
+                if start_date and end_date:
+                    # Filter events that are completely within the date range
+                    qs = qs.filter(
+                        fechaInicio__gte=start_date,
+                        fechaFin__lte=end_date
+                    )
+                elif start_date:
+                    qs = qs.filter(fechaInicio__gte=start_date)
+                elif end_date:
+                    qs = qs.filter(fechaFin__lte=end_date)
                 else:
                     qs = qs.none()
 

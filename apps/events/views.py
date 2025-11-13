@@ -55,9 +55,10 @@ def mis_eventos(request):
     page = request.GET.get('page', 1)
     search = request.GET.get('search', None)
     search_by = request.GET.get('search_by', None)
+    search_end = request.GET.get('search_end', '')
     hay_filtros = bool(search and search_by)
 
-    page_obj = EventoService.listar_por_organizador(request.user, status=status, page=page, per_page=12, search=search, search_by=search_by) 
+    page_obj = EventoService.listar_por_organizador(request.user, status=status, page=page, per_page=12, search=search, search_by=search_by, search_end=search_end) 
 
     # --- paging window calculation ---
     paginator = page_obj.paginator

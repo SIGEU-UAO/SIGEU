@@ -81,13 +81,14 @@ export function searchByForm(e) {
     e.preventDefault();
     const url = new URL(window.location.href);
     const searchValue = searchInput?.value.trim();
+    const searchEndDateValue = searchInputEndDate?.value.trim();
     const searchByValue = searchBy?.value || 'nombre';
 
-    if (searchValue) {
+    if (searchValue || searchEndDateValue) {
         // Handle date range validation
         if (searchByValue === 'fecha') {
             const startDate = new Date(searchValue);
-            const endDate = searchInputEndDate?.value ? new Date(searchInputEndDate.value) : null;
+            const endDate = new Date(searchEndDateValue);
             
             if (endDate && endDate < startDate) {
                 Alert.error('La fecha de fin debe ser mayor o igual a la fecha de inicio');
@@ -97,7 +98,7 @@ export function searchByForm(e) {
             // Set both start and end date parameters
             url.searchParams.set('search', searchValue);
             if (endDate) {
-                url.searchParams.set('search_end', searchInputEndDate.value);
+                url.searchParams.set('search_end', searchEndDateValue);
             } else {
                 url.searchParams.delete('search_end');
             }

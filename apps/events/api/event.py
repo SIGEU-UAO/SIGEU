@@ -34,6 +34,7 @@ class EventoAPI:
         page = request.GET.get('page', 1)
         search = request.GET.get('search')
         search_by = request.GET.get('search_by')
+        search_end = request.GET.get('search_end', '')
 
         try:
             page = int(page)
@@ -41,7 +42,7 @@ class EventoAPI:
             page = 1
 
         page_obj = EventoService.listar_por_organizador(
-            request.user, status=status, page=page, per_page=12, search=search, search_by=search_by
+            request.user, status=status, page=page, per_page=12, search=search, search_by=search_by, search_end=search_end
         )
 
         data = EventoSerializer.serialize_page(page_obj)
