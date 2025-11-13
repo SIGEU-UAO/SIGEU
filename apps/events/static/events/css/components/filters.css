@@ -51,8 +51,23 @@
 
 .filters__search form{
     display: flex;
+    align-items: flex-end;
     flex-wrap: wrap;
     gap: 8px;
+}
+
+.form__label{
+    display: block;
+}
+
+.form__group{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.form__group--hidden, .form__label--hidden{
+    display: none;
 }
 
 .search__input{
@@ -61,6 +76,7 @@
     border-radius: 8px;
     border: 1px solid rgba(102, 102, 102, 0.35);
     font-size: 16px;
+    height: min-content;
 }
 
 .filter__btn--search{
