@@ -11,7 +11,7 @@ import Alert from "/static/js/modules/classes/Alert.js";
 //* Variables
 const validationRules = {
     fechaInicio: [
-        {check:(v,f)=>{if(!v)return!1;const[yy,mm,dd]=v.split('-').map(Number),fi=new Date(yy,mm-1,dd),h=new Date();h.setHours(0,0,0,0);if(fi<h)return!1;const vf=f.get("fechaFin");if(vf){const[y2,m2,d2]=vf.split('-').map(Number),ff=new Date(y2,m2-1,d2);if(fi>ff)return!1;}return!0},msg:"La fecha de inicio debe ser hoy o posterior y no puede ser mayor que la fecha de fin"}
+        {check: (v, f) => !f.get("fechaFin") || new Date(v) <= new Date(f.get("fechaFin")), msg: "La fecha de inicio no puede ser mayor que la fecha de fin"}
     ],
     horaFin: [
         {check:(value,formData)=>{const p=s=>{if(!s) return NaN;const[a='0',b='0',c='0']=s.trim().split(':');return Number(a)*3600+Number(b)*60+Number(c)};return p(value)>p(formData.get("horaInicio"))},msg:"La hora fin debe ser mayor a la hora inicio"}
