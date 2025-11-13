@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.db import IntegrityError
-from django.contrib.auth.models import Group
 from django.contrib.auth.hashers import check_password
 from django.db.models import Q, Value, Case, When, CharField
 from django.db.models.functions import Concat
@@ -91,18 +90,13 @@ class UserService:
         try:
             if rol == "estudiante":
                 programa = Programa.objects.get(pk=data["programa_id"])
-                estudiantes = Group.objects.get(name="Estudiantes")      
                 Estudiante.objects.create(usuario=usuario, codigo_estudiante=data["codigo_estudiante"], programa=programa)
-                usuario.groups.add(estudiantes)
 
             elif rol == "docente":
-                docentes = Group.objects.get(name="Docentes") 
                 unidad = UnidadAcademica.objects.get(pk=data["unidad_academica_id"])
                 Docente.objects.create(usuario=usuario, unidadAcademica=unidad)
-                usuario.groups.add(docentes) 
 
             elif rol == "secretaria":
-                secretarias = Group.objects.get(name="Secretarias") 
                 facultad = Facultad.objects.get(pk=data["facultad_id"])
                 # Ensure only one secretaria per facultad
                 if Secretaria.objects.filter(facultad=facultad).exists():
@@ -110,7 +104,6 @@ class UserService:
                         usuario.delete()
                     raise ValueError("Ya existe una secretaria registrada para esta facultad.")
                 Secretaria.objects.create(usuario=usuario, facultad=facultad)
-                usuario.groups.add(secretarias)
                 
             send_email(
                     subject="Bienvenido/a a SIGEU 🎓",
