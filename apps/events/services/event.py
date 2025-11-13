@@ -43,8 +43,8 @@ class EventoService:
         qs = Evento.objects.filter(creador=usuario).order_by('-fecha_ultimo_cambio')
         if status:
             qs = qs.filter(estado__iexact=status)
-
-        if search and search_by:
+        
+        if (search and search_by) or (search_end and search_by):
             if search_by == "nombre":
                 qs = qs.filter(nombre__icontains=search)
             elif search_by == "fecha":

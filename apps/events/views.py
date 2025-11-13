@@ -109,6 +109,7 @@ def mis_eventos(request):
         # search data
         "search": search or "",
         "search_by": search_by or "",
+        "search_end": search_end or "",
         "hay_filtros": hay_filtros,
     }
 
