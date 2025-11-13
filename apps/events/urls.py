@@ -11,6 +11,7 @@ urlpatterns = [
     path("eventos/mis-eventos/", views.mis_eventos, name="mis_eventos"),   
     path("eventos/editar/<int:pk>/", views.formulario_edicion, name="editar_evento"),
     path("eventos/enviados/", views.eventos_enviados, name="eventos_enviados"),
+    path("eventos/publicados/", views.eventos_publicados, name="eventos_publicados"),
 
     # --- API ---
     path("eventos/api/registro/", EventoAPI.registro, name="registro_evento_api"),
