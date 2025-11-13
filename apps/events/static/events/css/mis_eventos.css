@@ -1,5 +1,5 @@
 @import url("./components/filters.css");
-@import url("./components/card.css");
+@import url("./components/cards/card.css");
 @import url("./components/pagination.css");
 
 .no-results-container{
