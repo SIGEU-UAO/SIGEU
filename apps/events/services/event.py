@@ -6,9 +6,9 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils import timezone
 from datetime import datetime
 from django.utils import timezone
-from apps.users.models import Usuario
 from ..models import EvaluacionEvento, Evento, OrganizadorEvento, OrganizacionInvitada
 from django.db.models import Q
+from datetime import timedelta
 
 class EventoService:
     @staticmethod
@@ -19,7 +19,8 @@ class EventoService:
                 descripcion=data["descripcion"],
                 tipo=data["tipo"],
                 capacidad=data["capacidad"],
-                fecha=data["fecha"],
+                fechaInicio=data["fechaInicio"],
+                fechaFin=data["fechaFin"],
                 horaInicio=data["horaInicio"],
                 horaFin=data["horaFin"],
                 creador=request.user
@@ -39,7 +40,7 @@ class EventoService:
             return False
     
     @staticmethod
-    def listar_por_organizador(usuario, status=None, page=1, per_page=12, search=None, search_by=None):
+    def listar_por_organizador(usuario, status=None, page=1, per_page=12, search=None, search_by=None, search_end=None):
         qs = Evento.objects.filter(creador=usuario).order_by('-fecha_ultimo_cambio')
         if status:
             qs = qs.filter(estado__iexact=status)
@@ -48,15 +49,41 @@ class EventoService:
             if search_by == "nombre":
                 qs = qs.filter(nombre__icontains=search)
             elif search_by == "fecha":
-                parsed_date = None
+                # Parse start date
+                start_date = None
                 for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y"):
                     try:
-                        parsed_date = datetime.strptime(search, fmt).date()
+                        start_date = datetime.strptime(search, fmt).date()
                         break
                     except Exception:
                         continue
-                if parsed_date:
-                    qs = qs.filter(fecha=parsed_date)
+                
+                # Parse end date if provided
+                end_date = None
+                if search_end:
+                    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y"):
+                        try:
+                            end_date = datetime.strptime(search_end, fmt).date()
+                            break
+                        except Exception:
+                            continue
+                
+                if start_date:
+                    if end_date:
+                        # Filter events that overlap with the date range
+                        qs = qs.filter(
+                            Q(fechaInicio__range=(start_date, end_date)) |
+                            Q(fechaFin__range=(start_date, end_date)) |
+                            Q(fechaInicio__lte=start_date, fechaFin__gte=end_date)
+                        )
+                    else:
+                        # If only start date is provided, filter events on that specific date
+                        next_day = start_date + timedelta(days=1)
+                        qs = qs.filter(
+                            Q(fechaInicio__lt=next_day, fechaFin__gte=start_date) |
+                            Q(fechaInicio=start_date) |
+                            Q(fechaFin=start_date)
+                        )
                 else:
                     qs = qs.none()
 

@@ -10,7 +10,14 @@
 
   <div class="filters__search">
     <form id="events-search-form" role="search">
-      <input id="events-search-input" type="text" class="search__input" placeholder="Buscar..." aria-label="Buscar">
+      <div class="form__group">
+        <label for="events-search-input" class="form__label form__label--hidden">Desde</label>
+        <input id="events-search-input" type="text" class="search__input" placeholder="Buscar..." aria-label="Buscar">
+      </div>
+      <div class="form__group form__group--hidden">
+        <label for="events-search-input-endate" class="form__label">Hasta</label>
+        <input id="events-search-input-endate" type="date" class="search__input">
+      </div>
       <select id="events-search-by" name="search_by" class="search__input">
         <option value="nombre" selected>Buscar por Nombre</option>
         <option value="fecha">Buscar por Fecha</option>

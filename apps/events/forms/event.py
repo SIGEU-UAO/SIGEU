@@ -7,7 +7,8 @@ class RegistroEventoForm(forms.Form):
     tipo = forms.ChoiceField(label="Tipo", choices=Evento.TIPOS, required=True)
     descripcion = forms.CharField(label="Descripcion", required=True, max_length=200, widget=forms.Textarea())
     capacidad = forms.IntegerField(label="Capacidad", required=True, widget=forms.NumberInput(attrs={"class": "numeric-field", "min": '1'}))
-    fecha = forms.DateField(label="Fecha", required=True, widget=forms.DateInput(attrs={'type': 'date'}))
+    fechaInicio = forms.DateField(label="Fecha Inicio", required=True, widget=forms.DateInput(attrs={'type': 'date', 'min': date.today().isoformat()}))
+    fechaFin = forms.DateField(label="Fecha Fin", required=True, widget=forms.DateInput(attrs={'type': 'date', 'min': date.today().isoformat()}))
     horaInicio = forms.TimeField(label="Hora inicio", required=True, widget=forms.TimeInput(attrs={'type': 'time'}))
     horaFin = forms.TimeField(label="Hora fin", required=True, widget=forms.TimeInput(attrs={'type': 'time'}))
 
@@ -19,14 +20,19 @@ class RegistroEventoForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
-        fecha = cleaned_data.get("fecha")
+        fechaInicio = cleaned_data.get("fechaInicio")
+        fechaFin = cleaned_data.get("fechaFin")
         hora_inicio = cleaned_data.get("horaInicio")
         hora_fin = cleaned_data.get("horaFin")
         capacidad = cleaned_data.get("capacidad")
 
         # Validate that the date is not earlier than today
-        if fecha and fecha < date.today():
-            self.add_error("fecha", "La fecha del evento debe ser igual o posterior a la fecha actual.")
+        if fechaInicio and fechaInicio < date.today():
+            self.add_error("fechaInicio", "La fecha del evento debe ser igual o posterior a la fecha actual.")
+
+        # Validate that the end date is greater than the start date.
+        if fechaFin and fechaFin < fechaInicio:
+            self.add_error("fechaFin", "La fecha de fin debe ser igual o posterior a la fecha de inicio.")
 
         # Validate that the end time is greater than the start time.
         if hora_inicio and hora_fin and hora_fin <= hora_inicio:
