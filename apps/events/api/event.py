@@ -1,16 +1,16 @@
 from datetime import date
 from django.http import JsonResponse
+from django.db import transaction
 from ..forms.event import RegistroEventoForm
 from ..services.event import EventoService
 from ..serializers.eventoSerializer import EventoSerializer
-from ..models import Evento
 from django.contrib.auth.decorators import login_required
 from sigeu.decorators import organizador_required
 from sigeu.decorators import secretaria_required
 import json
 
 class EventoAPI:
-    @login_required()
+    @login_required
     @organizador_required
     def registro(request):
         if request.method == "POST":
@@ -27,7 +27,7 @@ class EventoAPI:
         return JsonResponse({"error": "Método no permitido"}, status=405)
     
 
-    @login_required()
+    @login_required
     @organizador_required
     def mis_eventos(request):
         status = request.GET.get('status')
@@ -47,7 +47,7 @@ class EventoAPI:
         data = EventoSerializer.serialize_page(page_obj)
         return JsonResponse(data, safe=False)
     
-    @login_required()
+    @login_required
     @organizador_required
     def actualizar(request, id):
         if request.method == "PUT":
@@ -69,6 +69,7 @@ class EventoAPI:
                     if result is None:
                         return JsonResponse({"message": "Tu información está al día."}, status=200)
                     
+                    EventoService.reestablecer_a_borrador(evento)
                     return JsonResponse({"message": "Información básica del evento actualizada correctamente."}, status=200)
                 except ValueError as e:
                     return JsonResponse({"error": str(e)}, status=400)
@@ -76,7 +77,7 @@ class EventoAPI:
                 return JsonResponse({"error": form.errors}, status=400)
         return JsonResponse({"error": "Método no permitido"}, status=405)
     
-    @login_required()
+    @login_required
     @organizador_required
     def enviar_evento_validacion(request, id_evento):
         if request.method == "PATCH":
@@ -89,6 +90,14 @@ class EventoAPI:
                 return JsonResponse({"error": "No tienes permiso para enviar este evento a validación."}, status=403)
             if not evento.instalaciones_asignadas.exists():
                 return JsonResponse({"error": "El evento debe tener al menos una instalación asignada antes de enviarlo a validación."}, status=400)
+            
+            # Validate the total capacity of the facilities
+            total_capacity = 0
+            for instalacionAsignada in evento.instalaciones_asignadas.all():
+                total_capacity += instalacionAsignada.instalacion.capacidad
+            if total_capacity < evento.capacidad:
+                return JsonResponse({"error": "La suma de las capacidades de las instalaciones no abarca la capacidad del evento"}, status=400)
+
             if not evento.organizadores_asignados.exists():
                 return JsonResponse({"error": "El evento debe tener al menos un organizador asignado."}, status=400)
             if not evento.organizadores_asignados.filter(organizador=evento.creador).exists():
@@ -101,9 +110,9 @@ class EventoAPI:
                 return JsonResponse({"message": "El evento ha sido enviado a validación correctamente."}, status=200)
             else:
                 return JsonResponse({"error": "No se pudo actualizar el estado del evento."}, status=500)
-            
-    login_required()
-    secretaria_required()
+
+    @login_required
+    @secretaria_required
     def listar_eventos_enviados(request):
         if request.method == "GET":
             page = request.GET.get('page', 1)
@@ -146,7 +155,7 @@ class EventoAPI:
             except Exception as e:
                 return JsonResponse({"error": str(e)}, status=500)
 
-    @login_required()
+    @login_required
     @organizador_required
     def eliminar_evento(request, id_evento):
         if request.method != "DELETE":
@@ -176,3 +185,111 @@ class EventoAPI:
             }, status=200)
         else:
             return JsonResponse({"message": "Evento eliminado correctamente."}, status=200)
+
+    # --- Evaluaciones ---
+    @login_required
+    @secretaria_required
+    def aprobar_evento(request, id_evento):
+        if request.method != "POST":
+            return JsonResponse({"error": "Método no permitido"}, status=405)
+
+        evento = EventoService.obtener_por_id(id_evento)
+        if not evento:
+            return JsonResponse({"error": "Evento no encontrado."}, status=404)
+        if evento.estado != "Enviado":
+            return JsonResponse({"error": "Solo los eventos en estado 'Enviado' pueden ser aprobados."}, status=400)
+
+        try:
+            acta = request.FILES.get("acta")
+            if not acta:
+                return JsonResponse({"error": "Debe adjuntar el acta de aprobación."}, status=400)
+
+            if acta.content_type != "application/pdf":
+                return JsonResponse({"error": "El archivo adjunto debe ser un PDF válido."}, status=400)
+
+            if not acta.name.lower().endswith(".pdf"):
+                return JsonResponse({"error": "El nombre del archivo debe terminar en .pdf."}, status=400)
+
+            with transaction.atomic():
+                evaluacion = EventoService.registrar_evaluacion(evento, {
+                    "evaluador": request.user,
+                    "tipoEvaluacion": "aprobacion",
+                    "acta": acta
+                })
+
+                aprobado = EventoService.actualizar_estado(id_evento, "Aprobado")
+
+                if not aprobado:
+                    raise ValueError("Error al actualizar el estado del evento.")
+
+            return JsonResponse({
+                "message": "El evento ha sido aprobado correctamente. Evaluación registrada.",
+                "evaluacion_id": evaluacion.idEvaluacion
+            }, status=200)
+
+        except ValueError as e:
+            return JsonResponse({"error": str(e)}, status=400)
+        
+    
+    @login_required
+    @secretaria_required
+    def rechazar_evento(request, id_evento):
+        if request.method != "POST":
+            return JsonResponse({"error": "Método no permitido"}, status=405)
+
+        evento = EventoService.obtener_por_id(id_evento)
+        if not evento:
+            return JsonResponse({"error": "Evento no encontrado."}, status=404)
+        if evento.estado != "Enviado":
+            return JsonResponse({"error": "Solo los eventos en estado 'Enviado' pueden ser rechazados."}, status=400)
+        
+        if not request.POST.get("justificacion"):
+            return JsonResponse({"error": "Debe proporcionar una justificación para el rechazo."}, status=400)
+        
+        if request.POST.get("justificacion") and len(request.POST.get("justificacion")) < 10:
+            return JsonResponse({"error": "La justificación debe tener al menos 10 caracteres."}, status=400)
+
+        try:
+
+            with transaction.atomic():
+                evaluacion = EventoService.registrar_evaluacion(evento, {
+                    "evaluador": request.user,
+                    "tipoEvaluacion": "rechazo",
+                    "justificacion": request.POST.get("justificacion")
+                })
+
+                aprobado = EventoService.actualizar_estado(id_evento, "Rechazado")
+
+                if not aprobado:
+                    raise ValueError("Error al actualizar el estado del evento.")
+
+            return JsonResponse({
+                "message": "El evento ha sido rechazado correctamente. Evaluación registrada.",
+                "evaluacion_id": evaluacion.idEvaluacion
+            }, status=200)
+
+        except ValueError as e:
+            return JsonResponse({"error": str(e)}, status=400)
+
+    @login_required
+    def marcar_como_leida(request, id_registro):
+        if request.method != "PATCH":
+            return JsonResponse({"error": "Método no permitido"}, status=405)
+
+        if request.user.rol == "Estudiante" or request.user.rol == "Docente":
+            registro = EventoService.obtener_evaluacion_por_id(id_registro)
+        else:
+            registro = EventoService.obtener_por_id(id_registro)
+
+        if not registro:
+            return JsonResponse({"error": "Registro no encontrado."}, status=404)
+        
+        try:
+            marcado_como_leida = EventoService.marcar_como_leida(registro)
+            if not marcado_como_leida:
+                raise ValueError("Error al marcar la notificación como leida.")
+
+            return JsonResponse({"message": "Notificación marcada como leida."}, status=200)
+
+        except ValueError as e:
+            return JsonResponse({"error": str(e)}, status=400)

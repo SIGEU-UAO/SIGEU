@@ -104,6 +104,11 @@ class UserService:
             elif rol == "secretaria":
                 secretarias = Group.objects.get(name="Secretarias") 
                 facultad = Facultad.objects.get(pk=data["facultad_id"])
+                # Ensure only one secretaria per facultad
+                if Secretaria.objects.filter(facultad=facultad).exists():
+                    if getattr(usuario, 'idUsuario', None):
+                        usuario.delete()
+                    raise ValueError("Ya existe una secretaria registrada para esta facultad.")
                 Secretaria.objects.create(usuario=usuario, facultad=facultad)
                 usuario.groups.add(secretarias)
                 
@@ -122,18 +127,23 @@ class UserService:
                 )
 
         except (Programa.DoesNotExist, UnidadAcademica.DoesNotExist, Facultad.DoesNotExist) as e:
-            usuario.delete()
+            if getattr(usuario, 'idUsuario', None):
+                usuario.delete()
             raise ValueError("ID relacionado inválido para el rol seleccionado.") from e
 
         except IntegrityError as e:
-            usuario.delete()
+            if getattr(usuario, 'idUsuario', None):
+                usuario.delete()
             s = str(e).lower()
             if "codigo_estudiante" in s or "codigo" in s:
                 raise ValueError("El código de estudiante ya existe.") from e
+            if "unique_secretaria_por_facultad" in s or ("facultad" in s and "unique" in s):
+                raise ValueError("Ya existe una secretaria registrada para esta facultad.") from e
             raise ValueError("Datos duplicados para el registro del rol.") from e
 
         except Exception as e:
-            usuario.delete()
+            if getattr(usuario, 'idUsuario', None):
+                usuario.delete()
             raise
 
         return usuario.idUsuario

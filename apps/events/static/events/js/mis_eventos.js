@@ -15,13 +15,15 @@ const deleteBtns = document.querySelectorAll(".card__btn--delete");
 
 //* Event Listeners
 document.querySelectorAll('.filters__buttons .filter__btn').forEach(btn => {
-  const token = btn.getAttribute('data-filter'); // 'aprobados', 'all', etc.
+  const token = btn.getAttribute('data-filter');
   btn.addEventListener('click', () => filterByState(token));
 });
 
 searchForm.addEventListener('submit', searchByForm)
 if (filtersResetBtn) filtersResetBtn.addEventListener("click", resetFilters);
 
+//* Event Listeners
+// === Send Event === 
 sendBtns.forEach(btn => btn.addEventListener('click', async () => {
 
     const id = btn.dataset.id;
@@ -36,24 +38,17 @@ sendBtns.forEach(btn => btn.addEventListener('click', async () => {
         });
 
         if (!result.isConfirmed) return;
-
         const response = await API.patch(url);
-        if (response.error) {
-            Alert.error(response.error);
-            return;
-        }
-
+        if (response.error) return;
         Alert.success("Evento enviado a validación correctamente.");
-
-        setTimeout(() => {
-            window.location.reload();
-        }, 1500);
+        setTimeout(() => window.location.reload(), 1500);
     } catch (error) {
         Alert.error("Error al procesar la solicitud");
         console.error(error);
     }
 }));
 
+// === Delete Event === 
 deleteBtns.forEach(btn => btn.addEventListener('click', async () => {
     const id = btn.dataset.id;
     if (!id) {
@@ -63,7 +58,7 @@ deleteBtns.forEach(btn => btn.addEventListener('click', async () => {
     const url = `/eventos/api/eliminar/${id}/`;
 
     try {
-      await API.delete(
+      const response = await API.delete(
         url,
         "Eliminar evento",
         "Esta acción eliminará el evento y sus archivos asociados. ¿Deseas continuar?",
@@ -71,11 +66,7 @@ deleteBtns.forEach(btn => btn.addEventListener('click', async () => {
         "No se pudo eliminar el evento.",
         null
       );
-
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
-
+      setTimeout(() => window.location.reload(), 1500);
     } catch (err) {
       Alert.error("Error al procesar la solicitud.");
     }

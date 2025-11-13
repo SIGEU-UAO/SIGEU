@@ -34,4 +34,8 @@ urlpatterns = [
     path("eventos/api/listar-enviados/",EventoAPI.listar_eventos_enviados,name="listar_eventos_enviados_api"),
     path("eventos/api/obtener-datos-organizador/<int:id_evento>/<int:id_organizador>/",EventoAPI.obtener_datos_organizador,name="obtener_datos_organizador_api"),
     path("eventos/api/obtener-datos-organizacion-invitada/<int:id_evento>/<int:id_organizacion>/",EventoAPI.obtener_datos_organizacion_invitada,name="obtener_datos_orginvitada_api"),
+    
+    path("eventos/api/aprobar-evento/<int:id_evento>/",EventoAPI.aprobar_evento,name="aprobar_evento_api"),
+    path("eventos/api/rechazar-evento/<int:id_evento>/",EventoAPI.rechazar_evento,name="rechazar_evento_api"),
+    path("eventos/api/marcar-notificacion-como-leida/<int:id_registro>/",EventoAPI.marcar_como_leida,name="marcar_notificacion_como_leida_api"),
 ]

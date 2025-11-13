@@ -84,6 +84,22 @@
             </details>
         {% endif %}
 
+        {% if type == "Aprobado" %}
+            <hr>
+            <details class="card__details card__details--acta">
+                <summary class="card__sub--label">Acta de aprobación:</summary>
+                <a href="{{ event.evaluaciones.last.acta.url }}" target="__blank" class="card__btn" title="Abrir Acta">Ver Acta <i class="ri-file-pdf-2-fill"></i></a>
+            </details>
+        {% endif %}
+
+        {% if type == "Rechazado" %}
+            <hr>
+            <details class="card__details">
+                <summary class="card__sub--label">Motivo del rechazo:</summary>
+                <p class="card__justification">{{ event.evaluaciones.first.justificacion }}</p>
+            </details>
+        {% endif %}
+
         {% if type == "Borrador" or type == "Rechazado" %}
             <hr>
         

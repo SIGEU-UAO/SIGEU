@@ -1,7 +1,7 @@
 <nav class="nav">
     <div class="nav__content">
         <div class="nav__user">
-            <i class="ri-notification-fill"></i>
+            <i class="ri-notification-fill nav__notification {% if notificaciones %}new{% endif %}"></i>
             <div class="nav__info">
                 <h5>{{ request.user.nombres }} {{ request.user.apellidos }}</h5>
                 <p>{{ request.user.rol }}</p>
@@ -11,4 +11,6 @@
             <i class="ri-logout-circle-r-line"></i>
         </button>
     </div>
+
+    {% include 'components/dashboard/notification.html' %}
 </nav>

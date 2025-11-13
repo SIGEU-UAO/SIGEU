@@ -7,7 +7,7 @@ from django.utils import timezone
 from datetime import datetime
 from django.utils import timezone
 from apps.users.models import Usuario
-from ..models import Evento, OrganizadorEvento, OrganizacionInvitada
+from ..models import EvaluacionEvento, Evento, OrganizadorEvento, OrganizacionInvitada
 from django.db.models import Q
 
 class EventoService:
@@ -18,6 +18,7 @@ class EventoService:
                 nombre=data["nombre"],
                 descripcion=data["descripcion"],
                 tipo=data["tipo"],
+                capacidad=data["capacidad"],
                 fecha=data["fecha"],
                 horaInicio=data["horaInicio"],
                 horaFin=data["horaFin"],
@@ -27,6 +28,7 @@ class EventoService:
             raise ValueError("Error al registar el evento.") from e
 
         return evento.idEvento
+    
 
     @staticmethod
     def obtener_por_id(id_evento):
@@ -79,7 +81,7 @@ class EventoService:
     def actualizar(event, data):
         #Validate integrity errors for unique fields
         try:
-            campos = ["nombre", "tipo", "descripcion", "fecha", "horaInicio", "horaFin"]
+            campos = ["nombre", "tipo", "descripcion", "capacidad", "fecha", "horaInicio", "horaFin"]
             cambios = {}
 
             for campo in campos:
@@ -120,50 +122,14 @@ class EventoService:
     def actualizar_fecha_ultimo_cambio(evento):
         evento.fecha_ultimo_cambio = timezone.now()
         evento.save(update_fields=["fecha_ultimo_cambio"])
-        
-    def serializar_eventos(page_obj, request=None):
-        results = []
-        for e in page_obj.object_list:
-            # organizadores asignados (resumido)
-            organizadores = []
-            for o in e.organizadores_asignados.all():
-                u = o.organizador
-                organizadores.append({
-                    "nombre": ((getattr(u, "nombres", "") or "") + " " + (getattr(u, "apellidos", "") or "")).strip(),
-                    "rol_organizador": o.get_tipo_display() if hasattr(o, "get_tipo_display") else o.tipo
-                })
-
-            # organizaciones invitadas (resumido)
-            organizaciones = []
-            for oi in e.organizaciones_invitadas.all():
-                org = oi.organizacion
-                organizaciones.append({"nombre": getattr(org, "nombre", None),"nit": getattr(org, "nit", None)})
-
-            item = {
-                "idEvento": e.idEvento,
-                "nombre": e.nombre,
-                "fecha": e.fecha.isoformat() if e.fecha else None,
-                "horaInicio": e.horaInicio.isoformat() if e.horaInicio else None,
-                "estado": e.estado,
-                "instalaciones": [ getattr(a.instalacion, "nombre", str(a.instalacion)) for a in e.instalaciones_asignadas.all() ],
-                "organizadores": organizadores,
-                "organizaciones_invitadas": organizaciones
-            }
-            
-            results.append(item)
-
-        return {
-            "count": page_obj.paginator.count,
-            "num_pages": page_obj.paginator.num_pages,
-            "current_page": page_obj.number,
-            "results": results,
-        }
     
     @staticmethod
     def actualizar_estado(id_evento, nuevo_estado):
         try:
             evento = Evento.objects.get(idEvento=id_evento)
             evento.estado = nuevo_estado
+            if nuevo_estado == "Enviado":
+                evento.notificacionEnvioLeida = False
             evento.save()
             return True
         except Evento.DoesNotExist:
@@ -178,6 +144,12 @@ class EventoService:
             return True
         except Evento.DoesNotExist:
             return False
+
+    @staticmethod
+    def reestablecer_a_borrador(evento):
+        if evento.estado == "Rechazado":
+            evento.estado = "Borrador"
+            evento.save(update_fields=["estado", "fecha_ultimo_cambio"])
 
     @staticmethod
     def listar_eventos_enviados(facultad, page=1, per_page=12):
@@ -287,3 +259,65 @@ class EventoService:
                 failed_paths.append(path)
 
         return {"deleted": True, "failed_paths": failed_paths}
+    
+    
+    # --------- EVALUATIONS -----------
+    
+    @staticmethod
+    def registrar_evaluacion(evento, evaluacion_data):
+        try:
+            evaluacionEvento = EvaluacionEvento.objects.create(
+                evento=evento,
+                evaluador=evaluacion_data["evaluador"],
+                tipoEvaluacion=evaluacion_data["tipoEvaluacion"],
+                justificacion=evaluacion_data.get("justificacion", ""),
+                acta=evaluacion_data.get("acta", None)
+            )
+            return evaluacionEvento
+        except IntegrityError as e:
+            raise ValueError("Error al registrar la evaluación del evento.") from e
+
+    @staticmethod
+    def obtener_evaluacion_por_id(id_evaluacion):
+        try:
+            evaluacion = EvaluacionEvento.objects.get(idEvaluacion=id_evaluacion)
+            return evaluacion
+        except EvaluacionEvento.DoesNotExist:
+            return None
+
+    @staticmethod
+    def obtener_notificaciones(user):
+        if user.rol == "Estudiante" or user.rol == "Docente":
+            notificaciones = (
+                EvaluacionEvento.objects
+                .filter(evento__creador=user, notificacionLeida=False)
+                .values("idEvaluacion", "evento__nombre", "tipoEvaluacion", "fechaEvaluacion")
+            .order_by('-fechaEvaluacion')[:10]
+        )
+        elif user.rol == "Secretaria":
+            facultad = user.secretaria.facultad
+            notificaciones = (
+                Evento.objects
+                .filter(
+                    Q(creador__estudiante__programa__facultad=facultad) |
+                    Q(creador__docente__unidadAcademica__facultad=facultad),
+                    estado="Enviado",
+                    notificacionEnvioLeida=False
+                )
+                .values("idEvento", "nombre", "fechaEnvio")
+                .order_by('-fechaEnvio')[:10]
+            )
+
+        return notificaciones
+
+    @staticmethod
+    def marcar_como_leida(registro):
+        try:
+            if isinstance(registro, EvaluacionEvento):
+                registro.notificacionLeida = True
+            elif isinstance(registro, Evento):
+                registro.notificacionEnvioLeida = True
+            registro.save()
+            return True
+        except Exception:
+            return False

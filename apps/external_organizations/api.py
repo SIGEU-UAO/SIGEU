@@ -8,7 +8,7 @@ from sigeu.decorators import organizador_required, no_superuser_required
 import json
 
 class OrganizacionesExternasAPI:
-    @login_required()
+    @login_required
     @organizador_required
     def registro(request):
         if request.method == "POST":
@@ -29,7 +29,7 @@ class OrganizacionesExternasAPI:
 
         return JsonResponse({"error": "Método no permitido"}, status=405)
 
-    @login_required()
+    @login_required
     @organizador_required
     def listar(request):
         # Check for query parameters
@@ -61,7 +61,7 @@ class OrganizacionesExternasAPI:
 
         return JsonResponse({"error": "Método no permitido"}, status=405)
     
-    @login_required()
+    @login_required
     @organizador_required
     def datatables_rendering(request):
         if request.method == "GET":
@@ -112,7 +112,7 @@ class OrganizacionesExternasAPI:
 
         return JsonResponse({"error": "Método no permitido"}, status=405)
 
-    @login_required()
+    @login_required
     @no_superuser_required
     def obtener_por_id(request, id):
         if request.method == "GET":
@@ -134,7 +134,7 @@ class OrganizacionesExternasAPI:
 
         return JsonResponse({"error": "Método no permitido"}, status=405)
     
-    @login_required()
+    @login_required
     @organizador_required
     def actualizar(request, id):
         if request.method == "PUT":
@@ -158,7 +158,7 @@ class OrganizacionesExternasAPI:
                 return JsonResponse({"error": form.errors}, status=400)
         return JsonResponse({"error": "Método no permitido"}, status=405)
     
-    @login_required()
+    @login_required
     @organizador_required
     def verificarCreador(request, id):
         es_creador = OrganizacionExternaService.es_creador(request.user, id)
@@ -172,7 +172,7 @@ class OrganizacionesExternasAPI:
         return JsonResponse({"isCreator": True}, status=200)
     
     
-    @login_required()
+    @login_required
     @organizador_required
     def eliminar(request, pk):
         if request.method != "DELETE":
