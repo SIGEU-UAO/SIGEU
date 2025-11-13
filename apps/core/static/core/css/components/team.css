@@ -1,4 +1,5 @@
 .team{
+    padding-top: 120px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -81,4 +82,58 @@
     font-size: 12px;
     line-height: 16px;
     color: var(--light-gray);
+}
+
+/* Responsive */
+@media screen and (max-width: 1000px){
+    .team{
+        gap: 36px;
+        padding: 120px 48px;
+    }
+
+    .team__title{
+        font-size: 36px;
+        text-align: center;
+    }
+
+    .team__person{
+        width: 220px;
+        height: 260px;
+    }
+
+    .person__info{
+        width: 200px;
+    }
+
+    .person__name{
+        font-size: 14px;
+        line-height: 18px;
+    }
+
+    .person__role{
+        font-size: 10px;
+        line-height: 14px;
+    }
+}
+
+@media screen and (max-width: 900px){
+    .team__grid{
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media screen and (max-width: 600px){
+    .team{
+        padding: 120px 24px;
+        gap: 24px;
+    }
+
+    .team__title{
+        font-size: 28px;
+        text-align: center;
+    }
+
+    .team__grid{
+        grid-template-columns: 1fr;
+    }
 }

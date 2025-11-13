@@ -23,3 +23,41 @@
     line-height: 28px;
     color: var(--gray);
 }
+
+/* Responsive */
+@media screen and (max-width: 1000px){
+    .about{
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        gap: 24px;
+        padding: 120px 48px;
+    }
+
+    .about__img img{
+        width: 80%;
+    }
+
+    .about__title{
+        font-size: 32px;
+        line-height: 36px;
+    }
+
+    .about__paragraph{
+        font-size: 16px;
+    }
+}
+
+@media screen and (max-width: 600px){
+    .about{
+        padding: 120px 24px;
+    }
+
+    .about__title{
+        font-size: 28px;
+    }
+
+    .about__paragraph{
+        font-size: 14px;
+    }
+}
