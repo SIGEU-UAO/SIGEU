@@ -4,11 +4,19 @@ from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
 from apps.events.services.event import EventoService
 from sigeu.decorators import no_superuser_required
+from datetime import datetime
 
 def get_csrf_token(request):
     response = JsonResponse({'csrfToken': get_token(request)})
     response.set_cookie('csrftoken', get_token(request))
     return response
+
+def index(request):
+    # TODO: Aquí se deben obtener los eventos publicados y que no se hayan pasado de la fecha actual (paginación)
+    current_year = datetime.now().year
+    return render(request, "core/index.html", {
+        "current_year": current_year,
+    })
 
 @no_superuser_required
 @login_required

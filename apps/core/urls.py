@@ -6,6 +6,9 @@ urlpatterns = [
     # --- CSRFToken ---
     path('get-csrf-token/', get_csrf_token, name='get-csrf-token'),
 
+    # --- Home Page ---
+    path('', index, name='index'),
+
     # --- Error Pages ---
     path('errors/not-found/', not_found, name='not_found'),
     path('errors/forbidden/', forbidden, name='forbidden'),
