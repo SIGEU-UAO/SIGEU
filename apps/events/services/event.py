@@ -1,9 +1,7 @@
 import os
 from django.db import IntegrityError, transaction
 from django.conf import settings
-from django.db import IntegrityError
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.utils import timezone
 from datetime import datetime
 from django.utils import timezone
 from ..models import EvaluacionEvento, Evento, OrganizadorEvento, OrganizacionInvitada
@@ -280,7 +278,19 @@ class EventoService:
                 failed_paths.append(path)
 
         return {"deleted": True, "failed_paths": failed_paths}
-    
+
+    @staticmethod
+    def listar_eventos_publicados(page=1, per_page=12):
+        qs = Evento.objects.filter(estado__iexact="Aprobado", fechaInicio__gte=timezone.now()).order_by('-fechaInicio')
+
+        paginator = Paginator(qs, per_page)
+        try:
+            page_obj = paginator.page(page)
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)
+        return page_obj
     
     # --------- EVALUATIONS -----------
     
