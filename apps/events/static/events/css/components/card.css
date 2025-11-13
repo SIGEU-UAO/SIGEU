@@ -120,6 +120,15 @@
     font-size: 15px;
 }
 
+.card__details[open] .card__sub--label{
+    margin-bottom: 18px;
+}
+
+.card__details[open] .card__btn{
+    text-decoration: none;
+    background-color: var(--red);
+}
+
 .card__justification{
     margin-top: 8px;
     font-size: 14px;
