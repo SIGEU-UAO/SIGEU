@@ -26,7 +26,7 @@
     <div class="card__date">
         <div class="card__day">
             <i class="ri-calendar-event-fill"></i>
-            <span>{{ event.fecha|date:"d/m/Y" }}</span>
+            <span>{{ event.fechaInicio|date:"d/m/Y" }} - {{ event.fechaFin|date:"d/m/Y" }}</span>
         </div>
         <div class="card__time">
             <i class="ri-time-fill"></i>
@@ -81,6 +81,14 @@
                     </li>
                     {% endfor %}
                 </ul>
+            </details>
+        {% endif %}
+
+        {% if type == "Aprobado" %}
+            <hr>
+            <details class="card__details card__details--acta">
+                <summary class="card__sub--label">Acta de aprobación:</summary>
+                <a href="{{ event.evaluaciones.last.acta.url }}" target="__blank" class="card__btn" title="Abrir Acta">Ver Acta <i class="ri-file-pdf-2-fill"></i></a>
             </details>
         {% endif %}
 

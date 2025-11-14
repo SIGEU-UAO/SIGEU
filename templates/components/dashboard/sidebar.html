@@ -61,6 +61,16 @@
                             </li>
                         </a>
                     {% endif %}
+                    <a href="{% url 'eventos_publicados' %}">
+                        <li class="sidebar__item {% if active_page == 'eventos-publicados' %}sidebar__item--active{% endif %}">
+                            <div class="item__group">
+                                <div class="item__info">
+                                    <i class="ri-pages-fill"></i>
+                                    <h4>Publicados</h4>
+                                </div>
+                            </div>
+                        </li>
+                    </a>
                 </ul>
             </details>
         </li>

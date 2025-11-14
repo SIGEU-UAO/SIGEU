@@ -98,6 +98,12 @@
     color: var(--black);
 }
 
+.card__date span{
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 300;
+}
+
 .card__main{
     display: flex;
     flex-direction: column;
@@ -118,6 +124,15 @@
     cursor: pointer;
     color: var(--black);
     font-size: 15px;
+}
+
+.card__details[open] .card__sub--label{
+    margin-bottom: 18px;
+}
+
+.card__details[open] .card__btn{
+    text-decoration: none;
+    background-color: var(--red);
 }
 
 .card__justification{

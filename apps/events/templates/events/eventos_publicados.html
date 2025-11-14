@@ -1,0 +1,34 @@
+{% extends 'layouts/dashboard.html' %}
+{% load static %}
+
+{% block page_title %} SIGEU | Eventos Publicados {% endblock page_title %}
+
+{% block css_files %}
+    <link rel="stylesheet" href="{% static 'events/css/eventos_publicados.css' %}">
+{% endblock css_files %}
+
+{% block js_files %}
+    <script type="module" defer src="{% static 'events/js/eventos_publicados.js' %}" ></script>
+{% endblock js_files %}
+
+{% block content %}
+
+    <div class="no-results-container">
+        <img src="{% static 'events/assets/img/empty-published-events.webp' %}" alt="No hay eventos">
+        <h3>No hay eventos publicados hasta el momento</h3>
+        <p>Parece que todo está tranquilo por ahora… ¡pero grandes eventos están en camino!</p>
+    </div>
+
+    <section class="cards">
+        {% if page_obj.object_list %}
+            {% for event in page_obj.object_list %}
+                {% include 'events/components/cards/card_publicado.html' with event=event color=color %}
+            {% endfor %}
+        {% endif %}
+    </section>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+        {% include 'events/components/pagination.html' %}
+    {% endif %}
+
+{% endblock content %}

@@ -23,7 +23,7 @@
     <section class="cards">
         {% if page_obj.object_list %}
             {% for event in page_obj.object_list %}
-                {% include 'events/components/card.html' with event=event type=event.estado %}
+                {% include 'events/components/cards/card.html' with event=event type=event.estado %}
             {% endfor %}
         {% endif %}
     </section>

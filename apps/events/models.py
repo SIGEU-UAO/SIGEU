@@ -4,6 +4,7 @@ from apps.users.models import Usuario
 from apps.external_organizations.models import OrganizacionExterna
 from .utils import *
 from django.core.validators import MinLengthValidator
+import datetime
 
 class Evento(models.Model):
     # Enumerations
@@ -26,8 +27,9 @@ class Evento(models.Model):
     estado = models.CharField(max_length=10, choices=ESTADOS, default="Borrador")
     tipo = models.CharField(max_length=100, choices=TIPOS)
     capacidad = models.IntegerField()
-    fecha = models.DateField()
-    horaInicio = models.TimeField()
+    fechaInicio = models.DateField()
+    fechaFin = models.DateField(default=datetime.date.today)
+    horaInicio = models.TimeField() 
     horaFin = models.TimeField()
     creador = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="eventos_creados")
     fecha_ultimo_cambio = models.DateTimeField(auto_now=True)

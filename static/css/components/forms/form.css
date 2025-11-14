@@ -16,6 +16,12 @@
     width: 50%;
 }
 
+.form__grid{
+    width: 50%;
+    display: flex;
+    gap: 24px;
+}
+
 .form__group label{
     color: var(--light-gray);
 }

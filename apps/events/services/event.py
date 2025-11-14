@@ -1,12 +1,9 @@
 import os
 from django.db import IntegrityError, transaction
 from django.conf import settings
-from django.db import IntegrityError
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.utils import timezone
 from datetime import datetime
 from django.utils import timezone
-from apps.users.models import Usuario
 from ..models import EvaluacionEvento, Evento, OrganizadorEvento, OrganizacionInvitada
 from django.db.models import Q
 
@@ -19,7 +16,8 @@ class EventoService:
                 descripcion=data["descripcion"],
                 tipo=data["tipo"],
                 capacidad=data["capacidad"],
-                fecha=data["fecha"],
+                fechaInicio=data["fechaInicio"],
+                fechaFin=data["fechaFin"],
                 horaInicio=data["horaInicio"],
                 horaFin=data["horaFin"],
                 creador=request.user
@@ -39,24 +37,45 @@ class EventoService:
             return False
     
     @staticmethod
-    def listar_por_organizador(usuario, status=None, page=1, per_page=12, search=None, search_by=None):
+    def listar_por_organizador(usuario, status=None, page=1, per_page=12, search=None, search_by=None, search_end=None):
         qs = Evento.objects.filter(creador=usuario).order_by('-fecha_ultimo_cambio')
         if status:
             qs = qs.filter(estado__iexact=status)
-
-        if search and search_by:
+        
+        if (search and search_by) or (search_end and search_by):
             if search_by == "nombre":
                 qs = qs.filter(nombre__icontains=search)
             elif search_by == "fecha":
-                parsed_date = None
-                for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y"):
-                    try:
-                        parsed_date = datetime.strptime(search, fmt).date()
-                        break
-                    except Exception:
-                        continue
-                if parsed_date:
-                    qs = qs.filter(fecha=parsed_date)
+                # Parse start date if provided
+                start_date = None
+                if search:
+                    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y"):
+                        try:
+                            start_date = datetime.strptime(search, fmt).date()
+                            break
+                        except Exception:
+                            continue
+                
+                # Parse end date if provided
+                end_date = None
+                if search_end:
+                    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y"):
+                        try:
+                            end_date = datetime.strptime(search_end, fmt).date()
+                            break
+                        except Exception:
+                            continue
+                
+                if start_date and end_date:
+                    # Filter events that are completely within the date range
+                    qs = qs.filter(
+                        fechaInicio__gte=start_date,
+                        fechaFin__lte=end_date
+                    )
+                elif start_date:
+                    qs = qs.filter(fechaInicio__gte=start_date)
+                elif end_date:
+                    qs = qs.filter(fechaFin__lte=end_date)
                 else:
                     qs = qs.none()
 
@@ -81,7 +100,7 @@ class EventoService:
     def actualizar(event, data):
         #Validate integrity errors for unique fields
         try:
-            campos = ["nombre", "tipo", "descripcion", "capacidad", "fecha", "horaInicio", "horaFin"]
+            campos = ["nombre", "tipo", "descripcion", "capacidad", "fechaInicio", "fechaFin", "horaInicio", "horaFin"]
             cambios = {}
 
             for campo in campos:
@@ -92,7 +111,7 @@ class EventoService:
                     cambios[campo] = valor_nuevo
                     
                 # Normalize types
-                if campo == "fecha" and isinstance(valor_nuevo, str):
+                if campo in ["fechaInicio", "fechaFin"] and isinstance(valor_nuevo, str):
                     valor_nuevo = datetime.strptime(valor_nuevo, "%Y-%m-%d").date()
 
                 if campo in ["horaInicio", "horaFin"] and isinstance(valor_nuevo, str):
@@ -259,7 +278,19 @@ class EventoService:
                 failed_paths.append(path)
 
         return {"deleted": True, "failed_paths": failed_paths}
-    
+
+    @staticmethod
+    def listar_eventos_publicados(page=1, per_page=12):
+        qs = Evento.objects.filter(estado__iexact="Aprobado", fechaInicio__gte=timezone.now()).order_by('-fechaInicio')
+
+        paginator = Paginator(qs, per_page)
+        try:
+            page_obj = paginator.page(page)
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)
+        return page_obj
     
     # --------- EVALUATIONS -----------
     
