@@ -10,7 +10,7 @@ const validationRules = {
       { check: value => emailRegex.test(value), msg: "Correo inválido, debe terminar en @uao.edu.co" }
     ],
     password: [
-      { check: value => passwordRegex.test(value), msg: "Contraseña inválida" }
+      { check: value => passwordRegex.test(value), msg: "Contraseña incorrecta" }
     ]
 };
 
