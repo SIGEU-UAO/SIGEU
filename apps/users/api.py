@@ -126,7 +126,10 @@ class UsersAPI():
                     UserService.cambiar_password(request.user, cd["contraseña"])
                 except ValueError:
                     return JsonResponse({"error": "La nueva contraseña no puede ser igual a las anteriores. Intenta con una diferente."}, status=400)
-                except IntegrityError:
+                except IntegrityError as e:
+                    msg = str(e).lower()
+                    if "telefono" in msg:
+                        return JsonResponse({"error": "No puedes registrar un teléfono ya asociado"}, status=400)
                     return JsonResponse({"error": "Violación de unicidad al actualizar el perfil."}, status=400)
             else:
                 # Save and rely on DB unique constraints
