@@ -96,6 +96,13 @@ DATABASES = {
         'PASSWORD': os.getenv('DB_PASSWORD'),
         'HOST': os.getenv('DB_HOST', '127.0.0.1'),
         'PORT': os.getenv('DB_PORT', '3306'),
+
+        'CONN_MAX_AGE': 0,
+
+        'OPTIONS': {
+            # Si la BD está caída, Django fallará en ~5 segundos en vez de ~40
+            'connect_timeout': 0,
+        },
     }
 }
 
