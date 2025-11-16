@@ -223,4 +223,12 @@ class UserService:
 
             return usuario
         except Usuario.DoesNotExist:
-            return False     
+            return False  
+
+    @staticmethod
+    def obtener_usuario_por_email(email):
+        try:
+            usuario = Usuario.objects.get(email=email)
+            return usuario
+        except Usuario.DoesNotExist:
+            return False
