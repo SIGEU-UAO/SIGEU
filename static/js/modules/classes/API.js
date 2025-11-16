@@ -20,7 +20,6 @@ async function parseJSONSafe(res) {
             return { ok: false, sessionExpired: true };
         }
 
-        console.error("Error al parsear JSON de la respuesta:", err);
         Alert.error("Respuesta inesperada del servidor. Intenta nuevamente en unos momentos.");
         return { ok: false, sessionExpired: false };
     }

@@ -100,7 +100,7 @@ DATABASES = {
         'CONN_MAX_AGE': 0,
 
         'OPTIONS': {
-            # Si la BD está caída, Django fallará en ~5 segundos en vez de ~40
+            # Si la BD está caída, Django fallará en ~20 segundos 
             'connect_timeout': 0,
         },
     }
