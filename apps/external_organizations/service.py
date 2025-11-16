@@ -7,6 +7,13 @@ from .serializer import ExternalOrganizationSerializer
 class OrganizacionExternaService:
     @staticmethod
     def registrar(request, data):
+        #Validate integrity errors for unique fields
+        if OrganizacionExterna.objects.filter(nit=data["nit"]).exists():
+            raise ValueError("Ya existe una organización con este NIT.")
+        
+        if OrganizacionExterna.objects.filter(telefono=data["telefono"]).exists():
+            raise ValueError("El teléfono ya se encuentra registrado en otra organización.")
+
         try:
             org = OrganizacionExterna.objects.create(
                 nit=data["nit"],
@@ -19,9 +26,6 @@ class OrganizacionExternaService:
                 creador=request.user
             )
         except IntegrityError as e:
-            s = str(e).lower()
-            if "nombre" in s:
-                raise ValueError("Ya existe una organización con este nombre.") from e
             raise ValueError("Error de integridad en el registro de organización.") from e
 
         return org.idOrganizacion
@@ -81,9 +85,16 @@ class OrganizacionExternaService:
     
     @staticmethod
     def actualizar(id, data):
-        #Validate integrity errors for unique fields
         try:
             org = OrganizacionExterna.objects.get(pk=id)
+
+            #Validate integrity errors for unique fields
+            if OrganizacionExterna.objects.filter(nit=data["nit"]).exclude(pk=id).exists():
+                raise ValueError("Ya existe una organización con este NIT.")
+            
+            if OrganizacionExterna.objects.filter(telefono=data["telefono"]).exclude(pk=id).exists():
+                raise ValueError("El teléfono ya se encuentra registrado en otra organización.")
+
             org.nit = data["nit"]
             org.nombre = data["nombre"]
             org.representanteLegal = data["representante_legal"]
@@ -92,16 +103,13 @@ class OrganizacionExternaService:
             org.sectorEconomico = data["sector_economico"]
             org.actividadPrincipal = data["actividad_principal"]
             org.save()
+
+            return org
+
         except OrganizacionExterna.DoesNotExist:
             raise ValueError("No se encontró la organización especificada.")
         except IntegrityError as e:
-            s = str(e).lower()
-            if "nit" in s:
-                raise ValueError("Ya existe una organización con este NIT.") from e
-            if "telefono" in s:
-                raise ValueError("Ya existe una organización con este teléfono.") from e
             raise ValueError("Error de integridad al actualizar la organización.") from e
-        return org
     
     @staticmethod
     def eliminar(pk):

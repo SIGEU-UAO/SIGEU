@@ -1,21 +1,51 @@
 import { formDataToJSON, getCookie } from "../forms/utils.js";
 import Alert from "./Alert.js";
+import { loginUrl } from "/static/js/base.js";
+
+// Intenta parsear JSON de forma segura y detecta sesión expirada
+async function parseJSONSafe(res) {
+    try {
+        const json = await res.json();
+        return { ok: true, json };
+    } catch (err) {
+        const contentType = (res.headers.get("content-type") || "").toLowerCase();
+        const url = res.url || "";
+
+        // Caso típico: la sesión expiró, Django devolvió la página de login (HTML)
+        if (contentType.includes("text/html") && url.includes("/users/inicio-sesion")) {
+            Alert.error("Sesión expirada. Serás redirigido a la página de inicio de sesión.");
+            setTimeout(() => {
+                window.location.href = loginUrl;   // "/users/inicio-sesion/"
+            }, 2000);
+            return { ok: false, sessionExpired: true };
+        }
+
+        Alert.error("Respuesta inesperada del servidor. Intenta nuevamente en unos momentos.");
+        return { ok: false, sessionExpired: false };
+    }
+}
+
+// Manejo centralizado de errores de red (cuando fetch revienta)
+function handleNetworkError(err) {
+    const raw = err && err.message ? String(err.message) : "";
+    const lower = raw.toLowerCase();
+
+    if (lower.includes("failed to fetch") || lower.includes("networkerror")) {
+        Alert.error("No se pudo conectar con el servidor. Verifica tu conexión a Internet e inténtalo de nuevo.");
+    } else {
+        Alert.error("Ocurrió un error al comunicarse con el servidor. Intenta nuevamente en unos momentos.");
+    }
+}
 
 export default class API {
     static async post(url, requestBody) {
-        // Get csrf token
-        const csrf = getCookie("csrftoken")
+        const csrf = getCookie("csrftoken");
 
-        // Detect whether the body is FormData or an object/JSON
         const isFormData = requestBody instanceof FormData;
-
-        let jsonBody = requestBody; 
-        
-        //Convert the formData to JSON
+        let jsonBody = requestBody;
         if (isFormData) jsonBody = formDataToJSON(jsonBody);
 
         try {
-            // Fetch the endpoint
             const res = await fetch(url, {
                 method: "POST",
                 headers: {
@@ -26,17 +56,27 @@ export default class API {
                 body: jsonBody
             });
 
-            const json = await res.json();
+            const { ok, json, sessionExpired } = await parseJSONSafe(res);
+            if (!ok) {
+                // Si la sesión expiró o hubo respuesta no válida, ya mostramos mensaje
+                if (sessionExpired) return { error: true };
+                return { error: true };
+            }
 
             if (!res.ok) {
                 let msg = json.error || "¡Error en la operación!";
+
+                if (res.status >= 500) {
+                    msg = "Ocurrió un error interno en el servidor al guardar la información. Tus datos no se han perdido, por favor inténtalo nuevamente.";
+                }
+
                 Alert.error(msg);
                 return { error: true, data: json };
             }
 
             if (res.status === 207) {
                 let msg = json.error || "Hubo errores parciales";
-    
+
                 if (json.errores && Array.isArray(json.errores) && json.errores.length > 0) {
                     const detalles = json.errores
                         .map(e => {
@@ -47,31 +87,25 @@ export default class API {
                         .join(" | ");
                     msg = `${msg} - ${detalles}`;
                 }
-    
+
                 Alert.warning(msg);
                 return { error: true, data: json };
             }
 
             return { error: false, data: json };
         } catch (err) {
-            // Network error or other type of exception
-            Alert.error(err.message || `¡Error de Red!`)
+            handleNetworkError(err);
             return { error: true };
         }
     }
 
     static async put(url, requestBody) {
-        // Get csrf token
-        const csrf = getCookie("csrftoken")
-        // Detect whether the body is FormData or an object/JSON
+        const csrf = getCookie("csrftoken");
         const isFormData = requestBody instanceof FormData;
-
         let jsonBody = requestBody;
-        //Convert the formData to JSON
         if (isFormData) jsonBody = formDataToJSON(jsonBody);
 
         try {
-            // Fetch the endpoint
             const res = await fetch(url, {
                 method: "PUT",
                 headers: {
@@ -81,16 +115,27 @@ export default class API {
                 },
                 body: jsonBody
             });
-            const json = await res.json();
+
+            const { ok, json, sessionExpired } = await parseJSONSafe(res);
+            if (!ok) {
+                if (sessionExpired) return { error: true };
+                return { error: true };
+            }
+
             if (!res.ok) {
                 let msg = json.error || "¡Error en la operación!";
+                if (res.status >= 500) {
+                    msg = "Ocurrió un error interno en el servidor al actualizar la información. Tus datos no se han perdido, por favor inténtalo nuevamente.";
+                }
                 Alert.error(msg);
                 return { error: true, data: json };
             }
+
             if (res.status === 207) {
                 let msg = json.error || "Hubo errores parciales";
                 if (json.errores && Array.isArray(json.errores) && json.errores.length > 0) {
-                    const detalles = json.errores.map(e => {
+                    const detalles = json.errores
+                        .map(e => {
                             if (typeof e === "string") return e;
                             if (e && e.error) return `ID ${e.id || "?"}: ${e.error}`;
                             return JSON.stringify(e);
@@ -100,35 +145,42 @@ export default class API {
                 Alert.warning(msg);
                 return { error: true, data: json };
             }
+
             return { error: false, data: json };
         } catch (err) {
-            // Network error or other type of exception
-            Alert.error(err.message || `¡Error de Red!`)
+            handleNetworkError(err);
             return { error: true };
         }
     }
 
     static async postFormData(url, formData) {
         const csrf = getCookie("csrftoken");
-    
+
         try {
             const res = await fetch(url, {
                 method: "POST",
                 headers: { "X-CSRFToken": csrf },
                 body: formData
             });
-    
-            const json = await res.json();
-            
+
+            const { ok, json, sessionExpired } = await parseJSONSafe(res);
+            if (!ok) {
+                if (sessionExpired) return { error: true };
+                return { error: true };
+            }
+
             if (!res.ok) {
                 let msg = json.error || "¡Error en la operación!";
+                if (res.status >= 500) {
+                    msg = "Ocurrió un error interno en el servidor. Por favor inténtalo nuevamente.";
+                }
                 Alert.error(msg);
                 return { error: true, data: json };
             }
 
             if (res.status === 207) {
                 let msg = json.error || "Hubo errores parciales";
-    
+
                 if (json.errores && Array.isArray(json.errores) && json.errores.length > 0) {
                     const detalles = json.errores
                         .map(e => {
@@ -139,33 +191,36 @@ export default class API {
                         .join(" | ");
                     msg = `${msg} - ${detalles}`;
                 }
-    
+
                 Alert.warning(msg);
                 return { error: true, data: json };
             }
 
             return { error: false, data: json };
         } catch (err) {
-            Alert.error(err.message || "¡Error de Red!");
+            handleNetworkError(err);
             return { error: true };
         }
-    }    
+    }
 
     static async fetchGet(url) {
         try {
-            // Fetch the endpoint
             const res = await fetch(url);
-            const json = await res.json();
+
+            const { ok, json, sessionExpired } = await parseJSONSafe(res);
+            if (!ok) {
+                if (sessionExpired) return { error: true };
+                return { error: true };
+            }
 
             if (!res.ok) {
-                Alert.error(json.error ||`¡Error en la operación!`)
-                return { error: true };
+                Alert.error(json.error || "¡Error en la operación!");
+                return { error: true, data: json };
             }
 
             return { error: false, data: json };
         } catch (err) {
-            // Network error or other type of exception
-            Alert.error(err.message || `¡Error de Red!`)
+            handleNetworkError(err);
             return { error: true };
         }
     }
@@ -191,6 +246,12 @@ export default class API {
                 credentials: "same-origin"
             });
 
+            const { ok, json, sessionExpired } = await parseJSONSafe(response);
+            if (!ok) {
+                if (sessionExpired) return;
+                return;
+            }
+
             if (response.ok || response.status === 404) {
                 Alert.success(successText);
 
@@ -200,26 +261,21 @@ export default class API {
                     }, 1500);
                 }
             } else {
-                const data = await response.json().catch(() => ({}));
-                Alert.error(data.error || errorText);
+                Alert.error(json.error || errorText);
             }
 
         } catch (err) {
-            Alert.error("Error de red. Intenta de nuevo.");
+            handleNetworkError(err);
         }
     }
 
     static async patch(url, requestBody) {
-        // Get csrf token
-        const csrf = getCookie("csrftoken")
-        
-        // Detect whether the body is FormData or an object/JSON
+        const csrf = getCookie("csrftoken");
         const isFormData = requestBody instanceof FormData;
         let jsonBody = requestBody;
-        //Convert the formData to JSON
         if (isFormData) jsonBody = formDataToJSON(jsonBody);
+
         try {
-            // Fetch the endpoint
             const res = await fetch(url, {
                 method: "PATCH",
                 headers: {
@@ -229,16 +285,25 @@ export default class API {
                 },
                 body: jsonBody
             });
-            const json = await res.json();
+
+            const { ok, json, sessionExpired } = await parseJSONSafe(res);
+            if (!ok) {
+                if (sessionExpired) return { error: true };
+                return { error: true };
+            }
+
             if (!res.ok) {
                 let msg = json.error || "¡Error en la operación!";
+                if (res.status >= 500) {
+                    msg = "Ocurrió un error interno en el servidor. Por favor inténtalo nuevamente.";
+                }
                 Alert.error(msg);
                 return { error: true, data: json };
             }
+
             return { error: false, data: json };
         } catch (err) {
-            // Network error or other type of exception
-            Alert.error(err.message || `¡Error de Red!`)
+            handleNetworkError(err);
             return { error: true };
         }
     }
