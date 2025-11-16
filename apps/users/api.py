@@ -72,12 +72,16 @@ class UsersAPI():
             email = data.get("email")
             password = data.get("password")
 
+            user = UserService.obtener_usuario_por_email(email)
+            if not user:
+                return JsonResponse({"error": "No se encontró ningun usuario."}, status=401)
             user = authenticate(request, email=email, password=password)
             if user is not None:
                 login(request, user) 
                 return JsonResponse({"message": "Inicio de sesión exitoso"}, status=200)
-
-            return JsonResponse({"error": "No se encontró ningun usuario."}, status=401)
+            else:
+                return JsonResponse({"error": "Contraseña incorrecta"}, status=401)
+            
         return JsonResponse({"error": "Método no permitido"}, status=405)
     
     @login_required
@@ -86,8 +90,7 @@ class UsersAPI():
             logout(request)
             return JsonResponse({"message": "Cierre de sesión exitoso"}, status=200)
         return JsonResponse({"error": "Método no permitido"}, status=405)
-    
-    
+        
     @login_required
     def editar_perfil(request):
         # Profile update via API (PUT JSON)
@@ -124,15 +127,21 @@ class UsersAPI():
             if cd.get("contraseña"):
                 try:
                     UserService.cambiar_password(request.user, cd["contraseña"])
-                except ValueError as e:
+                except ValueError:
                     return JsonResponse({"error": "La nueva contraseña no puede ser igual a las anteriores. Intenta con una diferente."}, status=400)
-                except IntegrityError:
+                except IntegrityError as e:
+                    msg = str(e).lower()
+                    if "telefono" in msg:
+                        return JsonResponse({"error": "No puedes registrar un teléfono ya asociado"}, status=400)
                     return JsonResponse({"error": "Violación de unicidad al actualizar el perfil."}, status=400)
             else:
                 # Save and rely on DB unique constraints
                 try:
                     request.user.save()
-                except IntegrityError:
+                except IntegrityError as e:
+                    msg = str(e).lower()
+                    if "telefono" in msg:
+                        return JsonResponse({"error": "No puedes registrar un teléfono ya asociado"}, status=400)
                     return JsonResponse({"error": "Violación de unicidad al actualizar el perfil."}, status=400)
 
             # Response
@@ -144,7 +153,6 @@ class UsersAPI():
             }, status=200)
 
         return JsonResponse({"error": "Metodo no permitido"}, status=405)
-
 
     # * Método para listar organizadores
     @login_required

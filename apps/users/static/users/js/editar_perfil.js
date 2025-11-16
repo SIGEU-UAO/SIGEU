@@ -82,13 +82,7 @@ async function handleSubmit(e) {
         });
         
         if (!result.isConfirmed) {
-            
-            editableFields.forEach(field => {
-                field.disabled = true;
-                field.setAttribute('disabled', 'true');
-            });
-            formActions.classList.add("hide");
-            return;
+            passwordFieldEl.value = "";
         }
     }
     

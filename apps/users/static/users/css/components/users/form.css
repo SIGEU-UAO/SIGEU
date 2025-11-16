@@ -49,6 +49,15 @@
     opacity: 1;
 }
 
+/* Evita que el <button> genere el icono por pseudo-elemento */
+.icon__btn.ri-eye-fill::before,
+.icon__btn.ri-eye-off-fill::before,
+.icon__btn:focus::before,
+.icon__btn:focus-visible::before {
+  content: none !important;
+  display: none !important;
+}
+
 /* End Form Icons */
 
 /* Responsive */
