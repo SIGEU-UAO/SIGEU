@@ -16,6 +16,11 @@ const validationRules = {
     horaFin: [
         {check:(value,formData)=>{const p=s=>{if(!s) return NaN;const[a='0',b='0',c='0']=s.trim().split(':');return Number(a)*3600+Number(b)*60+Number(c)};return p(value)>p(formData.get("horaInicio"))},msg:"La hora fin debe ser mayor a la hora inicio"}
     ],
+    horaInicio: [
+        {check: (v,f) => {const p=s=>{if(!s)return NaN;const[a='0',b='0',c='0']=s.trim().split(':');return Number(a)*3600+Number(b)*60+Number(c)}, h=new Date(), fi=new Date(f.get("fechaInicio")+"T00:00:00"), sd=fi.getFullYear()==h.getFullYear()&&fi.getMonth()==h.getMonth()&&fi.getDate()==h.getDate(), now=`${String(h.getHours()).padStart(2,"0")}:${String(h.getMinutes()).padStart(2,"0")}:${String(h.getSeconds()).padStart(2,"0")}`; return !sd || p(v)>=p(now);},
+         msg: "La hora de inicio no puede ser menor a la hora actual"}
+    ]
+
 };
 
 const organizationValidationRules = {

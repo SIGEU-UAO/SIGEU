@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from django.http import JsonResponse
 from django.db import transaction
 from ..forms.event import RegistroEventoForm
@@ -197,6 +197,13 @@ class EventoAPI:
         evento = EventoService.obtener_por_id(id_evento)
         if not evento:
             return JsonResponse({"error": "Evento no encontrado."}, status=404)
+        ahora = datetime.now()
+        fecha_inicio = evento.fechaInicio
+        hora_inicio = evento.horaInicio  
+        datetime_inicio_evento = datetime.combine(fecha_inicio, hora_inicio)  
+
+        if datetime_inicio_evento < ahora:
+            return JsonResponse({ "error": "El evento ha caducado. No es posible aprobar un evento cuya fecha y hora de inicio ya pasaron." }, status=400)
         if evento.estado != "Enviado":
             return JsonResponse({"error": "Solo los eventos en estado 'Enviado' pueden ser aprobados."}, status=400)
 
