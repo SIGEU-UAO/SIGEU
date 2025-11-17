@@ -1,0 +1,58 @@
+<div class="card">
+    <div class="card__left">
+        <div class="card__date">
+            <span class="card__month">
+                {% if event.fechaInicio|date:"m" == event.fechaFin|date:"m" %}
+                    {{ event.fechaInicio|date:"M"|capfirst }}
+                {% else %}
+                    {{ event.fechaInicio|date:"M"|capfirst }} - {{ event.fechaFin|date:"M"|capfirst }}
+                {% endif %}
+            </span>
+            <span class="card__day">
+                {% if event.fechaInicio|date:"d" == event.fechaFin|date:"d" %}
+                    {{ event.fechaInicio|date:"d" }}
+                {% else %}
+                    {{ event.fechaInicio|date:"d" }} - {{ event.fechaFin|date:"d" }}
+                {% endif %}
+            </span>
+        </div>
+        <span class="card__hour">
+            {{ event.horaInicio }} - {{ event.horaFin }}
+        </span>
+    </div>
+    <div class="card__right">
+        <div class="card__tag">{{ event.tipo }}</div>
+        <h3 class="card__title">{{ event.nombre }}</h3>
+        <p class="card__description">{{ event.descripcion|truncatewords:15 }}</p>
+
+        <ul class="card__associations">
+            <li class="card__association"><strong>Instalaciones físicas: </strong> 
+                {% for i in event.instalaciones_asignadas.all %}
+                    {{ i.instalacion.ubicacion }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </li>
+            <li class="card__association"><strong>Organizadores: </strong> 
+                {% for o in event.organizadores_ordenados|slice:':3' %}
+                    {{ o.organizador.nombres }} {{ o.organizador.apellidos }} {% if not forloop.last %}, {% endif %}
+                {% endfor %}
+                {% if event.organizadores_ordenados|length > 3 %}
+                    {% with event.organizadores_ordenados|length|add:"-3" as count %}
+                        + {{ count }} más
+                    {% endwith %}
+                {% endif %}
+            </li>
+            {% if event.organizaciones_invitadas.all %}
+                <li class="card__association"><strong>Organizaciones externas: </strong> 
+                    {% for o in event.organizaciones_invitadas.all|slice:':3' %}
+                        {{ o.organizacion.nombre }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                    {% if event.organizaciones_invitadas.all|length > 3 %}
+                        {% with event.organizaciones_invitadas.all|length|add:"-3" as count %}
+                            + {{ count }} más
+                        {% endwith %}
+                    {% endif %}
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</div>

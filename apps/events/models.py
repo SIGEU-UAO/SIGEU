@@ -2,7 +2,10 @@ from django.db import models
 from apps.core.models import InstalacionFisica
 from apps.users.models import Usuario
 from apps.external_organizations.models import OrganizacionExterna
-from .utils import path_coordinador_aval, path_organizacion_certificado
+from .utils import *
+from django.core.validators import MinLengthValidator
+import datetime
+
 class Evento(models.Model):
     # Enumerations
     ESTADOS = [ 
@@ -23,12 +26,15 @@ class Evento(models.Model):
     descripcion = models.TextField()
     estado = models.CharField(max_length=10, choices=ESTADOS, default="Borrador")
     tipo = models.CharField(max_length=100, choices=TIPOS)
-    fecha = models.DateField()
-    horaInicio = models.TimeField()
+    capacidad = models.IntegerField()
+    fechaInicio = models.DateField()
+    fechaFin = models.DateField(default=datetime.date.today)
+    horaInicio = models.TimeField() 
     horaFin = models.TimeField()
     creador = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="eventos_creados")
     fecha_ultimo_cambio = models.DateTimeField(auto_now=True)
     fechaEnvio = models.DateTimeField(default=None, null=True, blank=True)
+    notificacionEnvioLeida = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.nombre} - {self.tipo} ({ self.estado })"
@@ -36,9 +42,7 @@ class Evento(models.Model):
     @property
     def organizadores_ordenados(self):
         organizadores = list(self.organizadores_asignados.all())
-        organizadores.sort(
-            key=lambda o: 0 if o.organizador == self.creador else 1
-        )
+        organizadores.sort(key=lambda o: 0 if o.organizador == self.creador else 1)
         return organizadores
     
     class Meta:
@@ -104,3 +108,27 @@ class OrganizacionInvitada(models.Model):
                 name='unique_evento_organizacion'
             )
         ]
+
+class EvaluacionEvento(models.Model):
+    # Enumerations
+    TIPOS_EVALUACION = [
+        ("aprobacion", "Aprobación"),
+        ("rechazo", "Rechazo")
+    ]
+    
+    idEvaluacion = models.BigAutoField(auto_created=True, primary_key=True, serialize=False)
+    evento = models.ForeignKey(Evento, on_delete=models.CASCADE, related_name="evaluaciones")
+    evaluador = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="evaluaciones")
+    fechaEvaluacion = models.DateTimeField(auto_now_add=True)
+    tipoEvaluacion = models.CharField(max_length=10, choices=TIPOS_EVALUACION)
+    justificacion = models.TextField(validators=[MinLengthValidator(10)])
+    acta = models.FileField(upload_to=path_acta)
+    notificacionLeida = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.evento} - {self.tipoEvaluacion}"
+
+    class Meta:
+        db_table = "evaluaciones_eventos"
+        verbose_name = "evaluacion_evento"
+        verbose_name_plural = "evaluaciones_eventos"

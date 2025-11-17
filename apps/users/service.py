@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.db import IntegrityError
-from django.contrib.auth.models import Group
 from django.contrib.auth.hashers import check_password
 from django.db.models import Q, Value, Case, When, CharField
 from django.db.models.functions import Concat
@@ -91,21 +90,20 @@ class UserService:
         try:
             if rol == "estudiante":
                 programa = Programa.objects.get(pk=data["programa_id"])
-                estudiantes = Group.objects.get(name="Estudiantes")      
                 Estudiante.objects.create(usuario=usuario, codigo_estudiante=data["codigo_estudiante"], programa=programa)
-                usuario.groups.add(estudiantes)
 
             elif rol == "docente":
-                docentes = Group.objects.get(name="Docentes") 
                 unidad = UnidadAcademica.objects.get(pk=data["unidad_academica_id"])
                 Docente.objects.create(usuario=usuario, unidadAcademica=unidad)
-                usuario.groups.add(docentes) 
 
             elif rol == "secretaria":
-                secretarias = Group.objects.get(name="Secretarias") 
                 facultad = Facultad.objects.get(pk=data["facultad_id"])
+                # Ensure only one secretaria per facultad
+                if Secretaria.objects.filter(facultad=facultad).exists():
+                    if getattr(usuario, 'idUsuario', None):
+                        usuario.delete()
+                    raise ValueError("Ya existe una secretaria registrada para esta facultad.")
                 Secretaria.objects.create(usuario=usuario, facultad=facultad)
-                usuario.groups.add(secretarias)
                 
             send_email(
                     subject="Bienvenido/a a SIGEU 🎓",
@@ -122,18 +120,23 @@ class UserService:
                 )
 
         except (Programa.DoesNotExist, UnidadAcademica.DoesNotExist, Facultad.DoesNotExist) as e:
-            usuario.delete()
+            if getattr(usuario, 'idUsuario', None):
+                usuario.delete()
             raise ValueError("ID relacionado inválido para el rol seleccionado.") from e
 
         except IntegrityError as e:
-            usuario.delete()
+            if getattr(usuario, 'idUsuario', None):
+                usuario.delete()
             s = str(e).lower()
             if "codigo_estudiante" in s or "codigo" in s:
                 raise ValueError("El código de estudiante ya existe.") from e
+            if "unique_secretaria_por_facultad" in s or ("facultad" in s and "unique" in s):
+                raise ValueError("Ya existe una secretaria registrada para esta facultad.") from e
             raise ValueError("Datos duplicados para el registro del rol.") from e
 
         except Exception as e:
-            usuario.delete()
+            if getattr(usuario, 'idUsuario', None):
+                usuario.delete()
             raise
 
         return usuario.idUsuario
@@ -220,4 +223,12 @@ class UserService:
 
             return usuario
         except Usuario.DoesNotExist:
-            return False     
+            return False  
+
+    @staticmethod
+    def obtener_usuario_por_email(email):
+        try:
+            usuario = Usuario.objects.get(email=email)
+            return usuario
+        except Usuario.DoesNotExist:
+            return False

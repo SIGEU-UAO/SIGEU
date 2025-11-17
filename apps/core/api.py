@@ -5,7 +5,7 @@ from sigeu.decorators import organizador_required
 import json
 
 class CoreAPI:
-    @login_required()
+    @login_required
     @organizador_required
     def listar(request):
         # Check for query parameters

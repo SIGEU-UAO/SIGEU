@@ -1,6 +1,7 @@
-@import url("./components/card.css");
+@import url("./components/cards/card.css");
 @import url("./components/pagination.css");
-@import url("./components/modal_enviados.css");
+@import url("./components/modals/modal_enviados.css");
+@import url("/static/css/components/forms/form.css");
 
 .no-results-container{
     display:none; 

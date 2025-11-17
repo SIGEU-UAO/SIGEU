@@ -1,13 +1,10 @@
 import os
 from django.db import IntegrityError, transaction
 from django.conf import settings
-from django.db import IntegrityError
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.utils import timezone
 from datetime import datetime
 from django.utils import timezone
-from apps.users.models import Usuario
-from ..models import Evento, OrganizadorEvento, OrganizacionInvitada
+from ..models import EvaluacionEvento, Evento, OrganizadorEvento, OrganizacionInvitada
 from django.db.models import Q
 
 class EventoService:
@@ -18,7 +15,9 @@ class EventoService:
                 nombre=data["nombre"],
                 descripcion=data["descripcion"],
                 tipo=data["tipo"],
-                fecha=data["fecha"],
+                capacidad=data["capacidad"],
+                fechaInicio=data["fechaInicio"],
+                fechaFin=data["fechaFin"],
                 horaInicio=data["horaInicio"],
                 horaFin=data["horaFin"],
                 creador=request.user
@@ -27,6 +26,7 @@ class EventoService:
             raise ValueError("Error al registar el evento.") from e
 
         return evento.idEvento
+    
 
     @staticmethod
     def obtener_por_id(id_evento):
@@ -37,24 +37,45 @@ class EventoService:
             return False
     
     @staticmethod
-    def listar_por_organizador(usuario, status=None, page=1, per_page=12, search=None, search_by=None):
+    def listar_por_organizador(usuario, status=None, page=1, per_page=12, search=None, search_by=None, search_end=None):
         qs = Evento.objects.filter(creador=usuario).order_by('-fecha_ultimo_cambio')
         if status:
             qs = qs.filter(estado__iexact=status)
-
-        if search and search_by:
+        
+        if (search and search_by) or (search_end and search_by):
             if search_by == "nombre":
                 qs = qs.filter(nombre__icontains=search)
             elif search_by == "fecha":
-                parsed_date = None
-                for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y"):
-                    try:
-                        parsed_date = datetime.strptime(search, fmt).date()
-                        break
-                    except Exception:
-                        continue
-                if parsed_date:
-                    qs = qs.filter(fecha=parsed_date)
+                # Parse start date if provided
+                start_date = None
+                if search:
+                    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y"):
+                        try:
+                            start_date = datetime.strptime(search, fmt).date()
+                            break
+                        except Exception:
+                            continue
+                
+                # Parse end date if provided
+                end_date = None
+                if search_end:
+                    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y"):
+                        try:
+                            end_date = datetime.strptime(search_end, fmt).date()
+                            break
+                        except Exception:
+                            continue
+                
+                if start_date and end_date:
+                    # Filter events that are completely within the date range
+                    qs = qs.filter(
+                        fechaInicio__gte=start_date,
+                        fechaFin__lte=end_date
+                    )
+                elif start_date:
+                    qs = qs.filter(fechaInicio__gte=start_date)
+                elif end_date:
+                    qs = qs.filter(fechaFin__lte=end_date)
                 else:
                     qs = qs.none()
 
@@ -79,7 +100,7 @@ class EventoService:
     def actualizar(event, data):
         #Validate integrity errors for unique fields
         try:
-            campos = ["nombre", "tipo", "descripcion", "fecha", "horaInicio", "horaFin"]
+            campos = ["nombre", "tipo", "descripcion", "capacidad", "fechaInicio", "fechaFin", "horaInicio", "horaFin"]
             cambios = {}
 
             for campo in campos:
@@ -90,7 +111,7 @@ class EventoService:
                     cambios[campo] = valor_nuevo
                     
                 # Normalize types
-                if campo == "fecha" and isinstance(valor_nuevo, str):
+                if campo in ["fechaInicio", "fechaFin"] and isinstance(valor_nuevo, str):
                     valor_nuevo = datetime.strptime(valor_nuevo, "%Y-%m-%d").date()
 
                 if campo in ["horaInicio", "horaFin"] and isinstance(valor_nuevo, str):
@@ -120,50 +141,14 @@ class EventoService:
     def actualizar_fecha_ultimo_cambio(evento):
         evento.fecha_ultimo_cambio = timezone.now()
         evento.save(update_fields=["fecha_ultimo_cambio"])
-        
-    def serializar_eventos(page_obj, request=None):
-        results = []
-        for e in page_obj.object_list:
-            # organizadores asignados (resumido)
-            organizadores = []
-            for o in e.organizadores_asignados.all():
-                u = o.organizador
-                organizadores.append({
-                    "nombre": ((getattr(u, "nombres", "") or "") + " " + (getattr(u, "apellidos", "") or "")).strip(),
-                    "rol_organizador": o.get_tipo_display() if hasattr(o, "get_tipo_display") else o.tipo
-                })
-
-            # organizaciones invitadas (resumido)
-            organizaciones = []
-            for oi in e.organizaciones_invitadas.all():
-                org = oi.organizacion
-                organizaciones.append({"nombre": getattr(org, "nombre", None),"nit": getattr(org, "nit", None)})
-
-            item = {
-                "idEvento": e.idEvento,
-                "nombre": e.nombre,
-                "fecha": e.fecha.isoformat() if e.fecha else None,
-                "horaInicio": e.horaInicio.isoformat() if e.horaInicio else None,
-                "estado": e.estado,
-                "instalaciones": [ getattr(a.instalacion, "nombre", str(a.instalacion)) for a in e.instalaciones_asignadas.all() ],
-                "organizadores": organizadores,
-                "organizaciones_invitadas": organizaciones
-            }
-            
-            results.append(item)
-
-        return {
-            "count": page_obj.paginator.count,
-            "num_pages": page_obj.paginator.num_pages,
-            "current_page": page_obj.number,
-            "results": results,
-        }
     
     @staticmethod
     def actualizar_estado(id_evento, nuevo_estado):
         try:
             evento = Evento.objects.get(idEvento=id_evento)
             evento.estado = nuevo_estado
+            if nuevo_estado == "Enviado":
+                evento.notificacionEnvioLeida = False
             evento.save()
             return True
         except Evento.DoesNotExist:
@@ -178,6 +163,12 @@ class EventoService:
             return True
         except Evento.DoesNotExist:
             return False
+
+    @staticmethod
+    def reestablecer_a_borrador(evento):
+        if evento.estado == "Rechazado":
+            evento.estado = "Borrador"
+            evento.save(update_fields=["estado", "fecha_ultimo_cambio"])
 
     @staticmethod
     def listar_eventos_enviados(facultad, page=1, per_page=12):
@@ -287,3 +278,77 @@ class EventoService:
                 failed_paths.append(path)
 
         return {"deleted": True, "failed_paths": failed_paths}
+
+    @staticmethod
+    def listar_eventos_publicados(page=1, per_page=12):
+        qs = Evento.objects.filter(estado__iexact="Aprobado", fechaInicio__gte=timezone.now()).order_by('-fechaInicio')
+
+        paginator = Paginator(qs, per_page)
+        try:
+            page_obj = paginator.page(page)
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)
+        return page_obj
+    
+    # --------- EVALUATIONS -----------
+    
+    @staticmethod
+    def registrar_evaluacion(evento, evaluacion_data):
+        try:
+            evaluacionEvento = EvaluacionEvento.objects.create(
+                evento=evento,
+                evaluador=evaluacion_data["evaluador"],
+                tipoEvaluacion=evaluacion_data["tipoEvaluacion"],
+                justificacion=evaluacion_data.get("justificacion", ""),
+                acta=evaluacion_data.get("acta", None)
+            )
+            return evaluacionEvento
+        except IntegrityError as e:
+            raise ValueError("Error al registrar la evaluación del evento.") from e
+
+    @staticmethod
+    def obtener_evaluacion_por_id(id_evaluacion):
+        try:
+            evaluacion = EvaluacionEvento.objects.get(idEvaluacion=id_evaluacion)
+            return evaluacion
+        except EvaluacionEvento.DoesNotExist:
+            return None
+
+    @staticmethod
+    def obtener_notificaciones(user):
+        if user.rol == "Estudiante" or user.rol == "Docente":
+            notificaciones = (
+                EvaluacionEvento.objects
+                .filter(evento__creador=user, notificacionLeida=False)
+                .values("idEvaluacion", "evento__nombre", "tipoEvaluacion", "fechaEvaluacion")
+            .order_by('-fechaEvaluacion')[:10]
+        )
+        elif user.rol == "Secretaria":
+            facultad = user.secretaria.facultad
+            notificaciones = (
+                Evento.objects
+                .filter(
+                    Q(creador__estudiante__programa__facultad=facultad) |
+                    Q(creador__docente__unidadAcademica__facultad=facultad),
+                    estado="Enviado",
+                    notificacionEnvioLeida=False
+                )
+                .values("idEvento", "nombre", "fechaEnvio")
+                .order_by('-fechaEnvio')[:10]
+            )
+
+        return notificaciones
+
+    @staticmethod
+    def marcar_como_leida(registro):
+        try:
+            if isinstance(registro, EvaluacionEvento):
+                registro.notificacionLeida = True
+            elif isinstance(registro, Evento):
+                registro.notificacionEnvioLeida = True
+            registro.save()
+            return True
+        except Exception:
+            return False

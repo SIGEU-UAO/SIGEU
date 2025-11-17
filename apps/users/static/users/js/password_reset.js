@@ -55,7 +55,7 @@ function handleSubmit(e) {
     }
     
     if (!emailRegex.test(email.trim())) {
-        Alert.error('Correo inválido');
+        Alert.error('Correo inválido, debe terminar en @uao.edu.co');
         return;
     }
     
@@ -103,7 +103,7 @@ function validateEmailField(email) {
             parent.classList.add("form__group--valid");
         } else {
             parent.classList.add("form__group--invalid");
-            showFieldError(emailField, "Correo inválido");
+            showFieldError(emailField, "Correo inválido, debe terminar en @uao.edu.co");
         }
     }
 }

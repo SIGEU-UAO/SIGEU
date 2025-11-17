@@ -22,7 +22,7 @@
     <section class="cards">
         {% if page_obj.object_list %}
             {% for event in page_obj.object_list %}
-                {% include 'events/components/cards_enviados.html' with event=event type=event.estado %}
+                {% include 'events/components/cards/card_enviado.html' with event=event type=event.estado %}
             {% endfor %}
         {% endif %}
     </section>
@@ -31,7 +31,8 @@
         {% include 'events/components/pagination.html' %}
     {% endif %}
 
-    {% include "events/components/modal_organizadores.html"%}
-    {% include "events/components/modal_organizaciones_externas.html"%}
+    {% include "events/components/modals/modal_organizadores.html"%}
+    {% include "events/components/modals/modal_organizaciones_externas.html"%}
+    {% include "events/components/modals/modal_evaluacion.html"%}
 
 {% endblock content %}

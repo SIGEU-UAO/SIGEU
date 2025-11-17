@@ -3,7 +3,7 @@ from django.core.validators import RegexValidator
 from .models import *
 
 # * Validators
-nit_validator = RegexValidator(regex=r'^[0-9]{8,10}-[0-9]$', message="El NIT debe contener entre 8 y 10 dígitos seguidos de un guion y un dígito de verificación")
+nit_validator = RegexValidator(regex=r'^[1-9][0-9]{7,9}-[0-9]$', message="El NIT debe contener entre 8 y 10 dígitos seguidos de un guion y un dígito de verificación")
 telefono_validator = RegexValidator(regex=r'^[0-9]{10}$', message="El teléfono solo puede contener hasta 10 números.")
 
 class RegistroForm(forms.Form):

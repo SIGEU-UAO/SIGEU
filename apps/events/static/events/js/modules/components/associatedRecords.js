@@ -311,6 +311,13 @@ export default class AssociatedRecords{
         cardHeader.appendChild(cardAnnotation);
         cardHeader.appendChild(cardTitle);
 
+        if (type === "instalaciones"){
+            const cardCapacity = document.createElement("P");
+            cardCapacity.classList.add("card__paragraph")
+            cardCapacity.textContent = `Capacidad: ${data["capacidad"]} personas`;
+            cardHeader.appendChild(cardCapacity)
+        }
+
         if (type === "organizaciones") {
             const cardList = document.createElement("UL");
             cardList.classList.add("card__list")
@@ -375,7 +382,7 @@ export default class AssociatedRecords{
         stepCard.appendChild(cardIcon)
 
         container.appendChild(stepCard)
-
+        
         this.updateStepBtn(type, buttonStep, container)
     }
 
@@ -455,7 +462,7 @@ export default class AssociatedRecords{
         const isEnabledToSkip = recordsLength === 0 && dataStore[`${type}_cambios`].length === 0;
 
         if (buttonStep.classList.contains("step__button--finish")) {
-            finishStepHandler(buttonStep, recordsLength, stepDataKeys[type].saveHandler(container), "/eventos/mis-eventos/");
+            finishStepHandler(buttonStep, isEnabledToSkip, stepDataKeys[type].saveHandler(container), "/eventos/mis-eventos/");
         } else {
             toggleSkip(buttonStep, isEnabledToSkip, stepDataKeys[type].saveHandler(container));
         }

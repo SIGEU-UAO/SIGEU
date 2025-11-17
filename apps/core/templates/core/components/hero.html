@@ -1,0 +1,12 @@
+{% load static %}
+
+<section class="hero" id="hero">
+    <div class="hero__content">
+        <h1 class="hero__title">¡Gestionar eventos universitarios nunca fue tan fácil!</h1>
+        <p class="hero__paragraph">Con SIGEU puedes crear, enviar a validación y hacer seguimiento a tus eventos desde un mismo lugar. Sin correos, sin papeleo y sin perder tiempo. Todo el proceso, automatizado y transparente.</p>
+        <a href="{% url 'registro' %}" class="hero__cta">¡Registarse Ahora!</a>
+    </div>
+    <div class="hero__image">
+        <img src="{% static 'core/assets/img/hero.webp' %}" alt="SIGEU web app in desktop and mobile">
+    </div>
+</section>

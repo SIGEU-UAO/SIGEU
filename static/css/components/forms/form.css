@@ -16,17 +16,31 @@
     width: 50%;
 }
 
+.form__grid{
+    width: 50%;
+    display: flex;
+    gap: 24px;
+}
+
 .form__group label{
     color: var(--light-gray);
 }
 
-.form__group input, .form__group select{
+.form__group input, .form__group select, .form__group textarea{
     height: 48px;
     padding: 0 16px;
     color: var(--black);
     border-radius: 12px;
     border: 1px solid rgba(102, 102, 102, 0.35);
     font-size: 18px;
+}
+
+.form__group textarea{
+    padding: 12px 16px;
+    min-height: 120px;
+    max-height: 240px;
+    resize: vertical;
+    font-size: 16px;
 }
 
 .form__group .form__input--disabled{

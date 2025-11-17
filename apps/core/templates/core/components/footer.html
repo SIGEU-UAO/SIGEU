@@ -1,0 +1,14 @@
+{% load static %}
+
+<footer class="footer">
+    <div class="footer__logo">
+        <img src="{% static 'core/assets/img/uao.webp' %}" alt="Universidad Autónoma de Occidente Logo">
+    </div>
+    <ul class="footer__list">
+        <li><a href="#hero">Inicio</a></li>
+        <li><a href="#about">Nuestro Sistema</a></li>
+        <li><a href="#features">Funcionalidades</a></li>
+        <li><a href="#team">Equipo de Desarrollo</a></li>
+    </ul>
+    <p class="footer__copy">&copy; <span class="footer__year">{{ current_year }}</span> SIGEU. Todos los derechos reservados.</p>
+</footer>

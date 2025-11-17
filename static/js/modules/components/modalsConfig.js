@@ -28,7 +28,7 @@ export const modalsConfig = [
         modalStepLabel: 'Asignar instalación',
         assignedRecordsContainerSelector: ".main__step--2 .step__cards",
         onClickCallback: function(resultContainer, item) {
-            AssociatedRecords.addRecord({ id: item["idInstalacion"], ubicacion: item["ubicacion"], tipo: item["tipo"] }, this.type, this.assignedRecordsContainerSelector)
+            AssociatedRecords.addRecord({ id: item["idInstalacion"], ubicacion: item["ubicacion"], tipo: item["tipo"], capacidad: item["capacidad"] }, this.type, this.assignedRecordsContainerSelector)
             Modal.closeModal(resultContainer.closest("dialog"))
         }
     },

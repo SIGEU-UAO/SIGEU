@@ -15,7 +15,7 @@
     <div class="card__date">
         <div class="card__day">
             <i class="ri-calendar-event-fill"></i>
-            <span>{{ event.fecha|date:"d/m/Y" }}</span>
+            <span>{{ event.fechaInicio|date:"d/m/Y" }} - {{ event.fechaFin|date:"d/m/Y" }}</span>
         </div>
         <div class="card__time">
             <i class="ri-time-fill"></i>
@@ -43,7 +43,7 @@
             <details class="card__details card__organizators">
                 <summary class="card__sub--label">Organizadores:</summary>
                 <ul class="card__sub--list">
-                    {% for o in event.organizadores_asignados.all %}
+                    {% for o in event.organizadores_ordenados %}
                         <li class="card__sub--item card__sub--item--group">
                             <div class="card__sub--item--info">
                                 <h6>{{ o.organizador.nombres }} {{ o.organizador.apellidos }}</h6>
@@ -101,7 +101,7 @@
         <hr>
 
         <div class="card__actions">
-            <button class="card__btn card__btn--eval">Evaluar evento</button>
+            <button class="card__btn card__btn--eval" data-eventoid="{{ event.idEvento }}">Evaluar evento</button>
         </div>
     </div>
 </div>

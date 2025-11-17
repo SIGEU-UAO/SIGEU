@@ -46,15 +46,20 @@
                 {% include "components/form/input.html" with field=form.nombre %}
                 {% include "components/form/input.html" with field=form.tipo %}
             </div>
+
+            {% include "components/form/input.html" with field=form.descripcion %}
     
             <div class="form__row">
-                {% include "components/form/input.html" with field=form.descripcion %}
-                {% include "components/form/input.html" with field=form.fecha %}
+                {% include "components/form/input.html" with field=form.capacidad %}
+                {% include "components/form/input.html" with field=form.fechaInicio %}
             </div>
     
             <div class="form__row">
-                {% include "components/form/input.html" with field=form.horaInicio %}
-                {% include "components/form/input.html" with field=form.horaFin %}
+                {% include "components/form/input.html" with field=form.fechaFin %}
+                <div class="form__grid">
+                    {% include "components/form/input.html" with field=form.horaInicio %}
+                    {% include "components/form/input.html" with field=form.horaFin %}
+                </div>
             </div>
     
             <div class="form__actions">

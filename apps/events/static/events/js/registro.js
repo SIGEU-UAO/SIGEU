@@ -10,12 +10,17 @@ import Alert from "/static/js/modules/classes/Alert.js";
 
 //* Variables
 const validationRules = {
-    fecha: [
-        {check:value=>{if(!value) return false;const[yy,mm,dd]=value.split('-').map(Number);const f=new Date(yy,mm-1,dd);const h=new Date();h.setHours(0,0,0,0);return f.getTime()>=h.getTime()},msg:"La fecha debe ser hoy o posterior"}
+    fechaInicio: [
+        {check: (v, f) => !f.get("fechaFin") || new Date(v) <= new Date(f.get("fechaFin")), msg: "La fecha de inicio no puede ser mayor que la fecha de fin"}
     ],
     horaFin: [
         {check:(value,formData)=>{const p=s=>{if(!s) return NaN;const[a='0',b='0',c='0']=s.trim().split(':');return Number(a)*3600+Number(b)*60+Number(c)};return p(value)>p(formData.get("horaInicio"))},msg:"La hora fin debe ser mayor a la hora inicio"}
     ],
+    horaInicio: [
+        {check: (v,f) => {const p=s=>{if(!s)return NaN;const[a='0',b='0',c='0']=s.trim().split(':');return Number(a)*3600+Number(b)*60+Number(c)}, h=new Date(), fi=new Date(f.get("fechaInicio")+"T00:00:00"), sd=fi.getFullYear()==h.getFullYear()&&fi.getMonth()==h.getMonth()&&fi.getDate()==h.getDate(), now=`${String(h.getHours()).padStart(2,"0")}:${String(h.getMinutes()).padStart(2,"0")}:${String(h.getSeconds()).padStart(2,"0")}`; return !sd || p(v)>=p(now);},
+         msg: "La hora de inicio no puede ser menor a la hora actual"}
+    ]
+
 };
 
 const organizationValidationRules = {
@@ -91,7 +96,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     AssociatedRecords.addRecordToUI(currentUser.id, recordUI, "organizadores", assignedOrganizatorsContainer, true)
 
-    // TODO: If it's editing
     if (mainFormAction === "edit" && dataStore.eventoId) {
         await loadInstalacionesEvento(dataStore.eventoId)
         await loadOrganizadoresEvento(dataStore.eventoId)
@@ -165,7 +169,7 @@ async function loadInstalacionesEvento(eventoId) {
     instalaciones.forEach(inst => {
         AssociatedRecords.addRecordToUI(
             inst.idInstalacion,
-            { ubicacion: inst.ubicacion, tipo: inst.tipo },
+            { ubicacion: inst.ubicacion, tipo: inst.tipo, capacidad: inst.capacidad },
             "instalaciones",
             container
         );

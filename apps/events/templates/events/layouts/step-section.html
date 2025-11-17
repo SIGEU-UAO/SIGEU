@@ -16,9 +16,9 @@
 </div>
 
 {% if type == "Instalaciones Físicas" %}
-    {% include "components/dashboard/modal.html" with modal_title="Asignar Instalación Física" modal_paragraph="Busca las instalaciones físicas que serán ocupadas en el evento..." search_field=modal_buscar_instalaciones_form.ubicacion modal_type="Instalación Física" modal_plural_name="instalaciones" %}
+    {% include "events/components/modals/modal_registro.html" with modal_title="Asignar Instalación Física" modal_paragraph="Busca las instalaciones físicas que serán ocupadas en el evento..." search_field=modal_buscar_instalaciones_form.ubicacion modal_type="Instalación Física" modal_plural_name="instalaciones" %}
 {% elif type == "Organizadores" %}
-    {% include "components/dashboard/modal.html" with modal_title="Asignar Organizador" modal_paragraph="Busca los organizadores que coordinarán junto a ti en el evento..." search_field=modal_buscar_organizadores_form.nombre_completo modal_associate_form=modal_asociar_organizador_form modal_type="Organizador" modal_plural_name="organizadores" %}
+    {% include "events/components/modals/modal_registro.html" with modal_title="Asignar Organizador" modal_paragraph="Busca los organizadores que coordinarán junto a ti en el evento..." search_field=modal_buscar_organizadores_form.nombre_completo modal_associate_form=modal_asociar_organizador_form modal_type="Organizador" modal_plural_name="organizadores" %}
 {% elif type == "Organizaciones" %}
-    {% include "components/dashboard/modal.html" with modal_title="Asignar Organización" modal_paragraph="Busca las organizaciones externas que participarán en el evento..." search_field=modal_buscar_organizaciones_form.nit modal_associate_form=modal_asociar_organizacion_form modal_type="Organizacion" modal_plural_name="organizaciones" %}
+    {% include "events/components/modals/modal_registro.html" with modal_title="Asignar Organización" modal_paragraph="Busca las organizaciones externas que participarán en el evento..." search_field=modal_buscar_organizaciones_form.nit modal_associate_form=modal_asociar_organizacion_form modal_type="Organizacion" modal_plural_name="organizaciones" %}
 {% endif %}
