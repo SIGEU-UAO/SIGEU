@@ -42,7 +42,7 @@ class UsersAPI():
                 "nombres": data.get("nombre"),
                 "apellidos": data.get("apellido"),
                 "telefono": telefono,
-                "numeroIdentificacion": identificacion,
+                "numero_identificacion": identificacion,
                 "rol": rol,
             }
 
@@ -162,7 +162,7 @@ class UsersAPI():
             if request.GET:
                 nombreCompletoSearch = request.GET.get("q")
                 if nombreCompletoSearch:
-                    organizadores = UserService.filtrar_organizadores_por_nombre_completo(nombreCompletoSearch, request.user.idUsuario)
+                    organizadores = UserService.filtrar_organizadores_por_nombre_completo(nombreCompletoSearch, request.user.id_usuario)
 
                      # No results found
                     if not organizadores:
@@ -193,8 +193,8 @@ class UsersAPI():
             
             data = {
                 "organizador": {  
-                    "idUsuario": user["idUsuario"],
-                    "numeroIdentificacion": user["numeroIdentificacion"],
+                    "id_usuario": user["id_usuario"],
+                    "numero_identificacion": user["numero_identificacion"],
                     "nombres": user["nombres"],
                     "apellidos": user["apellidos"],
                     "email": user["email"],
