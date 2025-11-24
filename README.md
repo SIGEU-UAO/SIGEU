@@ -26,7 +26,7 @@ SIGEU es un **sistema web** desarrollado en Django para la gestión integral de 
 - Django 5.2.6
 - MySQL / MariaDB
 - HTML5, CSS3, JavaScript
-- Librerías JS: SweetAlert2, Notyf
+- Librerías JS: Datatables, SweetAlert2, Notyf
 - Python-dotenv
 
 ---
@@ -47,8 +47,8 @@ SIGEU es un **sistema web** desarrollado en Django para la gestión integral de 
 
 1. Clonar el repositorio:
 ```bash
-git clone https://github.com/tu-usuario/sigeu.git
-cd sigeu
+git clone https://github.com/SIGEU-UAO/SIGEU.git
+cd SIGEU
 ```
 
 2. Ejecutar el entorno virtual:
@@ -103,15 +103,24 @@ python manage.py runserver
 sigeu/
 │
 ├── manage.py
+├── .env
+├── .env.template
+├── .gitignore
+├── README.md
+├── requirements.txt
+├── setup.bat
 ├── sigeu/
 │   ├── settings.py
+│   ├── decorators.py
 │   ├── urls.py
-│   └── wsgi.py
+│   ├── wsgi.py
+│   └── asgi.py
 ├── templates/
 │   ├── layouts/
-│   │   ├── base.html
 │   │   └── dashboard.html
 │   └── components/
+│   └── errors/
+│   │   ├── error.html
 ├── static/
 │   ├── assets/
 │   │   ├── img/
@@ -119,19 +128,27 @@ sigeu/
 │   │   └── favicon/
 │   ├── css/
 │   │   ├── base.css
+│   │   ├── dashboard.css
 │   │   └── components/
 │   └── js/
 │       ├── main.js
+│       ├── base.js
 │       └── modules/
 ├── apps/
 │   └── nombre_app/
+│   │   ├── migrations/
 │       ├── admin.py
+│       ├── apps.py
 │       ├── models.py
 │       ├── urls.py
+│       ├── utils.py
 │       ├── services/
-│       │   └── 
-│       ├── views/
-│       │   └── <archivo por grupo de funciones>.py  # cuando aplique
+│       │   └── <archivo por servicio>.py
+│       ├── views.py
+│       ├── serializers/ (cuando aplique)
+│       │   └── <archivo por serializer>.py
+│       ├── validations/ (cuando aplique)
+│       │   └── <archivo por validacion>.py
 │       ├── forms/
 │       │   └── <archivo por formulario>.py
 │       ├── templates/
@@ -143,9 +160,7 @@ sigeu/
 │               ├── assets/
 │               ├── css/
 │               └── js/
-├── .gitignore
-├── .env
-└── .env.template
+
 ```
 
 ---
@@ -219,8 +234,6 @@ Ejemplos:
 - Formularios dinámicos en `forms.py` por app.
 - Componentes reutilizables (inputs, cards, botones, etc.).
 - Optimización de imágenes a WebP (TinyPNG o Squoosh).
-- Comentarios y código en español (excepto clases CSS).
-- Modificar solo los archivos necesarios; cambios mayores deben comunicarse al líder.
 
 ---
 
