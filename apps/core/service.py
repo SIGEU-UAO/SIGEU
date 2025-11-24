@@ -13,7 +13,7 @@ class InstalacionesFisicasService:
             InstalacionFisica.objects
             .filter(ubicacion__icontains=ubicacion)  
             .values(
-                "idInstalacion",   
+                "id_instalacion",   
                 "ubicacion",
                 "tipo",
                 "capacidad"
