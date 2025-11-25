@@ -50,7 +50,7 @@ class UsersAPI():
                 registro["codigo_estudiante"] = data.get("codigo_estudiante")
                 registro["programa_id"] = data.get("programa")
             elif rol == "docente":
-                registro["unidad_academica_id"] = data.get("unidadAcademica")
+                registro["unidad_academica_id"] = data.get("unidad_academica")
             elif rol == "secretaria":
                 registro["facultad_id"] = data.get("facultad")
 

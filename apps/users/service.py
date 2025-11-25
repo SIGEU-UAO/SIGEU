@@ -73,7 +73,7 @@ class UserService:
             s = str(e).lower()
             if "email" in s:
                 raise ValueError("El correo electrónico ya está registrado.") from e
-            if "numero_identificacion" in s:
+            if "numeroidentificacion" in s:
                 raise ValueError("El documento de identidad ya está registrado.") from e
             if "telefono" in s or "phone" in s:
                 raise ValueError("El teléfono ya está registrado.") from e

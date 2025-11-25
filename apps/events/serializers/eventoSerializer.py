@@ -25,14 +25,14 @@ class EventoSerializer:
         ]
 
         return {
-            "idEvento": evento.id_evento,
+            "id_evento": evento.id_evento,
             "nombre": evento.nombre,
             "tipo": evento.tipo,
             "descripcion": evento.descripcion,
-            "fechaInicio": evento.fecha_inicio.isoformat() if evento.fecha_inicio else None,
-            "fechaFin": evento.fecha_fin.isoformat() if evento.fecha_fin else None,
-            "horaInicio": evento.hora_inicio.isoformat() if evento.hora_inicio else None,
-            "horaFin": evento.hora_fin.isoformat() if evento.hora_fin else None,
+            "fecha_inicio": evento.fecha_inicio.isoformat() if evento.fecha_inicio else None,
+            "fecha_fin": evento.fecha_fin.isoformat() if evento.fecha_fin else None,
+            "hora_inicio": evento.hora_inicio.isoformat() if evento.hora_inicio else None,
+            "hora_fin": evento.hora_fin.isoformat() if evento.hora_fin else None,
             "estado": evento.estado,
             "instalaciones": instalaciones,
             "organizadores": organizadores,

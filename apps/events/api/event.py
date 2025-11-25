@@ -130,7 +130,7 @@ class EventoAPI:
                 facultad=request.user.secretaria.facultad
             )
 
-            data = EventoService.serializar_eventos(page_obj, request=request)
+            data = EventoSerializer.serialize_page(page_obj)
             return JsonResponse(data, safe=False)
         
     @login_required

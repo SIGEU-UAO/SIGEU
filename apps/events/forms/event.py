@@ -36,7 +36,7 @@ class RegistroEventoForm(forms.Form):
 
         # Validate that the end time is greater than the start time.
         if hora_inicio and hora_fin and hora_fin <= hora_inicio:
-            self.add_error("horaFin", "La hora de fin debe ser mayor que la hora de inicio.")
+            self.add_error("hora_fin", "La hora de fin debe ser mayor que la hora de inicio.")
 
         # Validate that the capacity is greater than 0
         if capacidad and capacidad <= 0:
