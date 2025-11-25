@@ -28,7 +28,7 @@ export const modalsConfig = [
         modalStepLabel: 'Asignar instalación',
         assignedRecordsContainerSelector: ".main__step--2 .step__cards",
         onClickCallback: function(resultContainer, item) {
-            AssociatedRecords.addRecord({ id: item["idInstalacion"], ubicacion: item["ubicacion"], tipo: item["tipo"], capacidad: item["capacidad"] }, this.type, this.assignedRecordsContainerSelector)
+            AssociatedRecords.addRecord({ id: item["id_instalacion"], ubicacion: item["ubicacion"], tipo: item["tipo"], capacidad: item["capacidad"] }, this.type, this.assignedRecordsContainerSelector)
             Modal.closeModal(resultContainer.closest("dialog"))
         }
     },
@@ -44,7 +44,7 @@ export const modalsConfig = [
         valueField: 'nombre_completo',
         fields: [
             { key: 'nombre_completo', label: '', tag: 'H5' },
-            { key: 'numeroIdentificacion', label: 'Número identificación' },
+            { key: 'numero_identificacion', label: 'Número identificación' },
             { key: 'rol', label: 'Rol' }
         ],
         icon: 'ri-map-pin-user-fill',
@@ -52,7 +52,7 @@ export const modalsConfig = [
         assignedRecordsContainerSelector: ".main__step--3 .step__cards",
         onClickCallback: async function(resultContainer, item) {
             const modal = resultContainer.closest("dialog")
-            const result = await API.fetchGet(`/organizadores/api/${item.idUsuario}`)
+            const result = await API.fetchGet(`/organizadores/api/${item.id_usuario}`)
             if (result.error) return; 
             Modal.renderDetailStep(modal, result.data.organizador, this.type)
             Modal.goStep(modal, "next");
@@ -60,7 +60,8 @@ export const modalsConfig = [
         associateFormSelector: "#asociar-organizador-form",
         associateValidationRules: {
             id: [{ check: (val) => !isNaN(Number(val)) && Number(val) > 0, msg: "El ID debe ser un número válido mayor que 0"}],
-            aval: [{ check: (val) => val instanceof File && val.name.endsWith('.pdf'), msg: "Debes subir un archivo PDF"}]
+            //* Files are optional when editing because they are not automatically loaded.
+            aval: [{ check: (val) => val instanceof File && val.name.endsWith('.pdf'), msg: "Debes subir un archivo PDF", optionalOnEdit: true }]
         },
         fieldsRecordUI: ["rol"],
         fileField: "aval"
@@ -79,14 +80,14 @@ export const modalsConfig = [
         fields: [
             { key: 'nit', label: 'NIT', tag: 'H5' },
             { key: 'nombre', label: 'Nombre' },
-            { key: 'representanteLegal', label: 'Representante Legal' }
+            { key: 'representante_legal', label: 'Representante Legal' }
         ],
         icon: 'ri-map-pin-user-fill',
         modalStepLabel: 'Visualizar datos',
         assignedRecordsContainerSelector: ".main__step--4 .step__cards",
         onClickCallback: async function(resultContainer, item) {
             const modal = resultContainer.closest("dialog")
-            const result = await API.fetchGet(`/orgs/api/${item.idOrganizacion}`)
+            const result = await API.fetchGet(`/orgs/api/${item.id_organizacion}`)
             if (result.error) return; 
             Modal.renderDetailStep(modal, result.data.organizacion, this.type)
             Modal.goStep(modal, "next");
@@ -94,7 +95,8 @@ export const modalsConfig = [
         associateFormSelector: "#asociar-organizacion-form",
         associateValidationRules: {
             id: [{ check: (val) => !isNaN(Number(val)) && Number(val) > 0, msg: "El ID debe ser un número válido mayor que 0"}],
-            certificado_participacion: [{ check: (val) => val instanceof File && val.name.endsWith('.pdf'), msg: "Debes subir un archivo PDF"}]
+            //* Files are optional when editing because they are not automatically loaded.
+            certificado_participacion: [{ check: (val) => val instanceof File && val.name.endsWith('.pdf'), msg: "Debes subir un archivo PDF", optionalOnEdit: true }]
         },
         fieldsRecordUI: ["nit", "nombre"],
         fileField: "certificado_participacion"

@@ -4,7 +4,7 @@ class OrganizacionInvitadaSerializer:
         organizacion_instance = organizacion.organizacion
 
         return {
-            "idOrganizacion": getattr(organizacion_instance, "idOrganizacion", None),
+            "id_organizacion": getattr(organizacion_instance, "id_organizacion", None),
             "representante_asiste": getattr(organizacion, "representante_asiste", None),
             "representante_alterno": getattr(organizacion, "representante_alterno", None),
             "certificado_participacion": organizacion.certificado_participacion.name if getattr(organizacion, "certificado_participacion", None) else None,

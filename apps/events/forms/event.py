@@ -7,10 +7,10 @@ class RegistroEventoForm(forms.Form):
     tipo = forms.ChoiceField(label="Tipo", choices=Evento.TIPOS, required=True)
     descripcion = forms.CharField(label="Descripcion", required=True, max_length=200, widget=forms.Textarea())
     capacidad = forms.IntegerField(label="Capacidad", required=True, widget=forms.NumberInput(attrs={"class": "numeric-field", "min": '1'}))
-    fechaInicio = forms.DateField(label="Fecha Inicio", required=True, widget=forms.DateInput(attrs={'type': 'date', 'min': date.today().isoformat()}))
-    fechaFin = forms.DateField(label="Fecha Fin", required=True, widget=forms.DateInput(attrs={'type': 'date', 'min': date.today().isoformat()}))
-    horaInicio = forms.TimeField(label="Hora inicio", required=True, widget=forms.TimeInput(attrs={'type': 'time'}))
-    horaFin = forms.TimeField(label="Hora fin", required=True, widget=forms.TimeInput(attrs={'type': 'time'}))
+    fecha_inicio = forms.DateField(label="Fecha Inicio", required=True, widget=forms.DateInput(attrs={'type': 'date', 'min': date.today().isoformat()}))
+    fecha_fin = forms.DateField(label="Fecha Fin", required=True, widget=forms.DateInput(attrs={'type': 'date', 'min': date.today().isoformat()}))
+    hora_inicio = forms.TimeField(label="Hora inicio", required=True, widget=forms.TimeInput(attrs={'type': 'time'}))
+    hora_fin = forms.TimeField(label="Hora fin", required=True, widget=forms.TimeInput(attrs={'type': 'time'}))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -20,19 +20,19 @@ class RegistroEventoForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
-        fechaInicio = cleaned_data.get("fechaInicio")
-        fechaFin = cleaned_data.get("fechaFin")
-        hora_inicio = cleaned_data.get("horaInicio")
-        hora_fin = cleaned_data.get("horaFin")
+        fecha_inicio = cleaned_data.get("fecha_inicio")
+        fecha_fin = cleaned_data.get("fecha_fin")
+        hora_inicio = cleaned_data.get("hora_inicio")
+        hora_fin = cleaned_data.get("hora_fin")
         capacidad = cleaned_data.get("capacidad")
 
         # Validate that the date is not earlier than today
-        if fechaInicio and fechaInicio < date.today():
-            self.add_error("fechaInicio", "La fecha del evento debe ser igual o posterior a la fecha actual.")
+        if fecha_inicio and fecha_inicio < date.today():
+            self.add_error("fecha_inicio", "La fecha del evento debe ser igual o posterior a la fecha actual.")
 
         # Validate that the end date is greater than the start date.
-        if fechaFin and fechaFin < fechaInicio:
-            self.add_error("fechaFin", "La fecha de fin debe ser igual o posterior a la fecha de inicio.")
+        if fecha_fin and fecha_fin < fecha_inicio:
+            self.add_error("fecha_fin", "La fecha de fin debe ser igual o posterior a la fecha de inicio.")
 
         # Validate that the end time is greater than the start time.
         if hora_inicio and hora_fin and hora_fin <= hora_inicio:

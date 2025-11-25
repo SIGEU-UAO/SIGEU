@@ -10,15 +10,15 @@ import Alert from "/static/js/modules/classes/Alert.js";
 
 //* Variables
 const validationRules = {
-    fechaInicio: [
-        {check: (v, f) => !f.get("fechaFin") || new Date(v) <= new Date(f.get("fechaFin")), msg: "La fecha de inicio no puede ser mayor que la fecha de fin"}
+    fecha_inicio: [
+        {check: (v, f) => !f.get("fecha_fin") || new Date(v) <= new Date(f.get("fecha_fin")), msg: "La fecha de inicio no puede ser mayor que la fecha de fin"}
     ],
-    horaFin: [
-        {check:(value,formData)=>{const p=s=>{if(!s) return NaN;const[a='0',b='0',c='0']=s.trim().split(':');return Number(a)*3600+Number(b)*60+Number(c)};return p(value)>p(formData.get("horaInicio"))},msg:"La hora fin debe ser mayor a la hora inicio"}
+    hora_fin: [
+        {check:(value,formData)=>{const p=s=>{if(!s) return NaN;const[a='0',b='0',c='0']=s.trim().split(':');return Number(a)*3600+Number(b)*60+Number(c)};return p(value)>p(formData.get("hora_inicio"))},msg:"La hora fin debe ser mayor a la hora inicio"}
     ],
-    horaInicio: [
-        {check: (v,f) => {const p=s=>{if(!s)return NaN;const[a='0',b='0',c='0']=s.trim().split(':');return Number(a)*3600+Number(b)*60+Number(c)}, h=new Date(), fi=new Date(f.get("fechaInicio")+"T00:00:00"), sd=fi.getFullYear()==h.getFullYear()&&fi.getMonth()==h.getMonth()&&fi.getDate()==h.getDate(), now=`${String(h.getHours()).padStart(2,"0")}:${String(h.getMinutes()).padStart(2,"0")}:${String(h.getSeconds()).padStart(2,"0")}`; return !sd || p(v)>=p(now);},
-         msg: "La hora de inicio no puede ser menor a la hora actual"}
+    hora_inicio: [
+        {check: (v,f) => {const p=s=>{if(!s)return NaN;const[a='0',b='0',c='0']=s.trim().split(':');return Number(a)*3600+Number(b)*60+Number(c)}, h=new Date(), fi=new Date(f.get("fecha_inicio")+"T00:00:00"), sd=fi.getFullYear()==h.getFullYear()&&fi.getMonth()==h.getMonth()&&fi.getDate()==h.getDate(), now=`${String(h.getHours()).padStart(2,"0")}:${String(h.getMinutes()).padStart(2,"0")}:${String(h.getSeconds()).padStart(2,"0")}`; return !sd || p(v)>=p(now);},
+         msg: "La hora de inicio no puede ser menor o igual a la hora actual"}
     ]
 
 };
@@ -162,13 +162,13 @@ async function loadInstalacionesEvento(eventoId) {
     if (instalaciones.length === 0) return
 
     // Save only the IDs in the datastore
-    dataStore.instalaciones = instalaciones.map(inst => ({ id: inst.idInstalacion }));
+    dataStore.instalaciones = instalaciones.map(inst => ({ id: inst.id_instalacion }));
 
     const container = document.querySelector(".main__step--2 .step__cards");
 
     instalaciones.forEach(inst => {
         AssociatedRecords.addRecordToUI(
-            inst.idInstalacion,
+            inst.id_instalacion,
             { ubicacion: inst.ubicacion, tipo: inst.tipo, capacidad: inst.capacidad },
             "instalaciones",
             container
@@ -194,7 +194,7 @@ async function loadOrganizadoresEvento(eventoId) {
     // Update the datastore 
     dataStore.organizadores = organizators.map(org => {
         const fd = new FormData();
-        fd.append("id", org.idOrganizador);
+        fd.append("id", org.id_organizador);
         fd.append("aval", org.aval);
         return fd;
     });
@@ -202,14 +202,14 @@ async function loadOrganizadoresEvento(eventoId) {
     organizators.forEach(org => {
         let isCurrentUser = false;
         // If it matches currentUser, remove the existing card from the DOM.
-        if (org.idOrganizador === currentUserId) {
+        if (org.id_organizador === currentUserId) {
             isCurrentUser = true;
             const existingCard = container.querySelector(`.step__card[data-id="${currentUserId}"]`);
             if (existingCard) existingCard.remove();
         }
 
         AssociatedRecords.addRecordToUI(
-            org.idOrganizador,
+            org.id_organizador,
             { rol: org.rol, nombreCompleto: org.nombreCompleto, aval: org.aval },
             "organizadores",
             container,
@@ -235,7 +235,7 @@ async function loadOrganizacionesInvitadasEvento(eventoId) {
     // Update the datastore 
     dataStore.organizaciones = organizations.map(org => {
         const fd = new FormData();
-        fd.append("id", org.idOrganizacion);
+        fd.append("id", org.id_organizacion);
         if (org.representante_asiste) fd.append("representante_asiste", "on")
         else fd.append("representante_alterno", org.representante_alterno)
         fd.append("certificado_participacion", org.certificado_participacion);
@@ -244,7 +244,7 @@ async function loadOrganizacionesInvitadasEvento(eventoId) {
     
     organizations.forEach(org => {
         AssociatedRecords.addRecordToUI(
-            org.idOrganizacion,
+            org.id_organizacion,
             { 
                 nit: org.nit,
                 nombre: org.nombre, 

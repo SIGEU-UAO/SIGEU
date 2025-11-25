@@ -15,11 +15,11 @@
     <div class="card__date">
         <div class="card__day">
             <i class="ri-calendar-event-fill"></i>
-            <span>{{ event.fechaInicio|date:"d/m/Y" }} - {{ event.fechaFin|date:"d/m/Y" }}</span>
+            <span>{{ event.fecha_inicio|date:"d/m/Y" }} - {{ event.fecha_fin|date:"d/m/Y" }}</span>
         </div>
         <div class="card__time">
             <i class="ri-time-fill"></i>
-            <span>{{ event.horaInicio|time:"H:i" }} - {{ event.horaFin|time:"H:i" }}</span>
+            <span>{{ event.hora_inicio|time:"H:i" }} - {{ event.hora_fin|time:"H:i" }}</span>
         </div>
     </div>
 
@@ -52,8 +52,8 @@
                             <div class="card__sub--item--actions">
                                 <button type="button"
                                     class="card__btn card__btn--infoOrg"
-                                    data-orgid="{{ o.organizador.idUsuario }}"
-                                    data-eventid="{{ event.idEvento }}"
+                                    data-orgid="{{ o.organizador.id_usuario }}"
+                                    data-eventid="{{ event.id_evento }}"
                                     title="Ver Más Información">
                                     <i class="ri-more-fill"></i>
                                 </button>
@@ -82,8 +82,8 @@
                             <div class="card__sub--item--actions">
                                 <button type="button"
                                     class="card__btn card__btn--infoOrgExt"
-                                    data-orgextid="{{ oi.organizacion.idOrganizacion }}"
-                                    data-eventoid="{{ event.idEvento }}"
+                                    data-orgextid="{{ oi.organizacion.id_organizacion }}"
+                                    data-eventoid="{{ event.id_evento }}"
                                     title="Ver Más Información">
                                     <i class="ri-more-fill"></i>
                                 </button>
@@ -101,7 +101,7 @@
         <hr>
 
         <div class="card__actions">
-            <button class="card__btn card__btn--eval" data-eventoid="{{ event.idEvento }}">Evaluar evento</button>
+            <button class="card__btn card__btn--eval" data-eventoid="{{ event.id_evento }}">Evaluar evento</button>
         </div>
     </div>
 </div>

@@ -16,22 +16,22 @@ class EventoService:
                 descripcion=data["descripcion"],
                 tipo=data["tipo"],
                 capacidad=data["capacidad"],
-                fechaInicio=data["fechaInicio"],
-                fechaFin=data["fechaFin"],
-                horaInicio=data["horaInicio"],
-                horaFin=data["horaFin"],
+                fecha_inicio=data["fecha_inicio"],
+                fecha_fin=data["fecha_fin"],
+                hora_inicio=data["hora_inicio"],
+                hora_fin=data["hora_fin"],
                 creador=request.user
             )
         except IntegrityError as e:
             raise ValueError("Error al registar el evento.") from e
 
-        return evento.idEvento
+        return evento.id_evento
     
 
     @staticmethod
     def obtener_por_id(id_evento):
         try:
-            evento = Evento.objects.get(idEvento=id_evento)
+            evento = Evento.objects.get(id_evento=id_evento)
             return evento
         except Evento.DoesNotExist:
             return False
@@ -69,13 +69,13 @@ class EventoService:
                 if start_date and end_date:
                     # Filter events that are completely within the date range
                     qs = qs.filter(
-                        fechaInicio__gte=start_date,
-                        fechaFin__lte=end_date
+                        fecha_inicio__gte=start_date,
+                        fecha_fin__lte=end_date
                     )
                 elif start_date:
-                    qs = qs.filter(fechaInicio__gte=start_date)
+                    qs = qs.filter(fecha_inicio__gte=start_date)
                 elif end_date:
-                    qs = qs.filter(fechaFin__lte=end_date)
+                    qs = qs.filter(fecha_fin__lte=end_date)
                 else:
                     qs = qs.none()
 
@@ -94,13 +94,13 @@ class EventoService:
         event = EventoService.obtener_por_id(id_event)
         if not event:
             return None 
-        return usuario.idUsuario == event.creador_id
+        return usuario.id_usuario == event.creador_id
     
     @staticmethod
     def actualizar(event, data):
         #Validate integrity errors for unique fields
         try:
-            campos = ["nombre", "tipo", "descripcion", "capacidad", "fechaInicio", "fechaFin", "horaInicio", "horaFin"]
+            campos = ["nombre", "tipo", "descripcion", "capacidad", "fecha_inicio", "fecha_fin", "hora_inicio", "hora_fin"]
             cambios = {}
 
             for campo in campos:
@@ -111,10 +111,10 @@ class EventoService:
                     cambios[campo] = valor_nuevo
                     
                 # Normalize types
-                if campo in ["fechaInicio", "fechaFin"] and isinstance(valor_nuevo, str):
+                if campo in ["fecha_inicio", "fecha_fin"] and isinstance(valor_nuevo, str):
                     valor_nuevo = datetime.strptime(valor_nuevo, "%Y-%m-%d").date()
 
-                if campo in ["horaInicio", "horaFin"] and isinstance(valor_nuevo, str):
+                if campo in ["hora_inicio", "hora_fin"] and isinstance(valor_nuevo, str):
                     valor_nuevo = datetime.strptime(valor_nuevo, "%H:%M").time()
 
                 # Compare normalized values
@@ -145,10 +145,10 @@ class EventoService:
     @staticmethod
     def actualizar_estado(id_evento, nuevo_estado):
         try:
-            evento = Evento.objects.get(idEvento=id_evento)
+            evento = Evento.objects.get(id_evento=id_evento)
             evento.estado = nuevo_estado
             if nuevo_estado == "Enviado":
-                evento.notificacionEnvioLeida = False
+                evento.notificacion_envio_leida = False
             evento.save()
             return True
         except Evento.DoesNotExist:
@@ -157,8 +157,8 @@ class EventoService:
     @staticmethod
     def actualizar_fecha_envio(id_evento):
         try:
-            evento = Evento.objects.get(idEvento=id_evento)
-            evento.fechaEnvio = timezone.now()
+            evento = Evento.objects.get(id_evento=id_evento)
+            evento.fecha_envio = timezone.now()
             evento.save()
             return True
         except Evento.DoesNotExist:
@@ -175,8 +175,8 @@ class EventoService:
         qs = Evento.objects.filter(
             estado__iexact="Enviado"
         ).filter(
-            Q(creador__estudiante__programa__facultad=facultad) | Q(creador__docente__unidadAcademica__facultad=facultad)
-        ).order_by('fechaEnvio')
+            Q(creador__estudiante__programa__facultad=facultad) | Q(creador__docente__unidad_academica__facultad=facultad)
+        ).order_by('fecha_envio')
 
         paginator = Paginator(qs, per_page)
         try:
@@ -228,7 +228,7 @@ class EventoService:
         try:
             with transaction.atomic():
                 try:
-                    evento = Evento.objects.select_for_update().get(idEvento=id_evento)
+                    evento = Evento.objects.select_for_update().get(id_evento=id_evento)
                 except Evento.DoesNotExist:
                     raise ValueError("Evento no encontrado.")
 
@@ -281,7 +281,7 @@ class EventoService:
 
     @staticmethod
     def listar_eventos_publicados(page=1, per_page=12):
-        qs = Evento.objects.filter(estado__iexact="Aprobado", fechaInicio__gte=timezone.now()).order_by('-fechaInicio')
+        qs = Evento.objects.filter(estado__iexact="Aprobado", fecha_inicio__gte=timezone.now()).order_by('-fecha_inicio')
 
         paginator = Paginator(qs, per_page)
         try:
@@ -300,7 +300,7 @@ class EventoService:
             evaluacionEvento = EvaluacionEvento.objects.create(
                 evento=evento,
                 evaluador=evaluacion_data["evaluador"],
-                tipoEvaluacion=evaluacion_data["tipoEvaluacion"],
+                tipo_evaluacion=evaluacion_data["tipo_evaluacion"],
                 justificacion=evaluacion_data.get("justificacion", ""),
                 acta=evaluacion_data.get("acta", None)
             )
@@ -311,7 +311,7 @@ class EventoService:
     @staticmethod
     def obtener_evaluacion_por_id(id_evaluacion):
         try:
-            evaluacion = EvaluacionEvento.objects.get(idEvaluacion=id_evaluacion)
+            evaluacion = EvaluacionEvento.objects.get(id_evaluacion=id_evaluacion)
             return evaluacion
         except EvaluacionEvento.DoesNotExist:
             return None
@@ -321,9 +321,9 @@ class EventoService:
         if user.rol == "Estudiante" or user.rol == "Docente":
             notificaciones = (
                 EvaluacionEvento.objects
-                .filter(evento__creador=user, notificacionLeida=False)
-                .values("idEvaluacion", "evento__nombre", "tipoEvaluacion", "fechaEvaluacion")
-            .order_by('-fechaEvaluacion')[:10]
+                .filter(evento__creador=user, notificacion_leida=False)
+                .values("id_evaluacion", "evento__nombre", "tipo_evaluacion", "fecha_evaluacion")
+            .order_by('-fecha_evaluacion')[:10]
         )
         elif user.rol == "Secretaria":
             facultad = user.secretaria.facultad
@@ -331,12 +331,12 @@ class EventoService:
                 Evento.objects
                 .filter(
                     Q(creador__estudiante__programa__facultad=facultad) |
-                    Q(creador__docente__unidadAcademica__facultad=facultad),
+                    Q(creador__docente__unidad_academica__facultad=facultad),
                     estado="Enviado",
-                    notificacionEnvioLeida=False
+                    notificacion_envio_leida=False
                 )
-                .values("idEvento", "nombre", "fechaEnvio")
-                .order_by('-fechaEnvio')[:10]
+                .values("id_evento", "nombre", "fecha_envio")
+                .order_by('-fecha_envio')[:10]
             )
 
         return notificaciones
@@ -345,9 +345,9 @@ class EventoService:
     def marcar_como_leida(registro):
         try:
             if isinstance(registro, EvaluacionEvento):
-                registro.notificacionLeida = True
+                registro.notificacion_leida = True
             elif isinstance(registro, Evento):
-                registro.notificacionEnvioLeida = True
+                registro.notificacion_envio_leida = True
             registro.save()
             return True
         except Exception:

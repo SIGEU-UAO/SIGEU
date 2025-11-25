@@ -4,7 +4,7 @@ class OrganizadorSerializer:
         organizador_instance = organizador.organizador
 
         return {
-            "idOrganizador": getattr(organizador_instance, "idUsuario", None),
+            "id_organizador": getattr(organizador_instance, "id_usuario", None),
             "aval": organizador.aval.name if getattr(organizador, "aval", None) else None,
             "nombreCompleto": getattr(organizador_instance, "nombres", "") + " " + getattr(organizador_instance, "apellidos", ""),
             "rol": getattr(organizador_instance, "rol", ""),

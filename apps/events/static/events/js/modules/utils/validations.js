@@ -12,7 +12,7 @@ const validationSchemas = {
         optionalExclusiveKeys: ["representante_asiste", "representante_alterno"],
         types: {
             id: "string", 
-            certificado_participacion: "file"
+            certificado_participacion: ["string", "file"]
         }
     }
 };
@@ -55,6 +55,19 @@ export function validateCollection(type, arr, mainFormAction = "add") {
         const requiredValid = schema.requiredKeys.every(k => {
             const expectedType = schema.types[k];
             const value = getValue(k);
+
+            if (Array.isArray(expectedType)) {
+                return expectedType.some(type => {
+                    if (type === "file") {
+                        if (!(value instanceof File)) return false;
+                        const isPDFType = value.type === "application/pdf";
+                        const isPDFExtension = value.name?.toLowerCase().endsWith(".pdf");
+                        return isPDFType || isPDFExtension;
+                    }
+
+                    return typeof value === type;
+                })
+            }
 
             if (expectedType === "file") {
                 if (!(value instanceof File)) return false;
