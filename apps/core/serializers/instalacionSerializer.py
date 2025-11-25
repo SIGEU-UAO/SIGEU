@@ -4,7 +4,7 @@ class InstalacionSerializer:
         instalacion_instance = instalacion.instalacion
 
         return {
-            "idInstalacion": getattr(instalacion_instance, "id_instalacion", None),
+            "id_instalacion": getattr(instalacion_instance, "id_instalacion", None),
             "ubicacion": getattr(instalacion_instance, "ubicacion", ""),
             "tipo": getattr(instalacion_instance, "tipo", ""),
             "capacidad": getattr(instalacion_instance, "capacidad", None)
