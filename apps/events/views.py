@@ -129,7 +129,6 @@ def eventos_enviados(request):
 
     page_obj = EventoService.listar_eventos_enviados(page=page, per_page=12, facultad=request.user.secretaria.facultad)
 
-
     # --- cálculo de ventana de paginación ---
     paginator = page_obj.paginator
     current = page_obj.number

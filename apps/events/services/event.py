@@ -173,7 +173,9 @@ class EventoService:
     @staticmethod
     def listar_eventos_enviados(facultad, page=1, per_page=12):
         qs = Evento.objects.filter(
-            estado__iexact="Enviado"
+            estado__iexact="Enviado",
+            # Filter events that are not expired
+            fecha_fin__gte=timezone.now().date()
         ).filter(
             Q(creador__estudiante__programa__facultad=facultad) | Q(creador__docente__unidad_academica__facultad=facultad)
         ).order_by('fecha_envio')
