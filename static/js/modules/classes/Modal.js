@@ -1,10 +1,10 @@
 import API from "./API.js";
 import Alert from "./Alert.js";
 import Loader from "./Loader.js"
-import dataStore from "/static/events/js/modules/dataStore.js";
+import dataStore from "/static/events/js/modules/data_store.js";
 import { validarFormData, handleFileInputsInfo } from "../forms/utils.js";
-import { modalOpeners, modalsConfig } from "../components/modalsConfig.js";
-import AssociatedRecords from "/static/events/js/modules/components/associatedRecords.js";
+import { modalOpeners, modalsConfig } from "../components/modals_config.js";
+import AssociatedRecords from "/static/events/js/modules/components/AssociatedRecords.js";
 
 export default class Modal{
     //* Initialize all modals and their steps/progress
@@ -96,20 +96,20 @@ export default class Modal{
     }
 
     static loadEditModalForm(record, form, type, callback, modalConfig, isCurrentUser = false){
+        const id = record instanceof FormData ? record.get("id") : record.id;
+
+        // Helpers
+        const getChangeId = (c) => c instanceof FormData ? Number(c.get("id")) : Number(c.id);
+        const getChangeAction = (c) => c instanceof FormData ? (c.get("accion") || c.get("action")) : (c.accion || c.action);
+
+        // If there is a pending change, use that instead of the original.
+        const changes = dataStore[`${type}_cambios`] || [];
+        const changeIdx = changes.findIndex(c => getChangeId(c) === Number(id) && getChangeAction(c) === "actualizar");
+        if (changeIdx !== -1) record = changes[changeIdx];
+        
         for (let [key, value] of record.entries()) {
             const input = form.querySelector(`[name="${key}"]`);
-            if (!input) continue;
-
-            const id = record instanceof FormData ? record.get("id") : record.id;
-
-            // Helpers
-            const getChangeId = (c) => c instanceof FormData ? Number(c.get("id")) : Number(c.id);
-            const getChangeAction = (c) => c instanceof FormData ? (c.get("accion") || c.get("action")) : (c.accion || c.action);
-
-            // If there is a pending change, use that instead of the original.
-            const changes = dataStore[`${type}_cambios`] || [];
-            const changeIdx = changes.findIndex(c => getChangeId(c) === Number(id) && getChangeAction(c) === "actualizar");
-            if (changeIdx !== -1) record = changes[changeIdx]
+            if (!input) continue;            
 
             if (input.type === "file") {
                 // Display file name in file info
@@ -117,7 +117,8 @@ export default class Modal{
                 input.removeAttribute("required");
                 handleFileInputsInfo(input, fileObj);
             } else if (input.type === "checkbox" || input.type === "radio") {
-                input.checked = input.value == value;
+                console.log(value)
+                input.checked = value === "on";
                 input.dispatchEvent(new Event('change', { bubbles: true }));
             } else {
                 input.value = value;
@@ -431,7 +432,7 @@ export default class Modal{
         }
 
         const modal = document.getElementById(modalConfig.modalId);
-        
+
         // Call the method that updates dataStore and UI
         AssociatedRecords.editRecord(updatedRecord, type, form, modal, modalConfig, isCurrentUser);
         

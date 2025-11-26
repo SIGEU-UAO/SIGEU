@@ -58,12 +58,12 @@ class InstalacionesAsignadasAPI:
             for instalacion in instalaciones_instances:
                 try:
                     InstalacionesAsignadasService.crearInstalacionAsignada({ "evento": evento, "instalacion": instalacion })
-                    guardadas.append(instalacion.idInstalacion)
+                    guardadas.append(instalacion.id_instalacion)
 
                 except Exception as e:
                     # Catch any other errors
                     errores.append({
-                        "id": instalacion.idInstalacion,
+                        "id": instalacion.id_instalacion,
                         "error": str(e)
                     })
                     continue
@@ -154,7 +154,7 @@ class InstalacionesAsignadasAPI:
             to_add = set()
             to_remove = set()
             for a in acciones:
-                inst_id = a["instalacion"].idInstalacion
+                inst_id = a["instalacion"].id_instalacion
                 if a["accion"] == "agregar":
                     to_add.add(inst_id)
                 elif a["accion"] == "eliminar":
@@ -181,17 +181,17 @@ class InstalacionesAsignadasAPI:
                     if accion == "agregar":
                         try:
                             InstalacionesAsignadasService.crearInstalacionAsignada({ "evento": evento, "instalacion": instalacion})
-                            agregadas.append(instalacion.idInstalacion)
+                            agregadas.append(instalacion.id_instalacion)
                         except Exception as e:
-                            errores.append({"id": instalacion.idInstalacion, "error": str(e)})
+                            errores.append({"id": instalacion.id_instalacion, "error": str(e)})
                     elif accion == "eliminar":
                         try:
                             InstalacionesAsignadasService.eliminarInstalacionAsignada({ "evento": evento, "instalacion": instalacion})
-                            eliminadas.append(instalacion.idInstalacion)
+                            eliminadas.append(instalacion.id_instalacion)
                         except Exception as e:
-                            errores.append({"id": instalacion.idInstalacion, "error": str(e)})
+                            errores.append({"id": instalacion.id_instalacion, "error": str(e)})
                 except Exception as e:
-                    errores.append({"id": instalacion.idInstalacion, "error": str(e)})
+                    errores.append({"id": instalacion.id_instalacion, "error": str(e)})
 
             if errores:
                 return JsonResponse({

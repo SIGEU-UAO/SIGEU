@@ -51,7 +51,7 @@ const dataStore = {
                 }
             }
 
-            if ((exists && getChangeAction(changes[idx]) === "agregar") || (!isFormData && originalHas)) {
+            if ((exists && getChangeAction(changes[idx]) === "agregar") || (originalHas)) {
                 return { success: false, message: `El registro con id ${id} ya existe o ya fue agregado.` };
             }
     

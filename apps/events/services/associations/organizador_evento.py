@@ -4,7 +4,7 @@ from django.db import IntegrityError
 from django.db.models import ObjectDoesNotExist
 from ..event import EventoService
 from ...models import OrganizadorEvento
-from ...serializers.organizadorSerializer import OrganizadorSerializer
+from ...serializers.organizador_serializer import OrganizadorSerializer
 
 class OrganizadoresEventosService:
     @staticmethod

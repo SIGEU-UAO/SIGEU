@@ -2,7 +2,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 
 class Facultad(models.Model):
-    idFacultad = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    id_facultad = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     nombre = models.CharField(max_length=100)
 
     def __str__(self):
@@ -14,7 +14,7 @@ class Facultad(models.Model):
         verbose_name_plural = "facultades"
 
 class Programa(models.Model):
-    idPrograma = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    id_programa = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     facultad = models.ForeignKey(Facultad, on_delete=models.CASCADE, related_name="programas")
     nombre = models.CharField(max_length=100)
 
@@ -25,7 +25,7 @@ class Programa(models.Model):
         db_table = "programas"
 
 class UnidadAcademica(models.Model):
-    idUnidadAcademica = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    id_unidad_academica = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     facultad = models.ForeignKey(Facultad, on_delete=models.CASCADE, related_name="unidades_academicas")
     nombre = models.CharField(max_length=100)
 
@@ -47,7 +47,7 @@ class InstalacionFisica(models.Model):
     ]
     
     #Fields
-    idInstalacion = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    id_instalacion = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     ubicacion = models.CharField(max_length=100)
     capacidad = models.IntegerField(validators=[MinValueValidator(0)])
     tipo = models.CharField(max_length=11, choices=TIPOS)

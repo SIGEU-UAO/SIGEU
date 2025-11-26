@@ -18,8 +18,8 @@ class UsuarioManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 class Usuario(AbstractBaseUser, PermissionsMixin):
-    idUsuario = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-    numeroIdentificacion = models.CharField(max_length=10, unique=True, verbose_name="Número de Identificación")
+    id_usuario = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    numero_identificacion = models.CharField(max_length=10, unique=True, verbose_name="Número de Identificación")
     nombres = models.CharField(max_length=100)
     apellidos = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
@@ -28,7 +28,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["numeroIdentificacion", "nombres", "apellidos", "telefono"]
+    REQUIRED_FIELDS = ["numero_identificacion", "nombres", "apellidos", "telefono"]
 
     objects = UsuarioManager()
 
@@ -51,14 +51,14 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         db_table = "usuarios"
     
 class Contrasenia(models.Model):
-    idContrasenia = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-    idUsuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="contrasenias")
-    fechaCambio = models.DateTimeField(auto_now_add=True)
+    id_contrasenia = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    id_usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="contrasenias")
+    fecha_cambio = models.DateTimeField(auto_now_add=True)
     clave = models.CharField(max_length=128)
     es_activa = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"Contraseña de {self.idUsuario.email} ({'Activa' if self.es_activa else 'Inactiva'})"
+        return f"Contraseña de {self.id_usuario.email} ({'Activa' if self.es_activa else 'Inactiva'})"
     
     class Meta:
         db_table = "contrasenias"
@@ -76,10 +76,10 @@ class Estudiante(models.Model):
 
 class Docente(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name="docente", primary_key=True)
-    unidadAcademica = models.ForeignKey(UnidadAcademica, on_delete=models.CASCADE, related_name="docentes")
+    unidad_academica = models.ForeignKey(UnidadAcademica, on_delete=models.CASCADE, related_name="docentes")
 
     def __str__(self):
-        return f"{self.usuario.nombres} {self.usuario.apellidos} ({self.unidadAcademica.nombre})"
+        return f"{self.usuario.nombres} {self.usuario.apellidos} ({self.unidad_academica.nombre})"
     
     class Meta:
         db_table = "docentes"

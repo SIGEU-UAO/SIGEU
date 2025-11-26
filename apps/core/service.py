@@ -13,7 +13,7 @@ class InstalacionesFisicasService:
             InstalacionFisica.objects
             .filter(ubicacion__icontains=ubicacion)  
             .values(
-                "idInstalacion",   
+                "id_instalacion",   
                 "ubicacion",
                 "tipo",
                 "capacidad"
@@ -23,6 +23,6 @@ class InstalacionesFisicasService:
     @staticmethod
     def obtener_por_id(id_instalacion):
         try:
-            return InstalacionFisica.objects.get(idInstalacion=id_instalacion)
+            return InstalacionFisica.objects.get(id_instalacion=id_instalacion)
         except InstalacionFisica.DoesNotExist:
             return False

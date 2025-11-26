@@ -91,6 +91,10 @@
     background-color: var(--blue);
 }
 
+.card__btn--acta{
+    background-color: var(--red);
+}
+
 .card__date{
     display: flex;
     align-items: center;
@@ -132,7 +136,6 @@
 
 .card__details[open] .card__btn{
     text-decoration: none;
-    background-color: var(--red);
 }
 
 .card__justification{

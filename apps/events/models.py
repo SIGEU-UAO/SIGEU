@@ -21,20 +21,20 @@ class Evento(models.Model):
     ]
 
     # Fields
-    idEvento = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    id_evento = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
     estado = models.CharField(max_length=10, choices=ESTADOS, default="Borrador")
     tipo = models.CharField(max_length=100, choices=TIPOS)
     capacidad = models.IntegerField()
-    fechaInicio = models.DateField()
-    fechaFin = models.DateField(default=datetime.date.today)
-    horaInicio = models.TimeField() 
-    horaFin = models.TimeField()
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField(default=datetime.date.today)
+    hora_inicio = models.TimeField() 
+    hora_fin = models.TimeField()
     creador = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="eventos_creados")
     fecha_ultimo_cambio = models.DateTimeField(auto_now=True)
-    fechaEnvio = models.DateTimeField(default=None, null=True, blank=True)
-    notificacionEnvioLeida = models.BooleanField(default=False)
+    fecha_envio = models.DateTimeField(default=None, null=True, blank=True)
+    notificacion_envio_leida = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.nombre} - {self.tipo} ({ self.estado })"
@@ -116,17 +116,17 @@ class EvaluacionEvento(models.Model):
         ("rechazo", "Rechazo")
     ]
     
-    idEvaluacion = models.BigAutoField(auto_created=True, primary_key=True, serialize=False)
+    id_evaluacion = models.BigAutoField(auto_created=True, primary_key=True, serialize=False)
     evento = models.ForeignKey(Evento, on_delete=models.CASCADE, related_name="evaluaciones")
     evaluador = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="evaluaciones")
-    fechaEvaluacion = models.DateTimeField(auto_now_add=True)
-    tipoEvaluacion = models.CharField(max_length=10, choices=TIPOS_EVALUACION)
+    fecha_evaluacion = models.DateTimeField(auto_now_add=True)
+    tipo_evaluacion = models.CharField(max_length=10, choices=TIPOS_EVALUACION)
     justificacion = models.TextField(validators=[MinLengthValidator(10)])
     acta = models.FileField(upload_to=path_acta)
-    notificacionLeida = models.BooleanField(default=False)
+    notificacion_leida = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.evento} - {self.tipoEvaluacion}"
+        return f"{self.evento} - {self.tipo_evaluacion}"
 
     class Meta:
         db_table = "evaluaciones_eventos"

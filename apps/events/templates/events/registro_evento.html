@@ -14,10 +14,10 @@
 
 {% block content %}
     <div class="main__steps">
-        <input type="radio" name="stepper" id="stepper-step--1" hidden>
-        <input type="radio" name="stepper" id="stepper-step--2" hidden>
-        <input type="radio" name="stepper" id="stepper-step--3" hidden>
-        <input type="radio" name="stepper" id="stepper-step--4" hidden>
+        <input type="radio" name="stepper" id="stepper-step--1" aria-label="Paso #1" hidden>
+        <input type="radio" name="stepper" id="stepper-step--2" aria-label="Paso #2" hidden>
+        <input type="radio" name="stepper" id="stepper-step--3" aria-label="Paso #3" hidden>
+        <input type="radio" name="stepper" id="stepper-step--4" aria-label="Paso #4" hidden>
 
         <div class="stepper">
             <div class="step step--1">
@@ -51,14 +51,14 @@
     
             <div class="form__row">
                 {% include "components/form/input.html" with field=form.capacidad %}
-                {% include "components/form/input.html" with field=form.fechaInicio %}
+                {% include "components/form/input.html" with field=form.fecha_inicio %}
             </div>
     
             <div class="form__row">
-                {% include "components/form/input.html" with field=form.fechaFin %}
+                {% include "components/form/input.html" with field=form.fecha_fin %}
                 <div class="form__grid">
-                    {% include "components/form/input.html" with field=form.horaInicio %}
-                    {% include "components/form/input.html" with field=form.horaFin %}
+                    {% include "components/form/input.html" with field=form.hora_inicio %}
+                    {% include "components/form/input.html" with field=form.hora_fin %}
                 </div>
             </div>
     
@@ -69,17 +69,17 @@
     
         {% comment "Step 2" %}-------------- STEP 2 --------------{% endcomment %}
         <section class="main__step main__step--2">
-            {% include "events/layouts/step-section.html" with type="Instalaciones Físicas" title="Asignar instalaciones físicas" subtitle="Espacios físicos asignados" row_btn="Asignar una nueva instalación física" id_btn="asignar-instalacion-btn" %}
+            {% include "events/layouts/step_section.html" with type="Instalaciones Físicas" title="Asignar instalaciones físicas" subtitle="Espacios físicos asignados" row_btn="Asignar una nueva instalación física" id_btn="asignar-instalacion-btn" %}
         </section>
 
         {% comment "Step 3" %}-------------- STEP 3 --------------{% endcomment %}
         <section class="main__step main__step--3">
-            {% include "events/layouts/step-section.html" with type="Organizadores" title="Asignar organizadores" subtitle="Organizadores asignados" row_btn="Asignar un nuevo organizador" id_btn="asignar-organizador-btn" %}
+            {% include "events/layouts/step_section.html" with type="Organizadores" title="Asignar organizadores" subtitle="Organizadores asignados" row_btn="Asignar un nuevo organizador" id_btn="asignar-organizador-btn" %}
         </section>
 
         {% comment "Step 4" %}-------------- STEP 4 --------------{% endcomment %}
         <section class="main__step main__step--4">
-            {% include "events/layouts/step-section.html" with type="Organizaciones" title="Asignar organizaciones externas" subtitle="Organizaciones externas asignadas" row_btn="Asignar una nueva organización" id_btn="asignar-organizacion-btn" %}
+            {% include "events/layouts/step_section.html" with type="Organizaciones" title="Asignar organizaciones externas" subtitle="Organizaciones externas asignadas" row_btn="Asignar una nueva organización" id_btn="asignar-organizacion-btn" %}
         </section>
     </div>
 

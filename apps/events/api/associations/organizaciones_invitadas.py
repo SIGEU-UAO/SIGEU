@@ -161,24 +161,24 @@ class OrganizacionInvitadaAPI:
                     if accion == "agregar":
                         try:
                             OrganizacionesInvitadasService.crearOrganizacionInvitada({ "evento": evento, "organizacion": organizacion, "representante_asiste":item["representante_asiste"], "representante_alterno":item["representante_alterno"], "certificado_participacion":item["certificado_participacion"] })
-                            agregadas.append(organizacion.idOrganizacion)
+                            agregadas.append(organizacion.id_organizacion)
                         except Exception as e:
-                            errores.append({"id": organizacion.idOrganizacion, "error": str(e)})
+                            errores.append({"id": organizacion.id_organizacion, "error": str(e)})
                     elif accion == "actualizar":
                         try:
                             OrganizacionesInvitadasService.actualizarOrganizacionInvitada({ "evento": evento, "organizacion": organizacion, "representante_asiste":item["representante_asiste"], "representante_alterno":item["representante_alterno"], "certificado_participacion":item["certificado_participacion"] })
-                            actualizadas.append(organizacion.idOrganizacion)
+                            actualizadas.append(organizacion.id_organizacion)
                         except Exception as e:
-                            errores.append({"id": organizacion.idOrganizacion, "error": str(e)})
+                            errores.append({"id": organizacion.id_organizacion, "error": str(e)})
                     elif accion == "eliminar":
                         try:
                             OrganizacionesInvitadasService.eliminarOrganizacionInvitada({ "evento": evento, "organizacion": organizacion})
-                            eliminadas.append(organizacion.idOrganizacion)
+                            eliminadas.append(organizacion.id_organizacion)
                         except Exception as e:
-                            errores.append({"id": organizacion.idOrganizacion, "error": str(e)})
+                            errores.append({"id": organizacion.id_organizacion, "error": str(e)})
 
                 except Exception as e:
-                    errores.append({"id": organizacion.idOrganizacion, "error": str(e)})
+                    errores.append({"id": organizacion.id_organizacion, "error": str(e)})
 
             if errores:
                 return JsonResponse({

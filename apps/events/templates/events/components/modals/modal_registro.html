@@ -1,15 +1,15 @@
 <dialog class="modal" id="modal-{{ modal_plural_name|lower }}">
     <div class="modal__content">
-        <input type="radio" name="steps" value="1" hidden>
+        <input type="radio" name="steps" value="1" aria-label="Paso #1 del Modal" hidden>
         {% if modal_type != "Instalación Física" %}
-            <input type="radio" name="steps" value="2" hidden>
-            <input type="radio" name="steps" value="3" hidden>
+            <input type="radio" name="steps" value="2" aria-label="Paso #2 del Modal" hidden>
+            <input type="radio" name="steps" value="3" aria-label="Paso #3 del Modal" hidden>
         {% endif %}
 
         <header class="modal__header">
             <h3>{{ modal_title }}</h3>
-            <button class="modal__close modal__close--icon">
-                <label for="openModal"><i class="ri-close-fill"></i></label>
+            <button class="modal__close modal__close--icon" aria-label="Cerrar Modal">
+                <label for="openModal" aria-label="Cerrar Modal"><i class="ri-close-fill"></i></label>
             </button>
         </header>
 

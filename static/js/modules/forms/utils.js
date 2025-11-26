@@ -1,8 +1,37 @@
 import Alert from "../classes/Alert.js"
 
 //* Validate fields in FormData (Reusable for all forms)
-export function validarFormData(formData, rules = {}) {
+export function validarFormData(formData, rules = {}, formAction = "add", originalData = null) {
+  const isEdit = formAction === "edit";
+  const formDataObj = Object.fromEntries(formData.entries());
+
+  // Check for changes if in edit mode and original data is provided
+  if (isEdit && originalData) {
+    const hasChanges = Object.entries(formDataObj).some(([key, value]) => {
+      const originalValue = originalData.get(key)
+
+      // Special handling for files
+      if (value instanceof File) return true; // If it's a new file, consider it a change
+
+      // Compare string values
+      return String(value) !== String(originalValue);
+    })
+
+    if (!hasChanges) {
+      Alert.info("No se detectaron cambios");
+      return false;
+    }
+  }
+
   for (let [campo, valor] of formData.entries()) {
+    // Skip validation for fields marked as optional in edit mode
+    const isOptionalOnEdit = rules[campo]?.some(rule => rule.optionalOnEdit);
+    const isEmpty = !valor || (valor instanceof File && !valor.name);
+
+    if (isEdit && isOptionalOnEdit && !isEmpty) {
+      continue;
+    }
+
     let val = valor instanceof File ? valor : valor.trim();
 
     // Default validation: empty
@@ -13,7 +42,7 @@ export function validarFormData(formData, rules = {}) {
 
     // Additional validations defined in rules
     if (rules[campo]) {
-      for (let { check, msg } of rules[campo]) {
+      for (let { check, msg } of rules[campo]) {                
         if (!check(val, formData)) {  // formData is passed in case you need to validate against another field
           Alert.error(msg);
           return false;

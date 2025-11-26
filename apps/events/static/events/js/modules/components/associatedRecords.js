@@ -1,4 +1,4 @@
-import dataStore from "../dataStore.js";
+import dataStore from "../data_store.js";
 import { validateCollection } from "../utils/validations.js";
 import { validarFormData, mergeFormDataFieldsArray, mergeFormDataIndexed, handleFileInputsInfo } from "/static/js/modules/forms/utils.js";
 import Modal from "/static/js/modules/classes/Modal.js";
@@ -93,12 +93,17 @@ export default class AssociatedRecords{
         const id = record instanceof FormData ? record.get('id') : record.id;
         const container = document.querySelector(modalConfig.assignedRecordsContainerSelector);
         const buttonStep = container.nextElementSibling.lastElementChild;
+        const originalData = dataStore.getByID(type, id);
 
         // Validate formData
-        if (!validarFormData(record, modalConfig.associateValidationRules)) {
+        if (!validarFormData(record, modalConfig.associateValidationRules, mainFormAction, originalData)) {
             Modal.resetEditModal(modal);
             return;
         };
+
+        for (const [key, value] of (record.entries())) {
+            console.log(key, value);
+        }
     
         // Update or add as appropriate and capture the result
         let result;
@@ -145,7 +150,7 @@ export default class AssociatedRecords{
             confirmButtonText: "Desvincular",
             cancelButtonText: "Cancelar"
         });
-    
+
         if (!result.isConfirmed) return;
 
         let success = false;

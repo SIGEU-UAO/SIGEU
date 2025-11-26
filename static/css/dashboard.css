@@ -1,6 +1,6 @@
 @import url("./components/dashboard/navbar.css");
 @import url("./components/dashboard/sidebar.css");
-@import url("./components/dashboard/modalConfirmation.css");
+@import url("./components/dashboard/modal_confirmation.css");
 
 body{
     min-height: 100vh;
