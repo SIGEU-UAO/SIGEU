@@ -42,7 +42,7 @@ def dashboard(request):
 @login_required
 def editar_perfil(request):
     initial_data = {
-        "numeroIdentificacion": request.user.numeroIdentificacion,
+        "numeroIdentificacion": request.user.numero_identificacion,
         "nombres": request.user.nombres,
         "apellidos": request.user.apellidos,
         "email": request.user.email,

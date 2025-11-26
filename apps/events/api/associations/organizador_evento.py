@@ -65,7 +65,7 @@ class OrganizadorEventoAPI:
                     # Determine type of endorsement according to role
                     tipo = OrganizadorEventoAPI.getAvalType(organizador.rol)
                     OrganizadoresEventosService.crearOrganizadorEvento({ "evento": evento, "organizador": organizador, "aval":item["aval"], "tipo":tipo })
-                    guardadas.append(organizador.idUsuario)
+                    guardadas.append(organizador.id_usuario)
                 except Exception as e:
                     # Catch any other errors
                     errores.append({
@@ -163,25 +163,25 @@ class OrganizadorEventoAPI:
                         try:
                             tipo = OrganizadorEventoAPI.getAvalType(organizador.rol)
                             OrganizadoresEventosService.crearOrganizadorEvento({ "evento": evento, "organizador": organizador, "aval":item["aval"], "tipo":tipo })
-                            agregados.append(organizador.idUsuario)
+                            agregados.append(organizador.id_usuario)
                         except Exception as e:
-                            errores.append({"id": organizador.idUsuario, "error": str(e)})
+                            errores.append({"id": organizador.id_usuario, "error": str(e)})
                     elif accion == "actualizar":
                         try:
                             tipo = OrganizadorEventoAPI.getAvalType(organizador.rol)
                             OrganizadoresEventosService.actualizarOrganizadorEvento({ "evento": evento, "organizador": organizador, "aval":item["aval"], "tipo":tipo })
-                            actualizados.append(organizador.idUsuario)
+                            actualizados.append(organizador.id_usuario)
                         except Exception as e:
-                            errores.append({"id": organizador.idUsuario, "error": str(e)})
+                            errores.append({"id": organizador.id_usuario, "error": str(e)})
                     elif accion == "eliminar":
                         try:
                             OrganizadoresEventosService.eliminarOrganizadorEvento({ "evento": evento, "organizador": organizador})
-                            eliminados.append(organizador.idUsuario)
+                            eliminados.append(organizador.id_usuario)
                         except Exception as e:
-                            errores.append({"id": organizador.idUsuario, "error": str(e)})
+                            errores.append({"id": organizador.id_usuario, "error": str(e)})
 
                 except Exception as e:
-                    errores.append({"id": organizador.idUsuario, "error": str(e)})
+                    errores.append({"id": organizador.id_usuario, "error": str(e)})
 
             if errores:
                 return JsonResponse({

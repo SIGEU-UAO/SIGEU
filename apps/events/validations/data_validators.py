@@ -1,4 +1,3 @@
-from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import UploadedFile
 
 def validate_collection(data, schema):
@@ -17,13 +16,15 @@ def validate_collection(data, schema):
 
         # Detect action if exists
         accion = item.get("accion", "").strip().lower()
+        is_remove = accion == "eliminar"
+        is_edit = accion == "actualizar"
 
         # Determine which required keys to validate
         keys_required = required_keys.copy()
-        if accion == "eliminar" and schema == SCHEMAS["organizadores_evento"]:
+        if is_remove and schema == SCHEMAS["organizadores_evento"]:
             keys_required.remove("aval")  # No need to validate aval when deleting
 
-        if accion == "eliminar" and schema == SCHEMAS["organizaciones_invitadas"]:
+        if is_remove and schema == SCHEMAS["organizaciones_invitadas"]:
             keys_required.remove("representante_asiste")
             keys_required.remove("certificado_participacion")
 
@@ -40,7 +41,7 @@ def validate_collection(data, schema):
         for k in keys_required:
             expected_type = types[k]
             value = item.get(k)
-            if not validate_type(value, expected_type):
+            if not validate_type(value, expected_type, is_edit):
                 return False
 
         # Validate optionals only if they exist
@@ -60,8 +61,7 @@ def validate_collection(data, schema):
     
     return True
 
-def validate_type(value, expected_type):
-    from django.core.files.uploadedfile import UploadedFile
+def validate_type(value, expected_type, is_edit=False):    
     if expected_type == int:
         return isinstance(value, int)
     elif expected_type == bool:
@@ -69,6 +69,8 @@ def validate_type(value, expected_type):
     elif expected_type == str:
         return isinstance(value, str)
     elif expected_type == "file/pdf":
+        if is_edit and value is None:
+            return True
         if not isinstance(value, UploadedFile):
             return False
         return value.name.lower().endswith(".pdf")

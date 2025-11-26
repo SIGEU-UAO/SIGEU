@@ -1,9 +1,10 @@
 from django.db import IntegrityError
 from django.db.models import ObjectDoesNotExist
-from ...serializers.organizacionInvitadaSerializer import OrganizacionInvitadaSerializer
+from ...serializers.organizacion_invitada_serializer import OrganizacionInvitadaSerializer
 from ..event import EventoService
 from ...models import OrganizacionInvitada
 import os
+from django.core.files.uploadedfile import UploadedFile
 
 class OrganizacionesInvitadasService:
     @staticmethod
@@ -47,7 +48,8 @@ class OrganizacionesInvitadasService:
         # Update fields
         rel.representante_asiste = representante_asiste
         rel.representante_alterno = representante_alterno
-        rel.certificado_participacion = certificado_participacion
+        if isinstance(certificado_participacion, UploadedFile):
+            rel.certificado_participacion = certificado_participacion
         rel.save()
 
     @staticmethod

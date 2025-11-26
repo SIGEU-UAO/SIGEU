@@ -19,18 +19,18 @@
         </div>
         {% if type == "Borrador" %}
             <div class="card__header--right">
-                <button class="card__btn card__btn--send" data-id="{{ event.idEvento }}">Enviar</button>
+                <button class="card__btn card__btn--send" data-id="{{ event.id_evento }}">Enviar</button>
             </div>
         {% endif %}
     </div>
     <div class="card__date">
         <div class="card__day">
             <i class="ri-calendar-event-fill"></i>
-            <span>{{ event.fechaInicio|date:"d/m/Y" }} - {{ event.fechaFin|date:"d/m/Y" }}</span>
+            <span>{{ event.fecha_inicio|date:"d/m/Y" }} - {{ event.fecha_fin|date:"d/m/Y" }}</span>
         </div>
         <div class="card__time">
             <i class="ri-time-fill"></i>
-            <span>{{ event.horaInicio|time:"H:i" }} - {{ event.horaFin|time:"H:i" }}</span>
+            <span>{{ event.hora_inicio|time:"H:i" }} - {{ event.hora_fin|time:"H:i" }}</span>
         </div>
     </div>
     <div class="card__main">
@@ -88,7 +88,7 @@
             <hr>
             <details class="card__details card__details--acta">
                 <summary class="card__sub--label">Acta de aprobación:</summary>
-                <a href="{{ event.evaluaciones.last.acta.url }}" target="__blank" class="card__btn" title="Abrir Acta">Ver Acta <i class="ri-file-pdf-2-fill"></i></a>
+                <a href="{{ event.evaluaciones.last.acta.url }}" target="__blank" class="card__btn card__btn--acta" title="Abrir Acta">Ver Acta <i class="ri-file-pdf-2-fill"></i></a>
             </details>
         {% endif %}
 
@@ -104,8 +104,8 @@
             <hr>
         
             <div class="card__actions">
-                <a href="{% url 'editar_evento' event.idEvento %}" class="card__btn card__btn--edit">Editar</a>
-                <button class="card__btn card__btn--delete" data-id="{{ event.idEvento }}">Eliminar</button>
+                <a href="{% url 'editar_evento' event.id_evento %}" class="card__btn card__btn--edit">Editar</a>
+                <button class="card__btn card__btn--delete" data-id="{{ event.id_evento }}">Eliminar</button>
             </div>    
         {% endif %}
 

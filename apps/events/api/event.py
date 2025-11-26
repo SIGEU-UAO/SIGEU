@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.db import transaction
 from ..forms.event import RegistroEventoForm
 from ..services.event import EventoService
-from ..serializers.eventoSerializer import EventoSerializer
+from ..serializers.evento_serializer import EventoSerializer
 from django.contrib.auth.decorators import login_required
 from sigeu.decorators import organizador_required
 from sigeu.decorators import secretaria_required
@@ -23,6 +23,7 @@ class EventoAPI:
                 except ValueError as e:
                     return JsonResponse({"error": str(e)}, status=400)
             else:
+                print(form.errors)
                 return JsonResponse({"error": form.errors}, status=400)
         return JsonResponse({"error": "Método no permitido"}, status=405)
     
@@ -103,7 +104,7 @@ class EventoAPI:
                 return JsonResponse({"error": "El evento debe tener al menos un organizador asignado."}, status=400)
             if not evento.organizadores_asignados.filter(organizador=evento.creador).exists():
                 return JsonResponse({"error": "El creador del evento debe pertenecer a los organizadores del evento."}, status=400)
-            if evento.fechaInicio < date.today():
+            if evento.fecha_inicio < date.today():
                 return JsonResponse({"error": "El evento debe tener una fecha posterior a la actual para poder ser enviado a validación."}, status=400)
             actualizado = EventoService.actualizar_estado(id_evento, "Enviado")
             fecha = EventoService.actualizar_fecha_envio(id_evento)
@@ -129,7 +130,7 @@ class EventoAPI:
                 facultad=request.user.secretaria.facultad
             )
 
-            data = EventoService.serializar_eventos(page_obj, request=request)
+            data = EventoSerializer.serialize_page(page_obj)
             return JsonResponse(data, safe=False)
         
     @login_required
@@ -198,8 +199,8 @@ class EventoAPI:
         if not evento:
             return JsonResponse({"error": "Evento no encontrado."}, status=404)
         ahora = datetime.now()
-        fecha_inicio = evento.fechaInicio
-        hora_inicio = evento.horaInicio  
+        fecha_inicio = evento.fecha_inicio
+        hora_inicio = evento.hora_inicio  
         datetime_inicio_evento = datetime.combine(fecha_inicio, hora_inicio)  
 
         if datetime_inicio_evento < ahora:
@@ -221,7 +222,7 @@ class EventoAPI:
             with transaction.atomic():
                 evaluacion = EventoService.registrar_evaluacion(evento, {
                     "evaluador": request.user,
-                    "tipoEvaluacion": "aprobacion",
+                    "tipo_evaluacion": "aprobacion",
                     "acta": acta
                 })
 
@@ -232,7 +233,7 @@ class EventoAPI:
 
             return JsonResponse({
                 "message": "El evento ha sido aprobado correctamente. Evaluación registrada.",
-                "evaluacion_id": evaluacion.idEvaluacion
+                "evaluacion_id": evaluacion.id_evaluacion
             }, status=200)
 
         except ValueError as e:
@@ -262,7 +263,7 @@ class EventoAPI:
             with transaction.atomic():
                 evaluacion = EventoService.registrar_evaluacion(evento, {
                     "evaluador": request.user,
-                    "tipoEvaluacion": "rechazo",
+                    "tipo_evaluacion": "rechazo",
                     "justificacion": request.POST.get("justificacion")
                 })
 
@@ -273,7 +274,7 @@ class EventoAPI:
 
             return JsonResponse({
                 "message": "El evento ha sido rechazado correctamente. Evaluación registrada.",
-                "evaluacion_id": evaluacion.idEvaluacion
+                "evaluacion_id": evaluacion.id_evaluacion
             }, status=200)
 
         except ValueError as e:

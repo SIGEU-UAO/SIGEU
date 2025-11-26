@@ -4,11 +4,11 @@
     {% if page_obj.has_previous %}
         <a class="pagination__item" 
            href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if search_by %}&search_by={{ search_by }}{% endif %}{% if search_end %}&search_end={{ search_end }}{% endif %}{% if status %}&status={{ status }}{% endif %}" 
-           aria-label="Previous">
+           aria-label="Página Anterior">
             <i class="ri-arrow-left-s-line"></i>
         </a>
     {% else %}
-        <button class="pagination__item pagination__item--disabled" disabled>
+        <button class="pagination__item pagination__item--disabled" aria-label="Página Anterior" disabled>
             <i class="ri-arrow-left-s-line"></i>
         </button>
     {% endif %}
@@ -56,11 +56,11 @@
     {% if page_obj.has_next %}
         <a class="pagination__item" 
            href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if search_by %}&search_by={{ search_by }}{% endif %}{% if search_end %}&search_end={{ search_end }}{% endif %}{% if status %}&status={{ status }}{% endif %}" 
-           aria-label="Next">
+           aria-label="Siguiente Página">
             <i class="ri-arrow-right-s-line"></i>
         </a>
     {% else %}
-        <button class="pagination__item pagination__item--disabled" disabled>
+        <button class="pagination__item pagination__item--disabled" aria-label="Siguiente Página" disabled>
             <i class="ri-arrow-right-s-line"></i>
         </button>
     {% endif %}

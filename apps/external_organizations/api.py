@@ -92,15 +92,15 @@ class OrganizacionesExternasAPI:
             data = []
             for org in page.object_list:
                 data.append({
-                    "id": org.idOrganizacion,
+                    "id": org.id_organizacion,
                     "nit": org.nit,
                     "nombre": org.nombre,
-                    "representanteLegal": org.representanteLegal,
+                    "representanteLegal": org.representante_legal,
                     "telefono": org.telefono,
                     "ubicacion": org.ubicacion,
-                    "sectorEconomico": org.sectorEconomico,
-                    "actividadPrincipal": org.actividadPrincipal,
-                    "esCreador": OrganizacionExternaService.es_creador(request.user, org.idOrganizacion)
+                    "sectorEconomico": org.sector_economico,
+                    "actividadPrincipal": org.actividad_principal,
+                    "esCreador": OrganizacionExternaService.es_creador(request.user, org.id_organizacion)
                 })
             
             return JsonResponse({
@@ -121,14 +121,14 @@ class OrganizacionesExternasAPI:
                 return JsonResponse({"error": "Organización no encontrada."}, status=404)
             
             data = {
-                "idOrganizacion": org.idOrganizacion,
+                "id_organizacion": org.id_organizacion,
                 "nit": org.nit,
                 "nombre": org.nombre,
-                "representanteLegal": org.representanteLegal,
+                "representanteLegal": org.representante_legal,
                 "telefono": org.telefono,
                 "ubicacion": org.ubicacion,
-                "sectorEconomico": org.sectorEconomico,
-                "actividadPrincipal": org.actividadPrincipal,
+                "sectorEconomico": org.sector_economico,
+                "actividadPrincipal": org.actividad_principal,
             }
             return JsonResponse({"organizacion": data}, status=200)
 

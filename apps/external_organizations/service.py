@@ -18,17 +18,17 @@ class OrganizacionExternaService:
             org = OrganizacionExterna.objects.create(
                 nit=data["nit"],
                 nombre=data["nombre"],
-                representanteLegal=data["representante_legal"],
+                representante_legal=data["representante_legal"],
                 telefono=data["telefono"],
                 ubicacion=data["ubicacion"],
-                sectorEconomico=data["sector_economico"],
-                actividadPrincipal=data["actividad_principal"],
+                sector_economico=data["sector_economico"],
+                actividad_principal=data["actividad_principal"],
                 creador=request.user
             )
         except IntegrityError as e:
             raise ValueError("Error de integridad en el registro de organización.") from e
 
-        return org.idOrganizacion
+        return org.id_organizacion
 
     @staticmethod
     def contar():
@@ -49,8 +49,8 @@ class OrganizacionExternaService:
             qs = qs.filter(
                 Q(nombre__icontains=termino)
                 | Q(nit__icontains=termino)
-                | Q(representanteLegal__icontains=termino)
-                | Q(sectorEconomico__icontains=termino)
+                | Q(representante_legal__icontains=termino)
+                | Q(sector_economico__icontains=termino)
             )
         return qs
 
@@ -59,7 +59,7 @@ class OrganizacionExternaService:
         org = OrganizacionExternaService.obtener_por_id(id_org)
         if not org:
             return None 
-        return usuario.idUsuario == org.creador_id
+        return usuario.id_usuario == org.creador_id
     
     @staticmethod
     def filtrar_por_nit(nit):
@@ -69,17 +69,17 @@ class OrganizacionExternaService:
             OrganizacionExterna.objects
             .filter(nit__icontains=nit)  
             .values(
-                "idOrganizacion",   
+                "id_organizacion",   
                 "nit",
                 "nombre",
-                "representanteLegal"
+                "representante_legal"
             )
         )
         
     @staticmethod
     def obtener_por_id(id_organizacion):
         try:
-            return OrganizacionExterna.objects.get(idOrganizacion=id_organizacion)
+            return OrganizacionExterna.objects.get(id_organizacion=id_organizacion)
         except OrganizacionExterna.DoesNotExist:
             return False
     
@@ -97,11 +97,11 @@ class OrganizacionExternaService:
 
             org.nit = data["nit"]
             org.nombre = data["nombre"]
-            org.representanteLegal = data["representante_legal"]
+            org.representante_legal = data["representante_legal"]
             org.telefono = data["telefono"]
             org.ubicacion = data["ubicacion"]
-            org.sectorEconomico = data["sector_economico"]
-            org.actividadPrincipal = data["actividad_principal"]
+            org.sector_economico = data["sector_economico"]
+            org.actividad_principal = data["actividad_principal"]
             org.save()
 
             return org

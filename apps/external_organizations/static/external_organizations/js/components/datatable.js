@@ -56,8 +56,8 @@ export default class Datatable{
                     render: (data, type, row) => {
                         if (data) {
                             return `
-                                <a href="/orgs/editar/${row.id}"><i class="ri-pencil-fill"></i></a>
-                                <button data-id="${row.id}"><i class="ri-delete-bin-fill"></i></button>
+                                <a href="/orgs/editar/${row.id}" aria-label="Editar Organización Externa"><i class="ri-pencil-fill"></i></a>
+                                <button data-id="${row.id}" aria-label="Eliminar Organización Externa"><i class="ri-delete-bin-fill"></i></button>
                             `;
                         }
                         return '';

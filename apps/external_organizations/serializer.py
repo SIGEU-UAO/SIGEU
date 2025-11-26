@@ -2,13 +2,13 @@ class ExternalOrganizationSerializer:
     def serialize_organization(organizacion):
         """Converts an Organization instance into a JSON-serializable dictionary."""
         return {
-            "nit": getattr(organizacion, "idOrganizacion", ""),
+            "nit": getattr(organizacion, "nit", ""),
             "nombre": getattr(organizacion, "nombre", ""),
-            "representanteLegal": getattr(organizacion, "representanteLegal", ""),
+            "representanteLegal": getattr(organizacion, "representante_legal", ""),
             "telefono": getattr(organizacion, "telefono", ""),
             "ubicacion": getattr(organizacion, "ubicacion", ""),
-            "sectorEconomico": getattr(organizacion, "sectorEconomico", ""),
-            "actividadPrincipal": getattr(organizacion, "actividadPrincipal", ""),
+            "sectorEconomico": getattr(organizacion, "sector_economico", ""),
+            "actividadPrincipal": getattr(organizacion, "actividad_principal", ""),
         }
 
     def serialize_organizations(organizaciones, many=False):

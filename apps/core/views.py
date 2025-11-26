@@ -12,7 +12,6 @@ def get_csrf_token(request):
     return response
 
 def index(request):
-    # TODO: Aquí se deben obtener los eventos publicados y que no se hayan pasado de la fecha actual (paginación)
     current_year = datetime.now().year
     return render(request, "core/index.html", {
         "current_year": current_year,

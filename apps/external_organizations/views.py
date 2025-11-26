@@ -31,11 +31,11 @@ def editar(request, pk):
     initial_data = {
         "nit": org.nit,
         "nombre": org.nombre,
-        "representante_legal": org.representanteLegal,
+        "representante_legal": org.representante_legal,
         "telefono": org.telefono,
         "ubicacion": org.ubicacion,
-        "sector_economico": org.sectorEconomico,
-        "actividad_principal": org.actividadPrincipal,
+        "sector_economico": org.sector_economico,
+        "actividad_principal": org.actividad_principal,
     }
     form = RegistroForm(initial=initial_data)
     notificaciones = EventoService.obtener_notificaciones(request.user)

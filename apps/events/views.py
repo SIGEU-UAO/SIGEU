@@ -2,14 +2,13 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from sigeu.decorators import no_superuser_required, organizador_required, secretaria_required
 from .forms.event import RegistroEventoForm
-from .forms.associations.OrganizadorEvento import OrganizadorEventoForm
-from .forms.associations.OrganizacionesInvitadas import OrganizacionInvitadaForm
+from .forms.associations.organizador_evento import OrganizadorEventoForm
+from .forms.associations.organizaciones_invitadas import OrganizacionInvitadaForm
 from apps.core.forms import ModalBuscarInstalacionForm
 from apps.users.forms import ModalBuscarOrganizadorForm
 from apps.external_organizations.forms import RegistroForm, ModalBuscarOrganizacionForm
 from .services.event import EventoService
 from .forms.event import EvaluacionEventoForm
-import random
 
 @no_superuser_required
 @login_required
@@ -43,7 +42,7 @@ def formulario_registro(request):
         "modal_asociar_organizador_form": modalAsociarOrganizadorForm,
         "modal_asociar_organizacion_form": modalAsociarOrganizacionForm,
         "registro_organizacion_form": registroOrganizacionForm,
-        "current_user_data": { "id": current_user.idUsuario, "nombreCompleto": f"{current_user.nombres} {current_user.apellidos}", "rol": current_user.rol },
+        "current_user_data": { "id": current_user.id_usuario, "nombreCompleto": f"{current_user.nombres} {current_user.apellidos}", "rol": current_user.rol },
         "active_page": "registrar-evento",
         "notificaciones": notificaciones,
     })
@@ -128,7 +127,6 @@ def eventos_enviados(request):
         page = 1
 
     page_obj = EventoService.listar_eventos_enviados(page=page, per_page=12, facultad=request.user.secretaria.facultad)
-
 
     # --- cálculo de ventana de paginación ---
     paginator = page_obj.paginator
@@ -265,10 +263,10 @@ def formulario_edicion(request, pk):
         "tipo": event.tipo,
         "descripcion": event.descripcion,
         "capacidad": event.capacidad,
-        "fechaInicio": event.fechaInicio,
-        "fechaFin": event.fechaFin,
-        "horaInicio": event.horaInicio,
-        "horaFin": event.horaFin,
+        "fecha_inicio": event.fecha_inicio.strftime('%Y-%m-%d') if event.fecha_inicio else None,
+        "fecha_fin": event.fecha_fin.strftime('%Y-%m-%d') if event.fecha_fin else None,
+        "hora_inicio": event.hora_inicio,
+        "hora_fin": event.hora_fin,
     }
 
     mainForm = RegistroEventoForm(initial=initial_data)
@@ -300,6 +298,6 @@ def formulario_edicion(request, pk):
         "modal_asociar_organizador_form": modalAsociarOrganizadorForm,
         "modal_asociar_organizacion_form": modalAsociarOrganizacionForm,
         "registro_organizacion_form": registroOrganizacionForm,
-        "current_user_data": { "id": current_user.idUsuario, "nombreCompleto": f"{current_user.nombres} {current_user.apellidos}", "rol": current_user.rol },
+        "current_user_data": { "id": current_user.id_usuario, "nombreCompleto": f"{current_user.nombres} {current_user.apellidos}", "rol": current_user.rol },
         "active_page": "mis-eventos",
     })
