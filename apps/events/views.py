@@ -9,7 +9,6 @@ from apps.users.forms import ModalBuscarOrganizadorForm
 from apps.external_organizations.forms import RegistroForm, ModalBuscarOrganizacionForm
 from .services.event import EventoService
 from .forms.event import EvaluacionEventoForm
-import random
 
 @no_superuser_required
 @login_required
