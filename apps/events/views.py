@@ -2,8 +2,8 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from sigeu.decorators import no_superuser_required, organizador_required, secretaria_required
 from .forms.event import RegistroEventoForm
-from .forms.associations.OrganizadorEvento import OrganizadorEventoForm
-from .forms.associations.OrganizacionesInvitadas import OrganizacionInvitadaForm
+from .forms.associations.organizador_evento import OrganizadorEventoForm
+from .forms.associations.organizaciones_invitadas import OrganizacionInvitadaForm
 from apps.core.forms import ModalBuscarInstalacionForm
 from apps.users.forms import ModalBuscarOrganizadorForm
 from apps.external_organizations.forms import RegistroForm, ModalBuscarOrganizacionForm

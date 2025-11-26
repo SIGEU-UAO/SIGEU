@@ -1,4 +1,4 @@
-import AssociatedRecords from "/static/events/js/modules/components/associatedRecords.js";
+import AssociatedRecords from "/static/events/js/modules/components/AssociatedRecords.js";
 import Modal from "../classes/Modal.js";
 import API from "../classes/API.js";
 

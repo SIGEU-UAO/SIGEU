@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.db import transaction
 from ..forms.event import RegistroEventoForm
 from ..services.event import EventoService
-from ..serializers.eventoSerializer import EventoSerializer
+from ..serializers.evento_serializer import EventoSerializer
 from django.contrib.auth.decorators import login_required
 from sigeu.decorators import organizador_required
 from sigeu.decorators import secretaria_required

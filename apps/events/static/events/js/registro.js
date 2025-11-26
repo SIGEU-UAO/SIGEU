@@ -1,11 +1,11 @@
 import { nitRegex, telefonoRegex } from "/static/js/base.js";
-import { modalsConfig } from "/static/js/modules/components/modalsConfig.js";
+import { modalsConfig } from "/static/js/modules/components/modals_config.js";
 import { goStep, goToListHandler, skipHandler } from "./modules/components/stepper.js";
 import Modal from "/static/js/modules/classes/Modal.js";
 import API from "/static/js/modules/classes/API.js";
 import { validarFormData, handleFileInputsInfo } from "/static/js/modules/forms/utils.js";
-import AssociatedRecords from "./modules/components/associatedRecords.js";
-import dataStore from "./modules/dataStore.js";
+import AssociatedRecords from "./modules/components/AssociatedRecords.js";
+import dataStore from "./modules/data_store.js";
 import Alert from "/static/js/modules/classes/Alert.js";
 
 //* Variables

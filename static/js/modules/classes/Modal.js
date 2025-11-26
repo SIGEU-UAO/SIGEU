@@ -1,10 +1,10 @@
 import API from "./API.js";
 import Alert from "./Alert.js";
 import Loader from "./Loader.js"
-import dataStore from "/static/events/js/modules/dataStore.js";
+import dataStore from "/static/events/js/modules/data_store.js";
 import { validarFormData, handleFileInputsInfo } from "../forms/utils.js";
-import { modalOpeners, modalsConfig } from "../components/modalsConfig.js";
-import AssociatedRecords from "/static/events/js/modules/components/associatedRecords.js";
+import { modalOpeners, modalsConfig } from "../components/modals_config.js";
+import AssociatedRecords from "/static/events/js/modules/components/AssociatedRecords.js";
 
 export default class Modal{
     //* Initialize all modals and their steps/progress

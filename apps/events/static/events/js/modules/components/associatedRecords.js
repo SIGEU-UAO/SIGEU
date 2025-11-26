@@ -1,4 +1,4 @@
-import dataStore from "../dataStore.js";
+import dataStore from "../data_store.js";
 import { validateCollection } from "../utils/validations.js";
 import { validarFormData, mergeFormDataFieldsArray, mergeFormDataIndexed, handleFileInputsInfo } from "/static/js/modules/forms/utils.js";
 import Modal from "/static/js/modules/classes/Modal.js";

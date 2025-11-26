@@ -1,6 +1,6 @@
 from django.db import IntegrityError
 from django.db.models import ObjectDoesNotExist
-from apps.core.serializers.instalacionSerializer import InstalacionSerializer
+from apps.core.serializers.instalacion_serializer import InstalacionSerializer
 from apps.events.services.event import EventoService
 from ...models import InstalacionAsignada
 

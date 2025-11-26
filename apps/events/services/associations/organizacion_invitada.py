@@ -1,6 +1,6 @@
 from django.db import IntegrityError
 from django.db.models import ObjectDoesNotExist
-from ...serializers.organizacionInvitadaSerializer import OrganizacionInvitadaSerializer
+from ...serializers.organizacion_invitada_serializer import OrganizacionInvitadaSerializer
 from ..event import EventoService
 from ...models import OrganizacionInvitada
 import os
