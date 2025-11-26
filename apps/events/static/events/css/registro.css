@@ -3,7 +3,7 @@
 @import url("/static/css/components/forms/form.css");
 @import url("./components/modals/modal_registro.css");
 @import url("/static/css/components/dashboard/loader.css");
-@import url("/static/css/components/dashboard/slide-section.css");
+@import url("/static/css/components/dashboard/slide_section.css");
 
 .main__step{
     max-width: 1100px;

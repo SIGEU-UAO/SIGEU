@@ -12,17 +12,17 @@
     <form id="events-search-form" role="search">
       <div class="form__group">
         <label for="events-search-input" class="form__label form__label--hidden">Desde</label>
-        <input id="events-search-input" type="text" class="search__input" placeholder="Buscar..." aria-label="Buscar">
+        <input id="events-search-input" type="text" class="search__input" placeholder="Buscar..." aria-label="Campo de Busqueda (Si es Fecha, Desde)">
       </div>
       <div class="form__group form__group--hidden">
         <label for="events-search-input-endate" class="form__label">Hasta</label>
-        <input id="events-search-input-endate" type="date" class="search__input">
+        <input id="events-search-input-endate" type="date" class="search__input" aria-label="Campo de Búsqueda (Hasta)">
       </div>
       <select id="events-search-by" name="search_by" class="search__input">
         <option value="nombre" selected>Buscar por Nombre</option>
         <option value="fecha">Buscar por Fecha</option>
       </select>
-      <button type="submit" class="filter__btn--search"><i class="ri-search-2-line"></i></button>
+      <button type="submit" class="filter__btn--search" aria-label="Buscar Eventos"><i class="ri-search-2-line"></i></button>
     </form>
   </div>
 </section>
