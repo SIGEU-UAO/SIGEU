@@ -2,22 +2,22 @@
     <div class="card__left">
         <div class="card__date">
             <span class="card__month">
-                {% if event.fechaInicio|date:"m" == event.fechaFin|date:"m" %}
-                    {{ event.fechaInicio|date:"M"|capfirst }}
+                {% if event.fecha_inicio|date:"m" == event.fecha_fin|date:"m" %}
+                    {{ event.fecha_inicio|date:"M"|capfirst }}
                 {% else %}
-                    {{ event.fechaInicio|date:"M"|capfirst }} - {{ event.fechaFin|date:"M"|capfirst }}
+                    {{ event.fecha_inicio|date:"M"|capfirst }} - {{ event.fecha_fin|date:"M"|capfirst }}
                 {% endif %}
             </span>
             <span class="card__day">
-                {% if event.fechaInicio|date:"d" == event.fechaFin|date:"d" %}
-                    {{ event.fechaInicio|date:"d" }}
+                {% if event.fecha_inicio|date:"d" == event.fecha_fin|date:"d" %}
+                    {{ event.fecha_inicio|date:"d" }}
                 {% else %}
-                    {{ event.fechaInicio|date:"d" }} - {{ event.fechaFin|date:"d" }}
+                    {{ event.fecha_inicio|date:"d" }} - {{ event.fecha_fin|date:"d" }}
                 {% endif %}
             </span>
         </div>
         <span class="card__hour">
-            {{ event.horaInicio }} - {{ event.horaFin }}
+            {{ event.hora_inicio }} - {{ event.hora_fin }}
         </span>
     </div>
     <div class="card__right">
